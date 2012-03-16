@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:baselineAligned="false"
+    android:gravity="center|center_horizontal|center_vertical"
+    android:orientation="horizontal" >
+
+    <GridLayout
+        android:id="@+id/gridLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp" >
+
+        <TextView
+            android:id="@+id/message_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="2"
+            android:layout_columnSpan="3"
+            android:layout_gravity="left"
+            android:layout_row="0"
+            android:text="@string/check_for_upgrade"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/version_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:layout_column="2"
+            android:layout_columnSpan="5"
+            android:layout_gravity="bottom"
+            android:layout_row="1"
+            android:layout_rowSpan="2"
+            />
+
+        <ProgressBar
+            android:id="@+id/spinner"
+            android:layout_column="4"
+            android:layout_row="2"
+            android:layout_rowSpan="5" />
+
+        <ProgressBar
+            android:id="@+id/download_progress_bar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_columnSpan="5"
+            android:layout_gravity="right"
+            android:layout_row="3"
+            android:layout_rowSpan="3" />
+
+        <Button
+            android:id="@+id/upgrade_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="2"
+            android:layout_columnSpan="3"
+            android:layout_row="5"
+            android:layout_rowSpan="2"
+            android:text="@string/upgrade" />
+
+        <Space
+            android:layout_width="1dp"
+            android:layout_height="23dp"
+            android:layout_column="0"
+            android:layout_gravity="fill_horizontal"
+            android:layout_row="1" />
+
+        <Space
+            android:layout_width="30dp"
+            android:layout_height="1dp"
+            android:layout_column="2"
+            android:layout_gravity="fill_horizontal"
+            android:layout_row="0" />
+
+        <Space
+            android:layout_width="21dp"
+            android:layout_height="1dp"
+            android:layout_column="0"
+            android:layout_row="0" />
+
+        <Space
+            android:layout_width="1dp"
+            android:layout_height="14dp"
+            android:layout_column="0"
+            android:layout_row="4" />
+    </GridLayout>
+
+        android:id="@+id/linearLayout1"
+        android:layout_width="318dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal"
+        android:orientation="vertical" >
+</LinearLayout>
