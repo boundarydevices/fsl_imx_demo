@@ -1,0 +1,19 @@
+
+    <resources>
+        <string name="upgrade">Upgrade</string>
+        <string name="version">Version</string>
+        <string name="check_for_upgrade">Checking Upgrade</string>
+        <string name="app_name">Freescale OTA System Update</string>
+        <string name="error_package_verify_failed">package verify failed, incomplete package</string>
+        <string name="download_upgrade_package">Downloading Upgrade Package</string>
+        <string name="error_server_no_package">Error: server don\'t have upgrade package</string>
+        <string name="error_write_file">Error: write file error</string>
+        <string name="already_up_to_date">\nYour software is up to date</string>
+        <string name="have_new">Have new release</string>
+        <string name="error_package_install_failed">package install failed</string>
+        <string name="error_needs_wifi">Error: needs wifi network.</string>
+        <string name="error_cannot_connect_server">Error: Can not connect to server</string>
+        <string name="size">Size </string>
+        <string name="length_unknown">Unknown</string>
+        <string name="verify_package">Verifing package</string>
+    </resources>
