@@ -29,13 +29,12 @@
         <TextView
             android:id="@+id/version_text_view"
             android:layout_width="match_parent"
-            android:layout_height="38dp"
+            android:layout_height="50dp"
             android:layout_column="2"
             android:layout_columnSpan="5"
             android:layout_gravity="bottom"
             android:layout_row="1"
-            android:layout_rowSpan="2"
-            />
+            android:layout_rowSpan="2" />
 
         <ProgressBar
             android:id="@+id/spinner"
