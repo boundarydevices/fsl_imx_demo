@@ -124,15 +124,22 @@ public class OTAServerManager  {
 		}
 	}
 	
-	// return 0 means equal
-	// return 1 means remote is updated
-	// return -1 means you are the latest or the network error
-	public int compareLocalVersionToServer() {
-		if (parser == null)
-			return -1;
+	// return true if needs to upgrade
+	public boolean compareLocalVersionToServer() {
+		if (parser == null) {
+			Log.d(TAG, "compareLocalVersion Without fetch remote prop list.");
+			return false;
+		}
 		String localNumVersion = Build.VERSION.INCREMENTAL;
+		Long buildutc = Build.TIME;
+		Long remoteBuildUTC = (Long.parseLong(parser.getProp("ro.build.date.utc"))) * 1000;
+		// *1000 because Build.java also *1000, align with it.
 		Log.d(TAG, "Local Version:" + Build.VERSION.INCREMENTAL + "server Version:" + parser.getNumRelease());
-		return parser.getNumRelease().compareTo(localNumVersion);
+		boolean upgrade = false;
+		upgrade = remoteBuildUTC > buildutc;
+		// here only check build time, in your case, you may also check build id, etc.
+		Log.d(TAG, "remote BUILD TIME: " + remoteBuildUTC + " local build rtc:" + buildutc);
+		return upgrade;
 	}
 	
 	void publishDownloadProgress(long total, long downloaded) {
