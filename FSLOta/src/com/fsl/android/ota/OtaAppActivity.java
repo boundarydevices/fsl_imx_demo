@@ -163,7 +163,6 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
 			mVersionTextView.post(new Runnable() {
 				public void run() {
 					mVersionTextView.setVisibility(View.VISIBLE);
-					mUpgradeButton.setVisibility(View.VISIBLE);
 				}
 			});
 		} else if (newstate == STATE_IN_DOWNLOADING) {
@@ -273,15 +272,16 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
 		if (error == 0) {
 			// return no error, usually means have a version info from remote server, release name is in @info
 			// needs check here whether the local version is newer then remote version
-			if (mOTAManager.compareLocalVersionToServer() <= 0) {
+			if (mOTAManager.compareLocalVersionToServer() == false) {
 				// we are already latest...
 				mMessageTextView.post(new Runnable() {
 					public void run() {
-						mMessageTextView.setText(Build.VERSION.RELEASE + getText(R.string.already_up_to_date));
+						mMessageTextView.setText(Build.VERSION.RELEASE + ", " + Build.ID + "\n" +  getText(R.string.already_up_to_date));
+						mVersionTextView.setVisibility(View.INVISIBLE);
 					}
 				});
 				
-			} else if (mOTAManager.compareLocalVersionToServer() > 0) {
+			} else if (mOTAManager.compareLocalVersionToServer() == true ) {
 				final BuildPropParser parser = (BuildPropParser) info;
 				final long bytes = mOTAManager.getUpgradePackageSize();
 				mMessageTextView.post(new Runnable() {
@@ -293,7 +293,9 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
 						
 						if (bytes > 0)
 							length = byteCountToDisplaySize(bytes, false);
-						mVersionTextView.setText(getText(R.string.version) +  " " +
+						mVersionTextView.setText(getText(R.string.version) +  ":" +
+								parser.getProp("ro.build.id") + "\n" +
+								getText(R.string.full_version) + ":" +
 								parser.getProp("ro.build.description") + "\n" +
 								getText(R.string.size) + " " + length);
 						mUpgradeButton.setVisibility(View.VISIBLE);
