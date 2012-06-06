@@ -15,6 +15,6 @@
         <string name="error_cannot_connect_server">Error: Can not connect to server</string>
         <string name="size">Size </string>
         <string name="length_unknown">Unknown</string>
-        <string name="verify_package">Verifing package</string>
+        <string name="verify_package">Verifying package</string>
         <string name="full_version">Description</string>
     </resources>
