@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="Profile">System Profile Setting</string>
+    <string name="app_name">FSL System Profile</string>
+    <string name="toastshow">select power mode</string>
+
+</resources>
