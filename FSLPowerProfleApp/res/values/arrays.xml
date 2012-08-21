@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+ <string-array name="profile_name">
+        <item>Performance Mode</item>
+        <item>Power Saving Mode</item>
+        <item>Normal Mode</item>
+    </string-array>
+
+</resources>
