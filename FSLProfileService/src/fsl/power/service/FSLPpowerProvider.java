@@ -282,7 +282,7 @@ public class FSLPpowerProvider extends ContentProvider{
 	    qb.setTables(PROFILE_TABLE_NAME);
 	    qb.setProjectionMap(sProfilesProjectionMap);
 	    defaultOrder=PowerServiceDB.Profiles.DEFAULT_SORT_ORDER;
-	    Log.i(TAG,"=========>query profile table");
+	    if(DEBUG) Log.i(TAG,"=========>query profile table");
 	    break;
 	case PROFILES_ID:
 	    qb.setTables(PROFILE_TABLE_NAME);
@@ -290,7 +290,7 @@ public class FSLPpowerProvider extends ContentProvider{
 	    qb.appendWhere(Profiles._ID + "=" + uri.getPathSegments().get(1));
 	    //qb.appendWhere(Profiles.ProfileID + "=" + uri.getPathSegments().get(1));
 	    defaultOrder=PowerServiceDB.Profiles.DEFAULT_SORT_ORDER;
-	    Log.i(TAG,"=========>query profile table item");
+	    if(DEBUG) Log.i(TAG,"=========>query profile table item");
 	    break;
 	default:
 	    throw new IllegalArgumentException("Unknown URI " + uri);
