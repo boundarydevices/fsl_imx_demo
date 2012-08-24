@@ -131,17 +131,14 @@ public class FSLPowerOptionService extends Service{
 	//showNotification();
 	//testProvider();
 	String sys_rev = get_system_rev();
-	byte rev[] = null;
 	if(!sys_rev.isEmpty()){
-		//rev = sys_rev.getBytes(US-ASCII);
-			gSocType = (int) Long.parseLong(sys_rev.substring(1, 3));
-			Log.i(TAG, "get soc type " + gSocType +"string:"+sys_rev.substring(1,3));
+		gSocType = (int) Long.parseLong(sys_rev.substring(1, 3));
+		Log.i(TAG, "get soc type " + gSocType +"string:"+sys_rev.substring(1,3));
 	}
 	else
 		Log.e(TAG, "could not get SOC type");
 
 	if(!sys_rev.isEmpty()){
-		//rev = sys_rev.getBytes(US-ASCII);
 		gSocRev = (int) Long.parseLong(sys_rev.substring(4));
 		if(DEBUG) Log.i(TAG, "get soc revision " + gSocRev +"string:"+sys_rev.substring(4));
 	}
@@ -276,7 +273,7 @@ public class FSLPowerOptionService extends Service{
 						 new FileInputStream( "/proc/cpuinfo") ), 1000 );
 				version = reader.readLine();
 				while (version != null){
-					Log.i(TAG,"get line: " +version);
+					if(DEBUG) Log.i(TAG,"get line: " +version);
 					version = reader.readLine();
 					if (version.startsWith("Revision")){
 						tmp = version.split(":");
