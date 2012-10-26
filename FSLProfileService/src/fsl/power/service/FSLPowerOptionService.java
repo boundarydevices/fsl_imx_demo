@@ -1,5 +1,5 @@
 /*
-/* Copyright 2012 Freescale Semiconductor, Inc.
+ * Copyright (C) 2012 Freescale Semiconductor, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,6 +52,7 @@ public class FSLPowerOptionService extends Service{
 
 	private static final String TAG = "FSL_POWER_SERVICE";
 	private static final boolean DEBUG = false;
+	private static final int RDSIZE = 100;
 
 	private NotificationManager mNM;
 	private int NOTIFICATION = R.string.start;
@@ -77,6 +78,9 @@ public class FSLPowerOptionService extends Service{
    static private int gSocType = 0;
    static private int gSocRev = 0;
    static private long gProfileId = 3;
+   static private int gMaxFreq = -1;
+   static private int gMinFreq = -1;
+   static private String gFreqTable [] = null;
    public class cpufreq_table {
 	   static final int F198 = 198*1000;
 	   static final int F400 = 396*1000;
@@ -128,8 +132,6 @@ public class FSLPowerOptionService extends Service{
 	mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 	if(DEBUG) Log.i(TAG,"service is starting");
 	timer = new Timer(true);
-	//showNotification();
-	//testProvider();
 	String sys_rev = get_system_rev();
 	if(!sys_rev.isEmpty()){
 		gSocType = (int) Long.parseLong(sys_rev.substring(1, 3));
@@ -152,6 +154,15 @@ public class FSLPowerOptionService extends Service{
 	ContentResolver cr = getContentResolver();
 	Cursor cur = cr.query(PowerServiceDB.Profiles.CONTENT_URI, null, null, null, null);
 	int i  = cur.getCount();
+	String freq_string = getFreqTable();
+	String freq_table[] = freq_string.split(" ");
+	gFreqTable = freq_table;
+	if(DEBUG) {
+		for(String freq : gFreqTable)
+			Log.i(TAG,"get freq table "+freq);
+	}
+	gMaxFreq = (int)(Long.parseLong(freq_table[freq_table.length-1]))/1000;
+	gMinFreq = (int)(Long.parseLong(freq_table[0]))/1000;
 	if (i  == 0)
 		initPowerProfile(gSocType, gSocRev);
 	cur.close();
@@ -309,6 +320,7 @@ public class FSLPowerOptionService extends Service{
 				try {
 
 					String freqs =  String.format("%d",maxf);
+					if(DEBUG) Log.i(TAG, "write  max freq: " + maxf);
 					scaling_max.write(freqs.getBytes());
 					//scaling_max.write(freq);
 					scaling_max.close();
@@ -338,6 +350,26 @@ public class FSLPowerOptionService extends Service{
 					e.printStackTrace();
 				}
 			}
+
+		}
+
+		static String getFreqTable(){
+			String load = null;
+			try {
+				BufferedReader reader = new BufferedReader(new InputStreamReader(
+							new FileInputStream(
+					"/sys/devices/system/cpu/cpu0/cpufreq/scaling_available_frequencies" )
+							), RDSIZE );
+				load = reader.readLine();
+				String freq_table[] = load.split(" ");
+				int minf = (int)(Long.parseLong(freq_table[freq_table.length-1]))/1000;
+				int maxf = (int)(Long.parseLong(freq_table[0]))/1000;
+				Log.i(TAG, "scaling cpu freqs:"+load+", maxf:"+maxf +", minf:"+minf);
+				 reader.close();
+			}catch( IOException ex ){
+				ex.printStackTrace();
+			}
+			return load;
 
 		}
 
@@ -605,8 +637,8 @@ public class FSLPowerOptionService extends Service{
 				   values.put(Profiles.ProfileID, PERFORMANCE);
 				   values.put(Profiles.TempActive, "60");
 				   values.put(Profiles.TempHot, "80");
-				   values.put(Profiles.MaxFreq, "996");
-				   values.put(Profiles.MinFreq, "996");
+				   values.put(Profiles.MaxFreq, gFreqTable[0]);
+				   values.put(Profiles.MinFreq, gFreqTable[0]);
 				   values.put(Profiles.CPUNM, "3");
 				   values.put(Profiles.CPUHotPlug, "0");
 				   values.put(Profiles.CurCPUGov, "performance");
@@ -618,8 +650,8 @@ public class FSLPowerOptionService extends Service{
 				   values.put(Profiles.ProfileID, POWERSAVING);
 				   values.put(Profiles.TempActive, "60");
 				   values.put(Profiles.TempHot, "80");
-				   values.put(Profiles.MaxFreq, "792");
-				   values.put(Profiles.MinFreq, "396");
+				   values.put(Profiles.MaxFreq, gFreqTable[1]);
+				   values.put(Profiles.MinFreq, gFreqTable[gFreqTable.length-1]);
 				   values.put(Profiles.CPUNM, "0");
 				   values.put(Profiles.CPUHotPlug, "1");
 				   values.put(Profiles.CurCPUGov, "ondemand");
@@ -631,8 +663,8 @@ public class FSLPowerOptionService extends Service{
 				   values.put(Profiles.ProfileID, DEFAULT);
 				   values.put(Profiles.TempActive, "50");
 				   values.put(Profiles.TempHot, "70");
-				   values.put(Profiles.MaxFreq, "996");
-				   values.put(Profiles.MinFreq, "396");
+				   values.put(Profiles.MaxFreq, gFreqTable[0]);
+				   values.put(Profiles.MinFreq, gFreqTable[gFreqTable.length-1]);
 				   values.put(Profiles.CPUNM, "1");
 				   values.put(Profiles.CPUHotPlug, "1");
 				   values.put(Profiles.CurCPUGov, "interactive");
@@ -647,8 +679,8 @@ public class FSLPowerOptionService extends Service{
 				   values.put(Profiles.ProfileID, PERFORMANCE);
 				   values.put(Profiles.TempActive, "60");
 				   values.put(Profiles.TempHot, "80");
-				   values.put(Profiles.MaxFreq, "996");
-				   values.put(Profiles.MinFreq, "996");
+				   values.put(Profiles.MaxFreq, gFreqTable[0]);
+				   values.put(Profiles.MinFreq, gFreqTable[0]);
 				   values.put(Profiles.CPUNM, "1");
 				   values.put(Profiles.CPUHotPlug, "0");
 				   values.put(Profiles.CurCPUGov, "performance");
@@ -660,8 +692,8 @@ public class FSLPowerOptionService extends Service{
 				   values.put(Profiles.ProfileID, POWERSAVING);
 				   values.put(Profiles.TempActive, "60");
 				   values.put(Profiles.TempHot, "80");
-				   values.put(Profiles.MaxFreq, "792");
-				   values.put(Profiles.MinFreq, "396");
+				   values.put(Profiles.MaxFreq, gFreqTable[1]);
+				   values.put(Profiles.MinFreq, gFreqTable[gFreqTable.length-1]);
 				   values.put(Profiles.CPUNM, "0");
 				   values.put(Profiles.CPUHotPlug, "0");
 				   values.put(Profiles.CurCPUGov, "ondemand");
@@ -673,8 +705,8 @@ public class FSLPowerOptionService extends Service{
 				   values.put(Profiles.ProfileID, DEFAULT);
 				   values.put(Profiles.TempActive, "50");
 				   values.put(Profiles.TempHot, "70");
-				   values.put(Profiles.MaxFreq, "996");
-				   values.put(Profiles.MinFreq, "396");
+				   values.put(Profiles.MaxFreq, gFreqTable[0]);
+				   values.put(Profiles.MinFreq, gFreqTable[gFreqTable.length-1]);
 				   values.put(Profiles.CPUNM, "1");
 				   values.put(Profiles.CPUHotPlug, "1");
 				   values.put(Profiles.CurCPUGov, "interactive");
@@ -690,8 +722,8 @@ public class FSLPowerOptionService extends Service{
 			long oldid = gProfileId;
 			int hottemp = 80;
 			int acttemp	= 60;
-			int maxfreq = 996;
-			int minfreq = 996;
+			int maxfreq = gMaxFreq*1000;
+			int minfreq = gMinFreq*1000;
 			String goveron = "performance";
 			int cpunm = 3;
 			int status =0;
@@ -732,7 +764,7 @@ public class FSLPowerOptionService extends Service{
 		valuestmp.clear();
 		valuestmp.put(Profiles.PfofileStatus,0);
 		cr.update(Profiles.CONTENT_URI, valuestmp, Profiles.ProfileID+"="+oldid, null);
-		if(DEBUG) Log.i(TAG, "clean profile " + oldid +" status");
+		if(DEBUG) Log.i(TAG, "clean profile " + oldid +" status"+" max freq ="+maxfreq);
 		valuestmp.clear();
 		valuestmp.put(Profiles.PfofileStatus,1);
 		cr.update(Profiles.CONTENT_URI, valuestmp, Profiles.ProfileID+"="+actid, null);
@@ -742,7 +774,7 @@ public class FSLPowerOptionService extends Service{
 		if(DEBUG) Log.i(TAG,"active profile "+ actid+ "/ " + hottemp+ " / " +acttemp+ " / " +cpunm + " / " +hotplug +" / " +maxfreq+" / "  +minfreq +" / " +goveron);
 
 		controlThermal(hottemp,acttemp);
-		setCPUFreq(maxfreq*1000, minfreq*1000);
+		setCPUFreq(maxfreq, minfreq);
 		setcpuNM(cpunm);
 		setCPUGovernor(goveron);
 		//setGPUFPS(gpufps);
