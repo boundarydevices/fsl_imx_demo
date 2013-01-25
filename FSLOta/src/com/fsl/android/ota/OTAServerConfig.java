@@ -58,7 +58,7 @@ public class OTAServerConfig {
 			return false;
 		}
 		
-		return false;
+		return true;
 	}
 	
 	void defaultConfigure(String productname) throws MalformedURLException
