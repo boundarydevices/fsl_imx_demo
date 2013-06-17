@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+	Copyright 2012, Freescale Semiconductor Inc.
+	All rights reserved.
+-->
+<FrameLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/ActiveWindow"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:background="#000000"
+	>
+
+	<!-- video: lowest layer -->
+	<com.freescale.cactusplayer.VideoView
+		android:id="@+id/SurfaceView"
+		android:layout_height="fill_parent"
+		android:layout_width="fill_parent"
+		android:layout_gravity="center"
+		>
+	</com.freescale.cactusplayer.VideoView>
+
+    <!-- layer to show some information -->
+	<LinearLayout
+	    android:orientation="vertical"
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent"
+		>
+		<!-- boundary -->
+		<LinearLayout
+		    android:orientation="vertical"
+		    android:layout_width="fill_parent"
+		    android:layout_height="0dp"
+			android:layout_weight=".05"
+			>
+		</LinearLayout>
+
+		<!-- title/chapter, not used, reserve for future use-->
+		<LinearLayout
+		    android:orientation="vertical"
+		    android:layout_width="fill_parent"
+		    android:layout_height="0dp"
+			android:layout_weight=".80"
+			>
+		    <com.freescale.cactusplayer.AutoHideTextView
+	            android:id="@+id/titlechapter"
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content"
+				android:layout_gravity="top|center"
+				android:background="#a0404080"
+		    	android:textColor="#ffff00"
+		    	android:textStyle="bold"
+				android:textSize="32sp"
+			    />
+		</LinearLayout>
+
+	    <com.freescale.cactusplayer.AutoHideTextView
+            android:id="@+id/info"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_marginLeft="24dp"
+			android:background="#a0404080"
+	    	android:textColor="#ffff00"
+			android:textSize="24sp"
+		    />
+
+		<LinearLayout
+		    android:orientation="vertical"
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+			android:layout_gravity="bottom"
+			>
+		    <com.freescale.cactusplayer.AutoHideTextView
+	            android:id="@+id/subtitletext"
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content"
+				android:layout_gravity="bottom|center"
+				android:background="#00404080"
+		    	android:textColor="#ffff00"
+		    	android:textStyle="bold"
+				android:textSize="32sp"
+			    />
+		</LinearLayout>
+
+		<LinearLayout
+		    android:orientation="vertical"
+		    android:layout_width="fill_parent"
+		    android:layout_height="0dp"
+			android:layout_weight=".08"
+			android:layout_gravity="bottom"
+			>
+		</LinearLayout>
+	</LinearLayout>
+
+	<!--
+		Display law rating string
+	-->
+	<!--
+	<com.freescale.cactusplayer.AutoHideTextView
+		android:id="@+id/lawrating"
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+	    android:layout_marginLeft="48dp"
+	    android:layout_marginTop="48dp"
+		android:background="#a0404080"
+    	android:textColor="#ff0000"
+		android:textSize="32sp"
+		android:textStyle="bold"
+		android:layout_gravity="top|left"
+		/>
+	-->
+	<!--
+		Display error string
+	-->
+	<com.freescale.cactusplayer.AutoHideTextView
+		android:id="@+id/subtitleinfo"
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+	    android:layout_marginTop="48dp"
+	    android:layout_marginLeft="48dp"
+	    android:layout_marginRight="48dp"
+		android:background="#a0404080"
+    	android:textColor="#ff0000"
+		android:textSize="32sp"
+		android:layout_gravity="top|left"
+		/>
+
+	<LinearLayout
+        android:id="@+id/ctrlpanel"
+        android:orientation="horizontal"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+		android:layout_gravity="bottom"
+		android:background="#60000000"
+		>
+		<ImageButton
+		    android:id="@+id/fastback"
+			android:background="@drawable/rw"
+		    android:layout_width="48dp"
+		    android:layout_height="48dp"
+			android:layout_marginLeft="15dp"
+			/>
+		<ImageButton
+		    android:id="@+id/playpause"
+		    android:layout_width="48dp"
+		    android:layout_height="48dp"
+			android:layout_marginLeft="10dp"
+			/>
+		<ImageButton
+		    android:id="@+id/fastforward"
+			android:background="@drawable/ff"
+		    android:layout_width="48dp"
+		    android:layout_height="48dp"
+			android:layout_marginLeft="10dp"
+			/>
+		<TextView android:id="@+id/currentpos"
+		    android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="12dp"
+			android:layout_marginLeft="15dp"
+			android:textColor="#ffffff"
+		    />
+		<SeekBar
+			android:id="@+id/seek"
+			android:layout_weight="1"
+			android:layout_width="0dp"
+			android:layout_height="30dp"
+			android:max="100"
+			android:layout_marginTop="8dp"
+			android:layout_marginLeft="10dp"
+			/>
+
+		<TextView android:id="@+id/duration"
+		    android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="12dp"
+			android:layout_marginLeft="10dp"
+			android:layout_marginRight="15dp"
+			android:textColor="#ffffff"
+		    />
+	</LinearLayout>
+
+</FrameLayout>
+
