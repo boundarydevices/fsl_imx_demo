@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+
+Copyright (c) 2012, Freescale Semiconductor Inc.
+All rights reserved.
+
+You should get a copy of license in this software package named EULA.txt.
+Please read EULA.txt carefully first.
+
+-->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	>
+
+	<LinearLayout
+		android:id="@+id/parentview"
+	    android:orientation="vertical"
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent"
+	    android:background="#000000">
+
+		<GridView
+			android:id="@+id/contentview"
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:columnWidth="196dp"
+			android:numColumns="auto_fit"
+			android:verticalSpacing="16dp"
+			android:horizontalSpacing="4dp"
+			android:stretchMode="columnWidth"
+			android:gravity="center"
+			/>
+	</LinearLayout>
+
+</RelativeLayout>
+
