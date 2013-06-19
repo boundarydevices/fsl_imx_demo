@@ -279,6 +279,7 @@ public class VideoPlayer extends Activity implements SeekBar.OnSeekBarChangeList
 		Log.d(TAG, CLASS + "onResume");
 		super.onResume();
 		////play();
+		start();
 	}
 
 	@Override
@@ -286,20 +287,22 @@ public class VideoPlayer extends Activity implements SeekBar.OnSeekBarChangeList
 		Log.d(TAG, CLASS + "onPause");
 		super.onPause();
 		pause();
+        if(mPlaySpeed != 1)
+            setNormalSpeed();
 	}
 
     @Override
 	protected void onStop() {
 		Log.d(TAG, CLASS + "onStop");
 		super.onStop();
-		stop();
-		mUrl = null;
+		//stop();
+		//mUrl = null;
 
 		// stop screen bright
 		wl.release();
 
 		// clean gui to not disturb onStart() next time
-		initPlay();
+		//initPlay();
 	}
 
 	@Override
