@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.io.FilenameFilter;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -566,6 +567,22 @@ public class VideoPlayer extends Activity implements SeekBar.OnSeekBarChangeList
             int curr = mMediaPlayer.getCurrentPosition();
             updateButtons(UPDATE_PLAYBACK_PROGRESS, 0, curr, 0);
 
+            /*
+            if(mPlaySpeed < 0){
+                mPlaySpeed = 1;
+                updateButtons(UPDATE_PLAYBACK_SPEED, 0, 0, mPlaySpeed);
+                return;
+            }
+            */
+
+            /*
+            if(mPlaySpeed >= 2){
+                mPlaySpeed = 1;
+                updateButtons(UPDATE_PLAYBACK_SPEED, 0, 0, mPlaySpeed);
+                return;
+            }
+            */
+
             stop();
             if(mLoopFile){
                 play();
@@ -605,6 +622,22 @@ public class VideoPlayer extends Activity implements SeekBar.OnSeekBarChangeList
 
     };
 
+
+    class FileAccept implements FilenameFilter
+    {
+        String str =null;
+        FileAccept(String s)
+        {
+            str = s;
+        }
+        public boolean accept(File dir,String name)
+        {
+            if(name.endsWith(".srt") && name.startsWith(str))
+                return true;
+            else
+                return false;
+        }
+    }
     private void play() {
 		if(mUrl != null) {
             try {
@@ -627,12 +660,30 @@ public class VideoPlayer extends Activity implements SeekBar.OnSeekBarChangeList
                 mMediaPlayer.setDisplay(mSurfaceHolder);
                 mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
                 mMediaPlayer.setScreenOnWhilePlaying(true);
-                if(mUrl.lastIndexOf('.') > 0){
-                    String srt_name = mUrl.substring(0,mUrl.lastIndexOf('.')) + ".srt";
-                    File f_srt = new File(srt_name);
-                    if(f_srt.exists())
-                        mMediaPlayer.addTimedTextSource(srt_name, MediaPlayer.MEDIA_MIMETYPE_TEXT_SUBRIP);
-                }
+
+                Log.w(TAG,"Url is " + mUrl);
+
+                do{
+                    if(mUrl.lastIndexOf('.') <= 0 || mUrl.lastIndexOf('.') >= mUrl.length()-1)
+                        break;
+                    if(mUrl.lastIndexOf('/') < 0 || mUrl.lastIndexOf('/') >= mUrl.length()-1)
+                        break;
+
+                    File f_url = new File(mUrl);
+                    //Log.w(TAG,"abs path:" + f_url.getAbsolutePath() + " path:" + f_url.getPath() + " name:" + f_url.getName());
+                    //Log.w(TAG,"parent:" + f_url.getParent());
+
+                    File f_path = f_url.getParentFile();
+                    String name = f_url.getName();
+                    FileAccept filenameFilter = new FileAccept(name.substring(0, name.lastIndexOf('.')));
+                    File list[] = f_path.listFiles(filenameFilter);
+                    for(int i = 0; i < list.length; i++){
+                        String srt_file = list[i].getAbsolutePath();
+                        Log.w(TAG, "srt:" + srt_file);
+                        mMediaPlayer.addTimedTextSource(srt_file, MediaPlayer.MEDIA_MIMETYPE_TEXT_SUBRIP);
+                    }
+
+                }while(false);
                 mMediaPlayer.prepareAsync();
 	        } catch (IOException ex) {
                 Log.w(TAG, "Unable to open content: " + mUrl, ex);
