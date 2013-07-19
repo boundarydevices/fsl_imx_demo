@@ -8,7 +8,7 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src)
 LOCAL_PACKAGE_NAME := WfdSink
 LOCAL_CERTIFICATE := platform
 
-LOCAL_JAVA_LIBRARIES := fsl.imx
+LOCAL_STATIC_JAVA_LIBRARIES := fsl.imx
 
 include $(BUILD_PACKAGE)
 
