@@ -586,8 +586,10 @@ public class VideoPlayer extends Activity implements SeekBar.OnSeekBarChangeList
             stop();
             if(mLoopFile){
                 play();
-                if(mCurSubtitleTrack >= 0)
+                if(mCurSubtitleTrack >= 0){
+                    Log.d(TAG,"onCompletion: select subtitle " + mCurSubtitleTrack);
                     mMediaPlayer.selectTrack(mCurSubtitleTrack);
+                }
                 if(mCurAudioTrack >= 0){
                     mMediaPlayer.selectTrack(mCurAudioTrack);
                     Log.d(TAG,"onCompletion: select audio " + mCurAudioTrack);
@@ -615,8 +617,14 @@ public class VideoPlayer extends Activity implements SeekBar.OnSeekBarChangeList
     private MediaPlayer.OnTimedTextListener mTimedTextListener =
         new MediaPlayer.OnTimedTextListener() {
         public void onTimedText(MediaPlayer mp, TimedText text){
-            if(text != null && mPlaySpeed == 1){
-                mSubtitleTextView.setText(text.getText(), 0);
+            //Log.d(TAG,"onTimeText");
+            if(mPlaySpeed == 1){
+                if(text != null){
+                    //Log.d(TAG,"text is " + text.getText());
+                    mSubtitleTextView.setText(text.getText(), 0);
+                }
+                else
+                    mSubtitleTextView.setText(null, 0);
             }
         }
 
@@ -632,6 +640,8 @@ public class VideoPlayer extends Activity implements SeekBar.OnSeekBarChangeList
         }
         public boolean accept(File dir,String name)
         {
+            //Log.d(TAG,"str:" + str);
+            //Log.d(TAG,"name:" + name);
             if(name.endsWith(".srt") && name.startsWith(str))
                 return true;
             else
@@ -730,23 +740,30 @@ public class VideoPlayer extends Activity implements SeekBar.OnSeekBarChangeList
 
     private void fastForward() {
         if(mMediaPlayer != null) {
+            float newSpeed;
+            int resultSpeed;
             if(mPlaySpeed < 0)
-            mPlaySpeed = 0.5f;
+            newSpeed = 0.5f;
             else if(mPlaySpeed == 1)
-            mPlaySpeed = 0.5f;
+            newSpeed = 0.5f;
             else if(mPlaySpeed == 0.5f)
-            mPlaySpeed = 1.5f;
+            newSpeed = 1.5f;
             else if(mPlaySpeed == 1.5f)
-            mPlaySpeed = 2;
+            newSpeed = 2;
             else
-            mPlaySpeed *= 2;
+            newSpeed = mPlaySpeed * 2;
 
-            if(mPlaySpeed > 16)
-            mPlaySpeed = 0.5f;
+            if(newSpeed > 16)
+                newSpeed = 0.5f;
 
-            mMediaPlayer.setPlaySpeed((int)(mPlaySpeed * 0x10000));
-            //updateButtons(UPDATE_PLAYBACK_STATE, PLAYER_PLAYING, 0, 0);
-            updateButtons(UPDATE_PLAYBACK_SPEED, 0, 0, mPlaySpeed);
+            int[] newScale = {(int)(newSpeed * 0x10000)};
+            mMediaPlayer.setPlaySpeed(newScale);
+
+            if(newScale[0] == newSpeed * 0x10000){
+                mPlaySpeed = newSpeed;
+                updateButtons(UPDATE_PLAYBACK_SPEED, 0, 0, mPlaySpeed);
+            }
+
             //mHandler.sendEmptyMessage(SHOW_PROGRESS);
         }
     }
@@ -755,28 +772,33 @@ public class VideoPlayer extends Activity implements SeekBar.OnSeekBarChangeList
         Log.d(TAG,"fastBackward");
 
 		if(mMediaPlayer != null) {
-			if(mPlaySpeed > -1)
-                mPlaySpeed = -1;
+            float newSpeed;
+            int resultSpeed;
+			if(mPlaySpeed > -2)
+                newSpeed = -2;
             else
-                mPlaySpeed *= 2;
+                newSpeed = mPlaySpeed * 2;
 
-            if(mPlaySpeed < -16)
-                mPlaySpeed = -1;
+            if(newSpeed < -16)
+                newSpeed = -2;
 
-            Log.d(TAG,"speed is " + mPlaySpeed);
+            int[] newScale = {(int)(newSpeed * 0x10000)};
+            mMediaPlayer.setPlaySpeed(newScale);
 
-			mMediaPlayer.setPlaySpeed((int)(mPlaySpeed * 0x10000));
-        	//updateButtons(UPDATE_PLAYBACK_STATE, PLAYER_PLAYING, 0, 0);
-			updateButtons(UPDATE_PLAYBACK_SPEED, 0, 0, mPlaySpeed);
+            if(newScale[0] == newSpeed * 0x10000){
+                mPlaySpeed = newSpeed;
+                updateButtons(UPDATE_PLAYBACK_SPEED, 0, 0, mPlaySpeed);
+            }
             //mHandler.sendEmptyMessage(SHOW_PROGRESS);
 		}
 	}
 
     private void setNormalSpeed() {
-		if(mMediaPlayer != null) {
+        if(mMediaPlayer != null) {
             mPlaySpeed = 1;
-			mMediaPlayer.setPlaySpeed((int)(mPlaySpeed * 0x10000));
-			updateButtons(UPDATE_PLAYBACK_SPEED, 0, 0, mPlaySpeed);
+            int[] newScale = {(int)(mPlaySpeed * 0x10000)};
+            mMediaPlayer.setPlaySpeed(newScale);
+            updateButtons(UPDATE_PLAYBACK_SPEED, 0, 0, mPlaySpeed);
         }
     }
 
