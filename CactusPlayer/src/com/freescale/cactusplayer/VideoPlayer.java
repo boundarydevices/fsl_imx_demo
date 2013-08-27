@@ -564,9 +564,6 @@ public class VideoPlayer extends Activity implements SeekBar.OnSeekBarChangeList
         public void onCompletion(MediaPlayer mp) {
             Log.d(TAG,"onCompletion");
 
-            int curr = mMediaPlayer.getCurrentPosition();
-            updateButtons(UPDATE_PLAYBACK_PROGRESS, 0, curr, 0);
-
             /*
             if(mPlaySpeed < 0){
                 mPlaySpeed = 1;
@@ -584,8 +581,11 @@ public class VideoPlayer extends Activity implements SeekBar.OnSeekBarChangeList
             */
 
             stop();
+            updateButtons(UPDATE_PLAYBACK_PROGRESS, 0, 0, 0);
+
             if(mLoopFile){
-                play();
+                //play();
+                mVideoView.setVisibility(View.VISIBLE);  // call Play() in surfaceCreated()
                 if(mCurSubtitleTrack >= 0){
                     Log.d(TAG,"onCompletion: select subtitle " + mCurSubtitleTrack);
                     mMediaPlayer.selectTrack(mCurSubtitleTrack);
@@ -735,6 +735,7 @@ public class VideoPlayer extends Activity implements SeekBar.OnSeekBarChangeList
             updateButtons(UPDATE_PLAYBACK_STATE, mPlayState, 0, 0);
             mSubtitleTextView.setText(null,0);
             mInfoView.setText(null,0);
+            mVideoView.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -940,7 +941,8 @@ public class VideoPlayer extends Activity implements SeekBar.OnSeekBarChangeList
                 else if(mPlayState == PLAYER_PAUSED)
                     start();
 				else if(mPlayState == PLAYER_STOPPED)
-					play();
+					//play();
+					mVideoView.setVisibility(View.VISIBLE); // call play() in surfaceCreated()
 			}
 			else if(view == mBtnFastForward)
 			{
