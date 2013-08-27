@@ -1,4 +1,6 @@
+ifeq ($(HAVE_FSL_IMX_GPU3D),true)
 LOCAL_PATH:= $(call my-dir)
+
 include $(CLEAR_VARS)
 
 LOCAL_MODULE_TAGS := optional
@@ -15,3 +17,5 @@ include $(BUILD_PACKAGE)
 
 # Use the folloing include to make our test apk.
 include $(call all-makefiles-under,$(LOCAL_PATH))
+
+endif
