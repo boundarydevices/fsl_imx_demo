@@ -17,6 +17,9 @@
 package com.freescale.wfdsink;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
 import android.view.GestureDetector;
@@ -34,6 +37,7 @@ import android.app.Presentation;
 import java.io.File;
 import java.io.FilenameFilter;
 import android.os.Bundle;
+import android.content.DialogInterface;
 import android.content.IntentFilter;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -97,6 +101,8 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
     DisplayMetrics mDisplayMetrics;
     private boolean mButtonShow = false;
     private Timer mTimer;
+    private String mThisName;
+	private TextView currentdevice;
 
     private final BroadcastReceiver mWifiP2pReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
@@ -104,6 +110,7 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
             if (WfdSink.WFD_DEVICE_LIST_CHANGED_ACTION.equals(action)) {
                 WifiP2pDevice[] devices;
                 Parcelable[] devs;
+
                 devs = intent.getParcelableArrayExtra(WfdSink.EXTRA_DEVICE_LIST);
                 if (devs == null || devs.length == 0) {
                     return;
@@ -124,21 +131,33 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
                 mGridView.postInvalidate();
             }
             if (WfdSink.WFD_DEVICE_CONNECTED_ACTION.equals(action)) {
-		Message msg = mHandler.obtainMessage(DO_CONNECTED);
+                Message msg = mHandler.obtainMessage(DO_CONNECTED);
                 boolean connected = intent.getBooleanExtra(WfdSink.EXTRA_CONNECTION_CHANGED, false);
                 msg.arg1 = (connected == true) ? 1 : 0;
-		mHandler.sendMessage(msg);
+                mHandler.sendMessage(msg);
             }
+
+            if (WfdSink.WFD_THIS_DEVICE_UPDATE_ACTION.equals(action)) {
+                currentdevice = (TextView)findViewById(R.id.currentdevice);
+                if (mThisName != mWfdSink.getDeviceName())
+                    mThisName = mWfdSink.getDeviceName();
+                currentdevice.setText(mWfdSink.getDeviceName());
+            }
+
         }
     };
+
+
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(WfdSink.WFD_DEVICE_LIST_CHANGED_ACTION);
         intentFilter.addAction(WfdSink.WFD_DEVICE_CONNECTED_ACTION);
+        intentFilter.addAction(WfdSink.WFD_THIS_DEVICE_UPDATE_ACTION);
         registerReceiver(mWifiP2pReceiver, intentFilter);
 
         mWfdSink = new WfdSink(this);
@@ -167,19 +186,19 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
 
         mGridView.setOnTouchListener(new View.OnTouchListener() {
             public boolean onTouch(View v, MotionEvent mv) {
-                switch (v.getId()) {
-  		    case R.id.gridview:
-		    Log.i(TAG, "onClick");
-		    if (!mStarted && !mConnected) {
-		    mImageButton.setVisibility(View.VISIBLE);
-		    mTimer.schedule(new TimerTask() {
-			public void run () {
-			mHandler.sendEmptyMessage(UPDATE_BUTTON_SHOW);
-			}
-			}, 4000);
-		    }
-		    break;
-		}
+            switch (v.getId()) {
+            case R.id.gridview:
+            Log.i(TAG, "onClick");
+            if (!mStarted && !mConnected) {
+            mImageButton.setVisibility(View.VISIBLE);
+            mTimer.schedule(new TimerTask() {
+                public void run () {
+                mHandler.sendEmptyMessage(UPDATE_BUTTON_SHOW);
+                }
+                }, 4000);
+            }
+            break;
+            }
                 return false;
             }
         });
@@ -195,6 +214,40 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
 
         startSearch();
         mTimer = new Timer(true);
+    }
+
+    @Override
+        public boolean onKeyDown(int keyCode, KeyEvent event) {
+            if(keyCode == KeyEvent.KEYCODE_BACK)
+            {
+                this.exitDialog();
+            }
+            return super.onKeyDown(keyCode, event);
+        }
+
+    private void exitDialog() {
+        Dialog dialog = new AlertDialog.Builder(WfdSinkActivity.this)
+            .setTitle("Program exit ?")
+            .setMessage("Are you sure to exit the program ?")
+            .setIcon(R.drawable.ic_hdmi)
+            .setPositiveButton("confirm", new DialogInterface.OnClickListener(){
+
+                    @Override
+                    public void onClick(DialogInterface arg0, int arg1) {
+                    WfdSinkActivity.this.finish();
+
+                    }
+
+                    }).setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+
+                        }
+                        }).create();
+        dialog.show();
+
     }
 
     public Handler mHandler = new Handler() {
@@ -275,10 +328,10 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
         }
         mWfdSink.stopRtsp();
 
-	mSourcePeers.clear();
-	mPictureAdapter.setSourcePeers(mSourcePeers);
-	mGridView.setAdapter(mPictureAdapter);
-	mGridView.postInvalidate();
+        mSourcePeers.clear();
+        mPictureAdapter.setSourcePeers(mSourcePeers);
+        mGridView.setAdapter(mPictureAdapter);
+        mGridView.postInvalidate();
 
         mSurfaceView.setVisibility(View.INVISIBLE);
         mImageButton.setVisibility(View.GONE);
@@ -287,7 +340,7 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
     }
 
     private void handleConnected(boolean connected) {
-	mConnected = connected;
+        mConnected = connected;
         if (mConnected) {
             mSurfaceView.setVisibility(View.VISIBLE);
             mGridView.setVisibility(View.GONE);
