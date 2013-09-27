@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Ethernet</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="eth_config_title" translatable="false">Configure Ethernet device</string>
+    <string name="eth_setting" translatable="false">Ethernet setting</string>
+    <string name="eth_dev_list" translatable="false">Ethernet Devices:</string>
+    <string name="eth_con_type" translatable="false">Connection Type</string>
+    <string name="eth_con_type_dhcp" translatable="false">DHCP</string>
+    <string name="eth_con_type_manual" translatable="false">Static IP</string>
+    <string name="eth_dns" translatable="false">DNS address</string>
+    <string name="eth_gw" translatable="false">Gateway address</string>
+    <string name="eth_ipaddr" translatable="false">IP address</string>
+    <string name="eth_quick_toggle_title" translatable="false">Ethernet</string>
+    <string name="eth_quick_toggle_summary" translatable="false">Turn on Ethernet</string>
+    <string name="eth_check_config" translatable="false">Check Ethernet</string>
+    <string name="eth_do_config" translatable="false">Configure Ethernet</string>
+    <string name="eth_conf_summary" translatable="false">Configure Ethernet devices</string>
+    <string name="eth_mask" translatable="false">Netmask</string>
+    <string name="eth_toggle_summary_off" translatable="false">Turn off Ethernet</string>
+    <string name="eth_toggle_summary_on" translatable="false">Turn on Ethernet</string>
+    <string name="menu_save">confirm</string>
+    <string name="menu_cancel">cancel</string>
+</resources>
