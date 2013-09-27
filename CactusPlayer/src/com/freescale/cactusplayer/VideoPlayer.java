@@ -283,14 +283,17 @@ public class VideoPlayer extends Activity implements SeekBar.OnSeekBarChangeList
 		start();
 	}
 
-	@Override
-	protected void onPause() {
-		Log.d(TAG, CLASS + "onPause");
-		super.onPause();
-		pause();
-        if(mPlaySpeed != 1)
-            setNormalSpeed();
-	}
+    @Override
+    protected void onPause() {
+        Log.d(TAG, CLASS + "onPause");
+        super.onPause();
+        if(mPlayState == PLAYER_PLAYING){
+            pause();
+            Log.d(TAG,"speed is "  + mPlaySpeed);
+            if(mPlaySpeed != 1)
+                setNormalSpeed();
+        }
+    }
 
     @Override
 	protected void onStop() {
