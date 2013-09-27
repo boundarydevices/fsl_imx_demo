@@ -25,7 +25,7 @@ import android.view.View;
 import android.view.GestureDetector;
 import android.widget.VideoView;
 import android.view.MotionEvent;
-
+import android.net.wifi.WifiManager;
 import android.util.Log;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -44,9 +44,12 @@ import java.util.TimerTask;
 import java.util.List;
 import java.util.ArrayList;
 import android.net.Uri;
+import android.content.Intent;
+import android.provider.Settings;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.view.Display;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -102,8 +105,9 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
     private boolean mButtonShow = false;
     private Timer mTimer;
     private String mThisName;
-	private TextView currentdevice;
-
+    private TextView currentdevice;
+    private TextView status;
+    private LinearLayout layout;    
     private final BroadcastReceiver mWifiP2pReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
@@ -141,7 +145,7 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
                 currentdevice = (TextView)findViewById(R.id.currentdevice);
                 if (mThisName != mWfdSink.getDeviceName())
                     mThisName = mWfdSink.getDeviceName();
-                currentdevice.setText(mWfdSink.getDeviceName());
+                currentdevice.setText("SSID:" + mWfdSink.getDeviceName());
             }
 
         }
@@ -167,10 +171,17 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
         SurfaceHolder holder = mSurfaceView.getHolder();
         holder.addCallback(this);
         holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-
+	    WifiManager manager = (WifiManager) getSystemService(WIFI_SERVICE);
         mGridView = (GridView)findViewById(R.id.gridview);
         mImageButton = (ImageButton)findViewById(R.id.sink_player);
 
+        status = (TextView)findViewById(R.id.status);
+        layout = (LinearLayout)findViewById(R.id.linearLayout1);
+	if(manager.isWifiEnabled()){
+				
+		}else{
+		     wifiDialog();
+		     }		
         mImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
@@ -184,31 +195,11 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
             }
         });
 
-        mGridView.setOnTouchListener(new View.OnTouchListener() {
-            public boolean onTouch(View v, MotionEvent mv) {
-            switch (v.getId()) {
-            case R.id.gridview:
-            Log.i(TAG, "onClick");
-            if (!mStarted && !mConnected) {
-            mImageButton.setVisibility(View.VISIBLE);
-            mTimer.schedule(new TimerTask() {
-                public void run () {
-                mHandler.sendEmptyMessage(UPDATE_BUTTON_SHOW);
-                }
-                }, 4000);
-            }
-            break;
-            }
-                return false;
-            }
-        });
-
         mPictureAdapter = new PictureAdapter(this);
         mDisplayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(mDisplayMetrics);
 
         mSurfaceView.setVisibility(View.INVISIBLE);
-        mImageButton.setVisibility(View.GONE);
         mGridView.setVisibility(View.VISIBLE);
         mGridView.setAdapter(mPictureAdapter);
 
@@ -225,6 +216,29 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
             return super.onKeyDown(keyCode, event);
         }
 
+	private void wifiDialog()
+	{
+		Dialog dialog = new AlertDialog.Builder(WfdSinkActivity.this)
+		.setTitle("WI-FI hasn't open ! ").setMessage("Are you sure to open now? If you cancel then will exit!").setIcon(R.drawable.ic_hdmi)
+		.setPositiveButton("confirm", new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				
+				startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+
+			}
+		}).setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				System.exit(-1);
+				
+			}
+		}).create();
+		dialog.show();
+	}		
+		
     private void exitDialog() {
         Dialog dialog = new AlertDialog.Builder(WfdSinkActivity.this)
             .setTitle("Program exit ?")
@@ -257,25 +271,22 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
                     mGridView.setAdapter(mPictureAdapter);
                     break;
 
-                case UPDATE_BUTTON_SHOW:
-                    mButtonShow = false;
-                    mImageButton.setVisibility(View.GONE);
-                    break;
-
                 case UPDATE_SURFACE:
                     SurfaceHolder holder = (SurfaceHolder)msg.obj;
                     handleUpdateSurface(holder);
                     break;
 
-                case START_PLAY:
+                case START_PLAY:                	
                     handleStartPlay();
                     break;
 
                 case STOP_PLAY:
+                	status.setText("Status:Disconnected!");
                     handleStopPlay();
                     break;
 
                 case DO_CONNECTED:
+                	status.setText("Status:Connected");
                     boolean connected = (msg.arg1 == 1);
                     handleConnected(connected);
                     break;
@@ -332,9 +343,8 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
         mPictureAdapter.setSourcePeers(mSourcePeers);
         mGridView.setAdapter(mPictureAdapter);
         mGridView.postInvalidate();
-
+        layout.setVisibility(View.VISIBLE);
         mSurfaceView.setVisibility(View.INVISIBLE);
-        mImageButton.setVisibility(View.GONE);
         mGridView.setVisibility(View.VISIBLE);
         mStarted = false;
     }
@@ -342,6 +352,7 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
     private void handleConnected(boolean connected) {
         mConnected = connected;
         if (mConnected) {
+        	layout.setVisibility(View.INVISIBLE);
             mSurfaceView.setVisibility(View.VISIBLE);
             mGridView.setVisibility(View.GONE);
             startPlayer();
@@ -352,6 +363,7 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
     }
 
     private void startSearch() {
+    	status.setText("Status:Searching for peers");
         mWfdSink.startSearch();
         //mWfdSink.setDeviceName("Android_me");
     }
@@ -378,19 +390,6 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
         mHandler.sendMessage(msg);
     }
 
-    public boolean onTouchEvent(MotionEvent event) {
-        super.onTouchEvent(event);
-        Log.w(TAG, "onTouchEvent");
-        if (!mStarted && !mConnected) {
-            mImageButton.setVisibility(View.VISIBLE);
-            mTimer.schedule(new TimerTask() {
-                public void run () {
-                    mHandler.sendEmptyMessage(UPDATE_BUTTON_SHOW);
-                }
-            }, 4000);
-        }
-        return true;
-    }
 
     public void onStart() {
         super.onStart();
