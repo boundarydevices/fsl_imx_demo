@@ -361,12 +361,12 @@ public class VideoPlayer extends Activity implements SeekBar.OnSeekBarChangeList
 
 			if(val1 > 0)
 				mDuration = val1;
-			else if(mDuration == 0)
+			else if(mDuration == 0 && mMediaPlayer != null)
 				mDuration = mMediaPlayer.getDuration();
 
 			val2 -= mTimeOffset; // offset by mTimeOffset
 
-			if(val2 > mDuration)
+			if(mDuration != 0 && val2 > mDuration)
 				val2 = mDuration;
 			else if(val2 < 0)
 				val2 = 0;
