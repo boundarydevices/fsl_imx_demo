@@ -17,8 +17,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg"
 	android:layout_gravity="center"
+	android:background="#000000"
     android:orientation="vertical" >
 
     <RelativeLayout
@@ -41,15 +41,7 @@
             <RelativeLayout
                 style="@style/style_quicksettings_category_title"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
-
-                <TextView
-                    style="@style/style_quicksettings_category_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_centerVertical="true"
-                    android:text="@string/search" />
+                android:layout_height="match_parent" >
 
                 <ImageButton
                     android:id="@+id/sink_player"
@@ -58,9 +50,50 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="30dp"
-                    android:src="@drawable/ic_refresh" />
+                    android:background="@drawable/ic_refresh" />
+
+                <ImageView
+                    android:id="@+id/imageView1"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="17dp"
+                    android:src="@drawable/ic_hdmi" />
+
+                <LinearLayout
+                    android:id="@+id/linearLayout2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="253dp"
+                    android:layout_toRightOf="@+id/imageView1"
+                    android:orientation="vertical" >
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/currentdevice"
+                    style="@style/style_quicksettings_category_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@+id/linearLayout2"
+                    android:layout_marginLeft="16dp"
+                    android:layout_toRightOf="@+id/imageView1"
+                    android:text="@string/current"
+                    android:textSize="25sp" />
+
+                <TextView
+                    android:id="@+id/status"
+                    style="@style/style_quicksettings_category_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@+id/imageView1"
+                    android:layout_alignLeft="@+id/currentdevice"
+                    android:text="@string/status"
+                    android:textSize="25sp" />
 
             </RelativeLayout>
+
         </LinearLayout>
 
         <GridView
@@ -71,37 +104,6 @@
             android:layout_below="@+id/linearLayout1"
             android:numColumns="4" >
         </GridView>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="true"
-            android:layout_below="@+id/gridview"
-            android:orientation="vertical" >
-
-            <TextView
-                android:id="@+id/text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/current"
-                android:textSize="30sp" />
-
-            <ImageView
-                android:id="@+id/imageView1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_hdmi" />
-
-            <TextView
-                android:id="@+id/currentdevice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/current"
-                android:textSize="25sp" />
-
-        </LinearLayout>
 
     </RelativeLayout>
 </LinearLayout>
