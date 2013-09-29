@@ -3,7 +3,6 @@
     package="com.freescale.wfdsink"
     coreApp="true"
     android:sharedUserId="android.uid.system" >
-
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_ALL_EXTERNAL_STORAGE" />
