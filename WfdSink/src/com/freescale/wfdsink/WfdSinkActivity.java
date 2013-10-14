@@ -206,6 +206,24 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
         startSearch();
         mTimer = new Timer(true);
     }
+	
+	@Override
+	protected void onRestart() {
+	    super.onRestart();
+       	    IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction(WfdSink.WFD_DEVICE_LIST_CHANGED_ACTION);
+            intentFilter.addAction(WfdSink.WFD_DEVICE_CONNECTED_ACTION);
+            intentFilter.addAction(WfdSink.WFD_THIS_DEVICE_UPDATE_ACTION);
+	    registerReceiver(mWifiP2pReceiver, intentFilter);
+	    WifiManager manager = (WifiManager) getSystemService(WIFI_SERVICE);
+	    mWfdSink = new WfdSink(this);
+	    if(manager.isWifiEnabled()){
+			
+	    }else{
+	        wifiDialog();
+            }
+	    startSearch();
+	}
 
     @Override
         public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -398,14 +416,7 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
 
     public void onStop() {
         super.onStop();
-    }
-
-    public void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(mWifiP2pReceiver);
-
-        mTimer.cancel();
-
+	unregisterReceiver(mWifiP2pReceiver);
         if (mStarted) {
             handleStopPlay();
         }
@@ -414,10 +425,14 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
             disconnectPeer();
             mConnected = false;
         }
-
-        stopSearch();
+	stopSearch();
         mWfdSink.dispose();
         mWfdSink = null;
+
+    }
+
+    public void onDestroy() {
+        super.onDestroy();
     }
 
     public class ViewHolder {
