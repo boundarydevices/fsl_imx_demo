@@ -1,5 +1,5 @@
 /*
-/* Copyright 2012 Freescale Semiconductor, Inc.
+/* Copyright 2012-2013 Freescale Semiconductor, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,28 @@
 
 package com.fsl.android.ota;
 import java.net.MalformedURLException;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import com.fsl.android.ota.R;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.*;
 
-
 // Controller of OTA Activity
 public class OtaAppActivity extends Activity implements OTAServerManager.OTAStateChangeListener {
 	
+	private final int IDLE = 1;
+	private final int CHECKED = 2;
+	private final int DOWNLOADING = 3;
+	private final int WIFI_NOT_AVALIBLE = 4;
+	private final int CANNOT_FIND_SERVER = 5;
+	private final int WRITE_FILE_ERROR = 6;
 	Button mUpgradeButton;
 	TextView mMessageTextView;
 	TextView mVersionTextView;
@@ -40,11 +48,46 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
 	
 	OTAServerManager mOTAManager;
 	int mState = 0;
-	
+	private Handler mHandler = new MainHandler();	
 	/* state change will be 0 -> Checked -> Downloading -> upgrading.  */
 	
 	final String TAG = "OTA";
 	
+        @SuppressLint("HandlerLeak")
+	private class MainHandler extends Handler {
+            @Override
+            public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case IDLE:
+                    	mVersionTextView.setVisibility(View.INVISIBLE);
+                    	mDownloadProgress.setVisibility(View.INVISIBLE);
+                    	mUpgradeButton.setVisibility(View.INVISIBLE); 
+                    	break;
+                case CHECKED:
+                    	mVersionTextView.setVisibility(View.VISIBLE);
+                    	mSpinner.setVisibility(View.INVISIBLE);
+                    	break;
+                case DOWNLOADING:
+                      	mVersionTextView.setVisibility(View.INVISIBLE);
+                    	mUpgradeButton.setVisibility(View.INVISIBLE);
+                    	mSpinner.setVisibility(View.INVISIBLE);
+                    	mDownloadProgress.setVisibility(View.VISIBLE);
+                    	break;
+                case WIFI_NOT_AVALIBLE:
+			mMessageTextView.setText(getText(R.string.error_needs_wifi));
+                	break;
+                case CANNOT_FIND_SERVER:
+                	mMessageTextView.setText(getText(R.string.error_cannot_connect_server));
+			break;
+                case WRITE_FILE_ERROR:
+                	mMessageTextView.setText(getText(R.string.error_write_file));
+			break;
+                default:
+                break;
+            }
+        }
+    }
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,16 +102,14 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
         mSpinner = (ProgressBar) findViewById(R.id.spinner);
         mDownloadProgress = (ProgressBar) findViewById(R.id.download_progress_bar);
         mContext = getBaseContext();
-        
-        try {
-			mOTAManager = new OTAServerManager(mContext);
+	try {
+	        mOTAManager = new OTAServerManager(mContext);
 		} catch (MalformedURLException e) {
 			mOTAManager = null;
 			Log.e(TAG, "meet not a mailformat URL... should not happens.");
 			e.printStackTrace();
 		}
-        mOTAManager.setmListener(this);
-
+		mOTAManager.setmListener(this);
     }
     
     @Override
@@ -79,7 +120,6 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
     	// default state is checking, if resume from any pervious state,
     	// resume the state
     	onStateChangeUI(mState);
-
     	if (mState == 0) {
         	new Thread(new Runnable() {
         		public void run() {
@@ -123,14 +163,16 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
 		
 	};
 	
+	
 	public void onStateOrProgress(int message, int error, Object info)
 	{
-		Log.v(TAG, "onStateOrProgress: " + "message: " + message + " error:" + error + " info: " + info );
-		switch (message) {
-		case STATE_IN_CHECKED:
-			onStateChangeUI(message);
-			onStateInChecked(error, info);
-			break;
+            Log.v(TAG, "onStateOrProgress: " + "message: " + message + " error:" + error + " info: " + info );
+	    switch (message) {
+	        case STATE_IN_CHECKED:
+                        onStateChangeUI(message);
+                        mState = STATE_IN_CHECKED;
+                        onStateInChecked(error, info);
+                        break;
 		case STATE_IN_DOWNLOADING:
 			onStateChangeUI(message);
 			mState = STATE_IN_DOWNLOADING;
@@ -153,28 +195,14 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
 	// other will control the model(download). 
 	void onStateChangeUI(int newstate)
 	{
-		mState = newstate;
+        	mState = newstate;
 		if (newstate == STATE_IN_IDLE) {
-			   mVersionTextView.setVisibility(View.INVISIBLE);
-			   mDownloadProgress.setVisibility(View.INVISIBLE);
-			   mUpgradeButton.setVisibility(View.INVISIBLE);
-		}
-		else if (newstate == STATE_IN_CHECKED) {
-			mVersionTextView.post(new Runnable() {
-				public void run() {
-					mVersionTextView.setVisibility(View.VISIBLE);
-				}
-			});
-		} else if (newstate == STATE_IN_DOWNLOADING) {
-			// from start download, it start hide the version again.
-			mVersionTextView.post(new Runnable() {
-				public void run() {
-					mVersionTextView.setVisibility(View.INVISIBLE);
-					mUpgradeButton.setVisibility(View.INVISIBLE);
-					mSpinner.setVisibility(View.INVISIBLE);
-					mDownloadProgress.setVisibility(View.VISIBLE);
-				}
-			});
+	       		mHandler.sendEmptyMessageDelayed(IDLE,0);
+		}else if (newstate == STATE_IN_CHECKED) {
+                	mHandler.sendEmptyMessageDelayed(CHECKED,0);
+		}else if (newstate == STATE_IN_DOWNLOADING) {
+	               // from start download, it start hide the version again.
+			mHandler.sendEmptyMessageDelayed(DOWNLOADING,0);
 		} 
 	}
 	
@@ -262,7 +290,6 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
 	}
 	
 	void onStateInChecked(int error, Object info) {
-		
 		mSpinner.post(new Runnable() {	
 			public void run() {
 				mSpinner.setVisibility(View.INVISIBLE);
@@ -273,7 +300,7 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
 			// return no error, usually means have a version info from remote server, release name is in @info
 			// needs check here whether the local version is newer then remote version
 			if (mOTAManager.compareLocalVersionToServer() == false) {
-				// we are already latest...
+				// we are already latest...				
 				mMessageTextView.post(new Runnable() {
 					public void run() {
 						mMessageTextView.setText(Build.VERSION.RELEASE + ", " + Build.ID + "\n" +  getText(R.string.already_up_to_date));
@@ -303,24 +330,11 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
 				});
 			}
 		} else if (error == ERROR_WIFI_NOT_AVALIBLE) {
-			mMessageTextView.post(new Runnable() {
-				
-				public void run() {
-					mMessageTextView.setText(getText(R.string.error_needs_wifi));
-				}
-			});
+			mHandler.sendEmptyMessageDelayed(WIFI_NOT_AVALIBLE,0);
 		} else if (error == ERROR_CANNOT_FIND_SERVER) {
-			mMessageTextView.post(new Runnable() {
-				public void run() {
-					mMessageTextView.setText(getText(R.string.error_cannot_connect_server));
-				}
-			});
+			mHandler.sendEmptyMessageDelayed(CANNOT_FIND_SERVER,0);
 		} else if (error == ERROR_WRITE_FILE_ERROR ) {
-			mMessageTextView.post(new Runnable() {
-				public void run() {
-					mMessageTextView.setText(getText(R.string.error_write_file));
-				}
-			});
+			mHandler.sendEmptyMessageDelayed(WRITE_FILE_ERROR,0);
 		}
 	}
 	
