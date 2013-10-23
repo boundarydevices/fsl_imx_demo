@@ -1,5 +1,5 @@
 /*
-/* Copyright 2012 Freescale Semiconductor, Inc.
+/* Copyright 2012-2013 Freescale Semiconductor, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,6 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.os.RecoverySystem;
 import android.util.Log;
-
 
 public class OTAServerManager  {
 	public interface OTAStateChangeListener {
@@ -72,7 +71,6 @@ public class OTAServerManager  {
 	Handler mSelfHandler;
 	WakeLock mWakelock;
 	
-	
 	public OTAServerManager(Context context) throws MalformedURLException {
 		mConfig = new OTAServerConfig(Build.PRODUCT);
 		PowerManager pm = (PowerManager)context.getSystemService(Context.POWER_SERVICE);
@@ -96,18 +94,21 @@ public class OTAServerManager  {
 		} else {
 			return false;
 		}
-	}
+	}	
 	
 	public void startCheckingVersion() {
 		
 		Log.v(TAG, "startCheckingVersion");
-		
 		if (checkURLOK(mConfig.getBuildPropURL()) == false) {
 			if (this.mListener != null) {
-				if (this.checkNetworkOnline())
+				if (this.checkNetworkOnline()) {
 					reportCheckingError(OTAStateChangeListener.ERROR_CANNOT_FIND_SERVER);
-				else
+                                        Log.v(TAG, "error cannot find server!");
+                                } 
+				else {
 					reportCheckingError(OTAStateChangeListener.ERROR_WIFI_NOT_AVALIBLE);
+                                        Log.v(TAG, "error wifi not avalible");
+                                }  
 			}
 			
 			return;
@@ -153,9 +154,11 @@ public class OTAServerManager  {
 	}
 	
 	void reportCheckingError(int error) {
-		if (this.mListener != null)
+		if (this.mListener != null ) {
 			this.mListener.onStateOrProgress(OTAStateChangeListener.STATE_IN_CHECKED, error, null);
-	}
+	                Log.v(TAG, "---------state in checked----------- ");
+                }
+        }
 	
 	void reportDownloadError(int error) {
 		if (this.mListener != null)
@@ -163,8 +166,10 @@ public class OTAServerManager  {
 	}
 	
 	void reportInstallError(int error) {
-		if (this.mListener != null)
+		if (this.mListener != null) {
 			this.mListener.onStateOrProgress(OTAStateChangeListener.STATE_IN_UPGRADING, error, null);
+                        Log.v(TAG, "---------state in upgrading----------- "); 
+                }   
 	}
 	
 	public long getUpgradePackageSize() {
