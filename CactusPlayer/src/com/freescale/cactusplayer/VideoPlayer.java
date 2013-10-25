@@ -949,7 +949,13 @@ public class VideoPlayer extends Activity implements SeekBar.OnSeekBarChangeList
         else if(itemId == CLOSE_SUBTITLE)
         {
             if(mCurSubtitleTrack >= 0 && mMediaPlayer != null){
-                mMediaPlayer.deselectTrack(mCurSubtitleTrack);
+                Log.v(TAG,"to deselected track  " + mCurSubtitleTrack);
+                try{
+                    mMediaPlayer.deselectTrack(mCurSubtitleTrack);
+                }
+                catch(Exception e){
+                    Log.d(TAG, "Failed to deselect track !!!");
+                }
                 mCurSubtitleTrack = -1;
                 mCurSubtitleIndex = -1;
                 mSubtitleTextView.setText(null,0);
@@ -1264,24 +1270,19 @@ public class VideoPlayer extends Activity implements SeekBar.OnSeekBarChangeList
                     MediaPlayer.TrackInfo[] ti = mMediaPlayer.getTrackInfo();
                     int totalCount = ti.length;
                     for(int j = 0; j< totalCount ; j++){
+                        Log.v(TAG,"track " + j + " type is " + ti[j].getTrackType());
                         if(ti[j].getTrackType() == MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_TIMEDTEXT)
                             index++;
                         if(index == i){
-                            mMediaPlayer.selectTrack(j);
-                            /*
-                            Parcel request = Parcel.obtain();
-                            Parcel reply = Parcel.obtain();
-                            try {
-                                request.writeInterfaceToken(IMEDIA_PLAYER);
-                                request.writeInt(INVOKE_ID_SELECT_TRACK);
-                                request.writeInt(j);
-                                mMediaPlayer.invoke(request, reply);
-                            } finally {
-                                request.recycle();
-                                reply.recycle();
+                            Log.v(TAG,"selected track " + j);
+                            try{
+                                mMediaPlayer.selectTrack(j);
                             }
-                            */
-                            //mInfoView.setText();
+                            catch(Exception e)
+                            {
+                                Log.d(TAG, "Failed to select subtitle track!!!");
+                                break;
+                            }
                             mCurSubtitleTrack = j;
                             mCurSubtitleIndex = i;
                             break;
