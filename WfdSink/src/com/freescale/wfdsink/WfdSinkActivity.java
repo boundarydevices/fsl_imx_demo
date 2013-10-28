@@ -299,7 +299,6 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
                     break;
 
                 case STOP_PLAY:
-                	status.setText("Status:Disconnected!");
                     handleStopPlay();
                     break;
 
@@ -370,6 +369,7 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
     private void handleConnected(boolean connected) {
         mConnected = connected;
         if (mConnected) {
+            stopSearch();
         	layout.setVisibility(View.INVISIBLE);
             mSurfaceView.setVisibility(View.VISIBLE);
             mGridView.setVisibility(View.GONE);
@@ -377,6 +377,7 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
         }
         else {
             stopPlayer();
+            startSearch();
         }
     }
 
@@ -390,10 +391,6 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
         mWfdSink.stopSearch();
     }
 
-    private void connectPeer(String address) {
-        mWfdSink.connect(address);
-    }
-
     private void disconnectPeer() {
         mWfdSink.disconnect();
     }
@@ -404,6 +401,7 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
     }
 
     private void stopPlayer() {
+        status.setText("Status:Disconnected!");
         Message msg = mHandler.obtainMessage(STOP_PLAY);
         mHandler.sendMessage(msg);
     }
@@ -449,7 +447,7 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
         }
 
         public void setSourcePeers(List<String> sourcePeers) {
-            Log.w(TAG, "setSourceIp");
+            Log.w(TAG, "setSourcePeers");
             mPeers = sourcePeers;
         }
 
