@@ -171,17 +171,17 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
         SurfaceHolder holder = mSurfaceView.getHolder();
         holder.addCallback(this);
         holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-	    WifiManager manager = (WifiManager) getSystemService(WIFI_SERVICE);
+        WifiManager manager = (WifiManager) getSystemService(WIFI_SERVICE);
         mGridView = (GridView)findViewById(R.id.gridview);
         mImageButton = (ImageButton)findViewById(R.id.sink_player);
 
         status = (TextView)findViewById(R.id.status);
         layout = (LinearLayout)findViewById(R.id.linearLayout1);
-	if(manager.isWifiEnabled()){
-				
-		}else{
-		     wifiDialog();
-		     }		
+        if(manager.isWifiEnabled()){
+
+        }else{
+            wifiDialog();
+        }
         mImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
@@ -206,24 +206,24 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
         startSearch();
         mTimer = new Timer(true);
     }
-	
-	@Override
-	protected void onRestart() {
-	    super.onRestart();
-       	    IntentFilter intentFilter = new IntentFilter();
-            intentFilter.addAction(WfdSink.WFD_DEVICE_LIST_CHANGED_ACTION);
-            intentFilter.addAction(WfdSink.WFD_DEVICE_CONNECTED_ACTION);
-            intentFilter.addAction(WfdSink.WFD_THIS_DEVICE_UPDATE_ACTION);
-	    registerReceiver(mWifiP2pReceiver, intentFilter);
-	    WifiManager manager = (WifiManager) getSystemService(WIFI_SERVICE);
-	    mWfdSink = new WfdSink(this);
-	    if(manager.isWifiEnabled()){
-			
-	    }else{
-	        wifiDialog();
-            }
-	    startSearch();
-	}
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(WfdSink.WFD_DEVICE_LIST_CHANGED_ACTION);
+        intentFilter.addAction(WfdSink.WFD_DEVICE_CONNECTED_ACTION);
+        intentFilter.addAction(WfdSink.WFD_THIS_DEVICE_UPDATE_ACTION);
+        registerReceiver(mWifiP2pReceiver, intentFilter);
+        WifiManager manager = (WifiManager) getSystemService(WIFI_SERVICE);
+        mWfdSink = new WfdSink(this);
+        if(manager.isWifiEnabled()){
+
+        }else{
+            wifiDialog();
+        }
+        startSearch();
+    }
 
     @Override
         public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -234,29 +234,27 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
             return super.onKeyDown(keyCode, event);
         }
 
-	private void wifiDialog()
-	{
-		Dialog dialog = new AlertDialog.Builder(WfdSinkActivity.this)
-		.setTitle("WI-FI hasn't open ! ").setMessage("Are you sure to open now? If you cancel then will exit!").setIcon(R.drawable.ic_hdmi)
-		.setPositiveButton("confirm", new DialogInterface.OnClickListener() {
-			
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				
-				startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+    private void wifiDialog() {
+        Dialog dialog = new AlertDialog.Builder(WfdSinkActivity.this)
+            .setTitle("WI-FI hasn't open ! ").setMessage("Are you sure to open now? If you cancel then will exit!").setIcon(R.drawable.ic_hdmi)
+            .setPositiveButton("confirm", new DialogInterface.OnClickListener() {
 
-			}
-		}).setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-			
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				System.exit(-1);
-				
-			}
-		}).create();
-		dialog.show();
-	}		
-		
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+
+                    }
+                    }).setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            System.exit(-1);
+                        }
+                        }).create();
+        dialog.show();
+    }
+
     private void exitDialog() {
         Dialog dialog = new AlertDialog.Builder(WfdSinkActivity.this)
             .setTitle("Program exit ?")
@@ -382,7 +380,7 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
     }
 
     private void startSearch() {
-    	status.setText("Status:Searching for peers");
+        status.setText("Status:Searching for peers");
         mWfdSink.startSearch();
         //mWfdSink.setDeviceName("Android_me");
     }
@@ -414,7 +412,7 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
 
     public void onStop() {
         super.onStop();
-	unregisterReceiver(mWifiP2pReceiver);
+        unregisterReceiver(mWifiP2pReceiver);
         if (mStarted) {
             handleStopPlay();
         }
@@ -423,7 +421,7 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
             disconnectPeer();
             mConnected = false;
         }
-	stopSearch();
+        stopSearch();
         mWfdSink.dispose();
         mWfdSink = null;
 
