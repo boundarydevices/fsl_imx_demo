@@ -624,7 +624,11 @@ public class VideoPlayer extends Activity implements SeekBar.OnSeekBarChangeList
             if(mPlaySpeed == 1){
                 if(text != null){
                     //Log.d(TAG,"text is " + text.getText());
-                    mSubtitleTextView.setText(text.getText(), 0);
+                    int start_pos = 0;
+                    if(text.getText().startsWith("{\\pos")){
+                        start_pos = text.getText().indexOf('}') + 1;
+                    }
+                    mSubtitleTextView.setText(text.getText().substring(start_pos), 0);
                 }
                 else
                     mSubtitleTextView.setText(null, 0);
