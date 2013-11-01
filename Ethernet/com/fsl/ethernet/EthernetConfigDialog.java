@@ -1,4 +1,3 @@
-package com.fsl.ethernet;
 /*
  * Copyright (C) 2013 Freescale Semiconductor, Inc.
  *
@@ -14,6 +13,7 @@ package com.fsl.ethernet;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.fsl.ethernet;
 
 import android.view.View;
 import android.app.AlertDialog;
