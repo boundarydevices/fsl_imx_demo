@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">HdmiDualVideo</string>
+    <string name="action_settings">Settings</string>
+    <string name="start">Start the video</string>
+    <string name="Button">Button</string>
+    <string name="TextView">TextView</string>
+    <string name="stop">Stop the video</string>
+    <string name="title_activity_second">SecondActivity</string>
+
+</resources>

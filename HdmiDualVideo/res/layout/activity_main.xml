@@ -1,0 +1,53 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity" >
+    <TextView
+         android:id="@+id/textview0"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+        />
+    <Spinner
+        android:id="@+id/spinner0"
+        android:layout_width="fill_parent"
+        android:layout_height="60dip"
+        android:drawSelectorOnTop="true"
+    />
+ <TextView
+      android:id="@+id/textview1"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+    />
+  <Spinner
+        android:id="@+id/spinner1"
+        android:layout_width="fill_parent"
+        android:layout_height="60dip"
+        android:drawSelectorOnTop="true"
+     />
+
+ <RelativeLayout
+      android:layout_width="fill_parent"
+      android:layout_height="477dp" >
+
+      <Button
+          android:id="@+id/start"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="@string/start" />
+
+      <Button
+          android:id="@+id/stop"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_alignRight="@+id/start"
+          android:layout_below="@+id/start"
+          android:layout_marginTop="59dp"
+          android:text="@string/stop" />
+
+  </RelativeLayout>
+
+
+
+</LinearLayout>
