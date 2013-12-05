@@ -88,18 +88,6 @@ public class VideoMenu extends Activity {
 	 Environment.getExternalStorageDirectory().getAbsolutePath()
 */
 
-	// a tricky way for DivX certification clip storage
-	private void scanUdisk() {
-/*
-		final String [] paths = new String [1];
-		paths[0] = "/mnt/udisk/CTK_1080P13_D2";
-
-		MediaScannerConnection.scanFile(this, paths, null, null);
-*/
-		this.sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://"
-				+ Environment.getExternalStorageDirectory())));
-	}
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
@@ -123,8 +111,6 @@ public class VideoMenu extends Activity {
 				mAdapter.clickItem(itv);
 			}
 		});
-
-		scanUdisk(); // trigger media scanner
 
 		mVideoScanTask = new TaskToScanVideoClips();
 		mVideoScanTask.Attach(this);
