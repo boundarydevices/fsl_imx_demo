@@ -79,8 +79,8 @@ import android.content.BroadcastReceiver;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.content.Intent;
 import android.os.Parcelable;
-
-public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
+import android.view.View.OnClickListener;
+public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback,OnClickListener
 {
     private static final String TAG = "WfdSinkActivity";
     private static final int UPDATE_GRID_VIEW = 0x10;
@@ -89,7 +89,9 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
     private static final int START_PLAY = 0x13;
     private static final int STOP_PLAY = 0x14;
     private static final int DO_CONNECTED = 0x15;
-
+    private static final int START_SEARCH = 0x16;
+    private static final int DELAY = 1000;
+    private static final int PERIOD = 3000;
     private WfdSink mWfdSink;
     private SurfaceHolder mSurfaceHolder = null;
     private boolean mWaitingForSurface = false;
@@ -152,7 +154,7 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
     };
 
 
-
+    private View sink_main;
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -163,9 +165,11 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
         intentFilter.addAction(WfdSink.WFD_DEVICE_CONNECTED_ACTION);
         intentFilter.addAction(WfdSink.WFD_THIS_DEVICE_UPDATE_ACTION);
         registerReceiver(mWifiP2pReceiver, intentFilter);
+        sink_main = getLayoutInflater().from(this).inflate(R.layout.sink_main, null);  
+        sink_main.setOnClickListener(this);
 
         mWfdSink = new WfdSink(this);
-        setContentView(R.layout.sink_main);
+        setContentView(sink_main);
 
         mSurfaceView = (SurfaceView) findViewById(R.id.sink_preview);
         SurfaceHolder holder = mSurfaceView.getHolder();
@@ -204,7 +208,6 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
         mGridView.setAdapter(mPictureAdapter);
 
         startSearch();
-        mTimer = new Timer(true);
     }
 
     @Override
@@ -301,9 +304,14 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
                     break;
 
                 case DO_CONNECTED:
-                	status.setText("Status:Connected");
+                    status.setText("Status:Connected");
                     boolean connected = (msg.arg1 == 1);
                     handleConnected(connected);
+                    sink_main.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+                    mTimer.cancel();
+                    break;
+                case START_SEARCH:
+                    mWfdSink.startSearch();
                     break;
             }
         }
@@ -410,6 +418,17 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
         mGridView.setAdapter(mPictureAdapter);
     }
 
+    public  void onResume() {
+        super.onResume();
+        TimerTask task = new TimerTask(){  
+            public void run() {     
+                mHandler.sendEmptyMessage(START_SEARCH);    
+            }  
+        };
+        mTimer = new Timer(true);
+        mTimer.schedule(task,DELAY, PERIOD);
+    }
+
     public void onStop() {
         super.onStop();
         unregisterReceiver(mWifiP2pReceiver);
@@ -495,5 +514,17 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback
             return convertView;
         }
     }
+        @Override
+        public void onClick(View v) {
+
+            int i = sink_main.getSystemUiVisibility();
+            if (i == View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) {
+                sink_main.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+            } else if (i == View.SYSTEM_UI_FLAG_VISIBLE){
+                sink_main.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
+            } else if (i == View.SYSTEM_UI_FLAG_LOW_PROFILE) {
+                sink_main.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+            }
+        }
 }
 
