@@ -17,7 +17,7 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_hdmi"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/theme" >
         <activity
             android:icon="@drawable/ic_hdmi"
             android:name="com.freescale.wfdsink.WfdSinkActivity"
