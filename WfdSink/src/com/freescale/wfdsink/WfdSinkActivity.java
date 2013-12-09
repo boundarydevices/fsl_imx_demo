@@ -443,6 +443,7 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback,
         stopSearch();
         mWfdSink.dispose();
         mWfdSink = null;
+        mTimer.cancel();
 
     }
 
