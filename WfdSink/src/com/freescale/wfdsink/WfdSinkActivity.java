@@ -147,7 +147,8 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback,
                 currentdevice = (TextView)findViewById(R.id.currentdevice);
                 if (mThisName != mWfdSink.getDeviceName())
                     mThisName = mWfdSink.getDeviceName();
-                currentdevice.setText("SSID:" + mWfdSink.getDeviceName());
+                String ssid = getString(R.string.wifi_ssid) + ":";
+                currentdevice.setText(ssid + mWfdSink.getDeviceName());
             }
 
         }
@@ -239,8 +240,8 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback,
 
     private void wifiDialog() {
         Dialog dialog = new AlertDialog.Builder(WfdSinkActivity.this)
-            .setTitle("WI-FI hasn't open ! ").setMessage("Are you sure to open now? If you cancel then will exit!").setIcon(R.drawable.ic_hdmi)
-            .setPositiveButton("confirm", new DialogInterface.OnClickListener() {
+            .setTitle(R.string.wifi_no_open).setMessage(R.string.wifi_cancel_exit).setIcon(R.drawable.ic_hdmi)
+            .setPositiveButton(R.string.wifi_confirm, new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -248,7 +249,7 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback,
                     startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
 
                     }
-                    }).setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                    }).setNegativeButton(R.string.wifi_cancel, new DialogInterface.OnClickListener() {
 
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -260,10 +261,10 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback,
 
     private void exitDialog() {
         Dialog dialog = new AlertDialog.Builder(WfdSinkActivity.this)
-            .setTitle("Program exit ?")
-            .setMessage("Are you sure to exit the program ?")
+            .setTitle(R.string.program_exit)
+            .setMessage(R.string.program_exit_sure)
             .setIcon(R.drawable.ic_hdmi)
-            .setPositiveButton("confirm", new DialogInterface.OnClickListener(){
+            .setPositiveButton(R.string.wifi_confirm, new DialogInterface.OnClickListener(){
 
                     @Override
                     public void onClick(DialogInterface arg0, int arg1) {
@@ -271,7 +272,7 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback,
 
                     }
 
-                    }).setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                    }).setNegativeButton(R.string.wifi_cancel, new DialogInterface.OnClickListener() {
 
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -295,7 +296,7 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback,
                     handleUpdateSurface(holder);
                     break;
 
-                case START_PLAY:                	
+                case START_PLAY:
                     handleStartPlay();
                     break;
 
@@ -304,7 +305,7 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback,
                     break;
 
                 case DO_CONNECTED:
-                    status.setText("Status:Connected");
+                    status.setText(R.string.wifi_status_connected);
                     boolean connected = (msg.arg1 == 1);
                     handleConnected(connected);
                     sink_main.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
@@ -376,7 +377,7 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback,
         mConnected = connected;
         if (mConnected) {
             stopSearch();
-        	layout.setVisibility(View.INVISIBLE);
+            layout.setVisibility(View.INVISIBLE);
             mSurfaceView.setVisibility(View.VISIBLE);
             mGridView.setVisibility(View.GONE);
             startPlayer();
@@ -388,7 +389,7 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback,
     }
 
     private void startSearch() {
-        status.setText("Status:Searching for peers");
+        status.setText(R.string.wifi_status_searching);
         mWfdSink.startSearch();
         //mWfdSink.setDeviceName("Android_me");
     }
@@ -407,7 +408,7 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback,
     }
 
     private void stopPlayer() {
-        status.setText("Status:Disconnected!");
+        status.setText(R.string.wifi_status_disconnected);
         Message msg = mHandler.obtainMessage(STOP_PLAY);
         mHandler.sendMessage(msg);
     }
