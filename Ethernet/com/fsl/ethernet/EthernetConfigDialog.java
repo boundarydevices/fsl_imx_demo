@@ -19,6 +19,8 @@ import android.view.View;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -44,7 +46,7 @@ public class EthernetConfigDialog extends AlertDialog implements
     private RadioButton mConTypeManual;
     private EditText mIpaddr;
     private EditText mDns;
-
+    private static String Mode_dhcp = "dhcp";
 
     public EthernetConfigDialog(Context context, EthernetEnabler Enabler) {
         super(context);
@@ -63,7 +65,7 @@ public class EthernetConfigDialog extends AlertDialog implements
         mDns = (EditText)mView.findViewById(R.id.eth_dns_edit);
         if (mEthEnabler.getManager().isConfigured()) {
             EthernetDevInfo info = mEthEnabler.getManager().getSavedConfig();
-            if (info.getConnectMode() == EthernetDevInfo.ETHERNET_CONN_MODE_DHCP) {
+            if (mEthEnabler.getManager().getSharedPreMode().equals(Mode_dhcp)) {
                 mConTypeDhcp.setChecked(true);
                 mConTypeManual.setChecked(false);
                 mIpaddr.setEnabled(false);
@@ -73,8 +75,8 @@ public class EthernetConfigDialog extends AlertDialog implements
                 mConTypeManual.setChecked(true);
                 mIpaddr.setEnabled(true);
                 mDns.setEnabled(true);
-                mIpaddr.setText(info.getIpAddress(), TextView.BufferType.EDITABLE);
-                mDns.setText(info.getDnsAddr(), TextView.BufferType.EDITABLE);
+                mIpaddr.setText(mEthEnabler.getManager().getSharedPreIpAddress(),TextView.BufferType.EDITABLE);
+                mDns.setText(mEthEnabler.getManager().getSharedPreDnsAddress(),TextView.BufferType.EDITABLE);
                 mEthEnabler.getManager().updateDevInfo(info);
                 mEthEnabler.setEthEnabled();
             }
@@ -119,10 +121,13 @@ public class EthernetConfigDialog extends AlertDialog implements
             info.setConnectMode(EthernetDevInfo.ETHERNET_CONN_MODE_DHCP);
             info.setIpAddress(null);
             info.setDnsAddr(null);
+            mEthEnabler.getManager().sharedPreferencesStore(EthernetDevInfo.ETHERNET_CONN_MODE_DHCP, null, null);
         } else {
             info.setConnectMode(EthernetDevInfo.ETHERNET_CONN_MODE_MANUAL);
             info.setIpAddress(mIpaddr.getText().toString());
             info.setDnsAddr(mDns.getText().toString());
+            mEthEnabler.getManager().sharedPreferencesStore(EthernetDevInfo.ETHERNET_CONN_MODE_MANUAL,
+                mIpaddr.getText().toString(), mDns.getText().toString());
         }
         mEthEnabler.getManager().updateDevInfo(info);
         mEthEnabler.setEthEnabled();
