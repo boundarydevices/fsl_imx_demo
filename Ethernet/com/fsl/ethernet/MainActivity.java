@@ -23,6 +23,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Button;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.DialogInterface;
 import com.fsl.ethernet.EthernetDevInfo;
 import android.view.View.OnClickListener;
@@ -34,11 +37,29 @@ public class MainActivity extends Activity {
     private Button mBtnConfig;
     private Button mBtnCheck;
     private EthernetDevInfo  mSaveConfig;
+    private String TAG = "MainActivity";
+    private static String Mode_dhcp = "dhcp";
+    private boolean shareprefences_flag = false;
+    private boolean first_run = true;
+    public static final String FIRST_RUN = "ethernet";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ethernet_configure);
+        SharedPreferences sp = getSharedPreferences("ethernet",
+                Context.MODE_WORLD_WRITEABLE);
+        first_run = sp.getBoolean(FIRST_RUN, false);
+        if (!first_run){
+        Editor editor = sp.edit();
+        try {
+            editor.putBoolean(FIRST_RUN, true);
+            editor.putString("conn_mode",EthernetDevInfo.ETHERNET_CONN_MODE_DHCP);
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
+            editor.commit();
+        }
         mEthEnabler = new EthernetEnabler(this);
         mEthConfigDialog = new EthernetConfigDialog(this, mEthEnabler);
         mEthEnabler.setConfigDialog(mEthConfigDialog);
@@ -75,9 +96,9 @@ public class MainActivity extends Activity {
                 text.setMovementMethod(ScrollingMovementMethod.getInstance());
                 mSaveConfig = mEthEnabler.getManager().getSavedConfig();
                 if (mSaveConfig != null) {
-                    final String config_detail = "IP address : " + mSaveConfig.getIpAddress() + "\n"
-                            + "DNS address: " + mSaveConfig.getDnsAddr() + "\n"
-                            + "IP mode    : " + mSaveConfig.getConnectMode() + "\n";
+                    final String config_detail = "IP address : " + mEthEnabler.getManager().getSharedPreIpAddress() + "\n"
+                            + "DNS address: " + mEthEnabler.getManager().getSharedPreDnsAddress() + "\n"
+                            + "IP mode    : " + mEthEnabler.getManager().getSharedPreMode() + "\n";
                     text.setText(config_detail);
                 }
             }
