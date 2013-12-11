@@ -43,6 +43,7 @@ import android.os.Message;
 import android.os.Parcel;
 import android.os.SystemProperties;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 /**
  * Created by B38613 on 9/27/13.
  */
@@ -96,6 +97,9 @@ public class EthernetManager {
     private INetworkManagementService mNMService;
     private DhcpInfo mDhcpInfo;
     private Handler mTrackerTarget;
+    private String mode;
+    private String ip_address;
+    private String dns_address;
 
     public EthernetManager(Context context) {
         mContext = context;
@@ -118,7 +122,8 @@ public class EthernetManager {
      * @return {@code true} if configured {@code false} otherwise
      */
     public boolean isConfigured() {
-        return "1".equals(SystemProperties.get("net."+ DevName[0] + ".config", "0"));
+        //return "1".equals(SystemProperties.get("net."+ DevName[0] + ".config", "0"));
+        return (getSharedPreMode().equals("manual"))||(getSharedPreMode().equals("dhcp"));
     }
 
     /**
@@ -246,6 +251,54 @@ public class EthernetManager {
         SystemProperties.set("net." + info.getIfName() + ".config", "1");
         SystemProperties.set("net." + info.getIfName() + ".mode", info.getConnectMode());
         SystemProperties.set("net." + info.getIfName() + ".ip", info.getIpAddress());
+    }
+
+    public SharedPreferences sharedPreferences(){
+        SharedPreferences sp = this.mContext.getSharedPreferences("ethernet",
+                Context.MODE_WORLD_WRITEABLE);
+        return sp;
+    }
+
+    public void sharedPreferencesStore(String mode,String ipAddress,String dnsAddress){
+        Editor editor = sharedPreferences().edit();
+        try {
+            editor.putString("conn_mode",mode);
+            editor.putString("mIpaddr",ipAddress);
+            editor.putString("mDns",dnsAddress);
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
+        editor.commit();
+
+    }
+
+    public String getSharedPreMode(){
+        try {
+            mode = sharedPreferences().getString("conn_mode",null);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        return mode;
+    }
+
+    public String getSharedPreIpAddress(){
+
+        try {
+            ip_address = sharedPreferences().getString("mIpaddr",null);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        return ip_address;
+    }
+
+    public String getSharedPreDnsAddress(){
+
+        try {
+            dns_address = sharedPreferences().getString("mDns",null);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        return dns_address;
     }
 
 }
