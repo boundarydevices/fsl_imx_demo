@@ -90,8 +90,7 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback,
     private static final int STOP_PLAY = 0x14;
     private static final int DO_CONNECTED = 0x15;
     private static final int START_SEARCH = 0x16;
-    private static final int DELAY = 1000;
-    private static final int PERIOD = 3000;
+    private static final int DELAY = 3000;
     private WfdSink mWfdSink;
     private SurfaceHolder mSurfaceHolder = null;
     private boolean mWaitingForSurface = false;
@@ -292,6 +291,7 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback,
                     break;
 
                 case UPDATE_SURFACE:
+                    mHandler.removeMessages(START_SEARCH);
                     SurfaceHolder holder = (SurfaceHolder)msg.obj;
                     handleUpdateSurface(holder);
                     break;
@@ -309,9 +309,9 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback,
                     boolean connected = (msg.arg1 == 1);
                     handleConnected(connected);
                     sink_main.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-                    mTimer.cancel();
                     break;
                 case START_SEARCH:
+                    mHandler.sendEmptyMessageDelayed(START_SEARCH,DELAY);
                     mWfdSink.startSearch();
                     break;
             }
@@ -421,13 +421,7 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback,
 
     public  void onResume() {
         super.onResume();
-        TimerTask task = new TimerTask(){  
-            public void run() {     
-                mHandler.sendEmptyMessage(START_SEARCH);    
-            }  
-        };
-        mTimer = new Timer(true);
-        mTimer.schedule(task,DELAY, PERIOD);
+        mHandler.sendEmptyMessageDelayed(START_SEARCH,DELAY);
     }
 
     public void onStop() {
@@ -444,7 +438,7 @@ public class WfdSinkActivity extends Activity implements SurfaceHolder.Callback,
         stopSearch();
         mWfdSink.dispose();
         mWfdSink = null;
-        mTimer.cancel();
+        mHandler.removeMessages(START_SEARCH);
 
     }
 
