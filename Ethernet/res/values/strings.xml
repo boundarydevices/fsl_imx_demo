@@ -23,4 +23,10 @@
     <string name="eth_toggle_summary_on" translatable="false">Turn on Ethernet</string>
     <string name="menu_save">confirm</string>
     <string name="menu_cancel">cancel</string>
+    <string name="proxy_setting">Proxy setting</string>
+    <string name="eth_proxy">Proxy server</string>
+    <string name="proxy_address">Proxy address</string>
+    <string name="proxy_port">Proxy port</string> 
+    <string name="eth_proxy_address">Proxy address</string>
+    <string name="show_need_setting">You should setting the static IP and DNS address in this mode</string>
 </resources>
