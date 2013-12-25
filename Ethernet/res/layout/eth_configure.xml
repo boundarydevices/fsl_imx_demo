@@ -42,6 +42,7 @@
                   android:layout_marginEnd="16dip"
                   android:orientation="vertical"
                   android:gravity="start"
+                  android:textAppearance="?android:attr/textAppearanceMedium"
                   android:text="@string/eth_con_type" />
         <RadioGroup android:id="@+id/con_type"
                     android:layout_width="match_parent"
@@ -61,6 +62,25 @@
                          android:text="@string/eth_con_type_manual">
             </RadioButton>
         </RadioGroup>
+        <TextView android:id="@+id/eth_proxy_text"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_marginTop="8dip"
+                  android:layout_marginStart="16dip"
+                  android:layout_marginEnd="16dip"
+                  android:orientation="vertical"
+                  android:gravity="start"
+                  android:textAppearance="?android:attr/textAppearanceMedium"
+                  android:text="@string/proxy_setting" />
+        
+        <CheckBox
+            android:id="@+id/eth_proxy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:checked="false"
+            android:textAlignment="viewStart"            
+            android:text="@string/eth_proxy" />
 
         <!-- IP address -->
         <LinearLayout android:id="@+id/enterprise_wrapper"
@@ -68,6 +88,12 @@
                       android:layout_height="wrap_content"
                       android:padding="0dip"
                       android:orientation="vertical">
+            <LinearLayout
+                android:id="@+id/ip_dns_setting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+                
             <TextView android:id="@+id/ipaddr_text"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
@@ -99,7 +125,50 @@
                       android:textSize="18sp"
                       android:textAlignment="viewStart"
                       android:singleLine="true"
+                      android:inputType="none" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/address_port_setting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+            <TextView android:id="@+id/eth_proxy_address"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_marginTop="8dip"
+                      android:layout_marginStart="16dip"
+                      android:layout_marginEnd="16dip"
+                      android:orientation="vertical"
+                      android:gravity="start"
+                      android:text="@string/proxy_address" />
+            <EditText android:id="@+id/proxy_address_edit"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:textSize="18sp"
+                      android:textAlignment="viewStart"
+                      android:singleLine="true"
                       android:inputType="phone" />
+           
+            <TextView android:id="@+id/eth_proxy_port"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_marginTop="8dip"
+                      android:layout_marginStart="16dip"
+                      android:layout_marginEnd="16dip"
+                      android:orientation="vertical"
+                      android:gravity="start"
+                      android:text="@string/proxy_port" />
+            <EditText android:id="@+id/proxy_port_edit"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:textSize="18sp"
+                      android:textAlignment="viewStart"
+                      android:singleLine="true"
+                      android:inputType="number" />                
+            </LinearLayout>
+            
         </LinearLayout>
 
     </LinearLayout>

@@ -30,6 +30,11 @@ import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import com.fsl.ethernet.EthernetDevInfo;
+import android.widget.LinearLayout;
+import android.widget.CompoundButton;
+import android.widget.CheckBox;
+import android.widget.Toast;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 /**
  * Created by B38613 on 13-8-5.
  */
@@ -46,6 +51,9 @@ public class EthernetConfigDialog extends AlertDialog implements
     private RadioButton mConTypeManual;
     private EditText mIpaddr;
     private EditText mDns;
+    private CheckBox mProxy;
+    private LinearLayout ip_dns_setting;
+    private LinearLayout address_port_setting;
     private static String Mode_dhcp = "dhcp";
 
     public EthernetConfigDialog(Context context, EthernetEnabler Enabler) {
@@ -61,18 +69,22 @@ public class EthernetConfigDialog extends AlertDialog implements
         mDevList = (Spinner) mView.findViewById(R.id.eth_dev_spinner);
         mConTypeDhcp = (RadioButton) mView.findViewById(R.id.dhcp_radio);
         mConTypeManual = (RadioButton) mView.findViewById(R.id.manual_radio);
+        mProxy = (CheckBox) mView.findViewById(R.id.eth_proxy);
         mIpaddr = (EditText)mView.findViewById(R.id.ipaddr_edit);
         mDns = (EditText)mView.findViewById(R.id.eth_dns_edit);
+        ip_dns_setting = (LinearLayout)mView.findViewById(R.id.ip_dns_setting);
+        address_port_setting = (LinearLayout)mView.findViewById(R.id.address_port_setting);
+        address_port_setting.setVisibility(View.GONE);
         if (mEthEnabler.getManager().isConfigured()) {
             EthernetDevInfo info = mEthEnabler.getManager().getSavedConfig();
             if (mEthEnabler.getManager().getSharedPreMode().equals(Mode_dhcp)) {
                 mConTypeDhcp.setChecked(true);
                 mConTypeManual.setChecked(false);
-                mIpaddr.setEnabled(false);
-                mDns.setEnabled(false);
+                ip_dns_setting.setVisibility(View.GONE);
             } else {
                 mConTypeDhcp.setChecked(false);
                 mConTypeManual.setChecked(true);
+                ip_dns_setting.setVisibility(View.VISIBLE);
                 mIpaddr.setEnabled(true);
                 mDns.setEnabled(true);
                 mIpaddr.setText(mEthEnabler.getManager().getSharedPreIpAddress(),TextView.BufferType.EDITABLE);
@@ -84,19 +96,30 @@ public class EthernetConfigDialog extends AlertDialog implements
             mEthEnabler.getManager().setMode(EthernetDevInfo.ETHERNET_CONN_MODE_DHCP);
             mConTypeDhcp.setChecked(true);
             mConTypeManual.setChecked(false);
-            mIpaddr.setEnabled(false);
-            mDns.setEnabled(false);
+            ip_dns_setting.setVisibility(View.GONE);
         }
         mConTypeManual.setOnClickListener(new RadioButton.OnClickListener() {
             public void onClick(View v) {
+                ip_dns_setting.setVisibility(View.VISIBLE);
                 mIpaddr.setEnabled(true);
                 mDns.setEnabled(true);
             }
         });
         mConTypeDhcp.setOnClickListener(new RadioButton.OnClickListener() {
             public void onClick(View v) {
+                ip_dns_setting.setVisibility(View.GONE);
                 mIpaddr.setEnabled(false);
                 mDns.setEnabled(false);
+            }
+        });
+        mProxy.setOnCheckedChangeListener(new OnCheckedChangeListener(){
+            public void onCheckedChanged(CompoundButton buttonView,boolean isChecked) {
+                if (!isChecked)
+                {
+                    address_port_setting.setVisibility(View.GONE);
+                }else{
+                    address_port_setting.setVisibility(View.VISIBLE);
+                }
             }
         });
 
@@ -122,15 +145,24 @@ public class EthernetConfigDialog extends AlertDialog implements
             info.setIpAddress(null);
             info.setDnsAddr(null);
             mEthEnabler.getManager().sharedPreferencesStore(EthernetDevInfo.ETHERNET_CONN_MODE_DHCP, null, null);
+            mEthEnabler.getManager().updateDevInfo(info);
+            mEthEnabler.setEthEnabled();
+
         } else {
-            info.setConnectMode(EthernetDevInfo.ETHERNET_CONN_MODE_MANUAL);
-            info.setIpAddress(mIpaddr.getText().toString());
-            info.setDnsAddr(mDns.getText().toString());
-            mEthEnabler.getManager().sharedPreferencesStore(EthernetDevInfo.ETHERNET_CONN_MODE_MANUAL,
-                mIpaddr.getText().toString(), mDns.getText().toString());
+            if ((mIpaddr.getText().toString().equals(""))||(mDns.getText().toString().equals("")))
+            {
+                Toast.makeText(this.getContext(), R.string.show_need_setting,Toast.LENGTH_SHORT).show();
+            }else{
+                info.setConnectMode(EthernetDevInfo.ETHERNET_CONN_MODE_MANUAL);
+                info.setIpAddress(mIpaddr.getText().toString());
+                info.setDnsAddr(mDns.getText().toString());
+                mEthEnabler.getManager().sharedPreferencesStore(EthernetDevInfo.ETHERNET_CONN_MODE_MANUAL,
+                    mIpaddr.getText().toString(), mDns.getText().toString());
+                mEthEnabler.getManager().updateDevInfo(info);
+                mEthEnabler.setEthEnabled();
+
+            }
         }
-        mEthEnabler.getManager().updateDevInfo(info);
-        mEthEnabler.setEthEnabled();
     }
 
     public void onClick(DialogInterface dialog, int which) {
