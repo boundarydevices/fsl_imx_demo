@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Freescale Semiconductor, Inc.
+ * Copyright (C) 2013-2014 Freescale Semiconductor, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,17 +49,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.ethernet_configure);
         SharedPreferences sp = getSharedPreferences("ethernet",
                 Context.MODE_WORLD_WRITEABLE);
-        first_run = sp.getBoolean(FIRST_RUN, false);
-        if (!first_run){
-        Editor editor = sp.edit();
-        try {
-            editor.putBoolean(FIRST_RUN, true);
-            editor.putString("conn_mode",EthernetDevInfo.ETHERNET_CONN_MODE_DHCP);
-            } catch (NumberFormatException e) {
-                e.printStackTrace();
-            }
-            editor.commit();
-        }
+
         mEthEnabler = new EthernetEnabler(this);
         mEthConfigDialog = new EthernetConfigDialog(this, mEthEnabler);
         mEthEnabler.setConfigDialog(mEthConfigDialog);
