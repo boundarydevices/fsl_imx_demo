@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 Freescale Semiconductor, Inc.
+ * Copyright (C) 2014 Freescale Semiconductor, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,8 @@ import android.content.DialogInterface;
 import com.fsl.ethernet.EthernetDevInfo;
 import android.view.View.OnClickListener;
 import android.text.method.ScrollingMovementMethod;
+import android.view.Window;
+import android.view.WindowManager;
 
 public class MainActivity extends Activity {
     private EthernetEnabler mEthEnabler;
@@ -46,6 +48,9 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.ethernet_configure);
         SharedPreferences sp = getSharedPreferences("ethernet",
                 Context.MODE_WORLD_WRITEABLE);
