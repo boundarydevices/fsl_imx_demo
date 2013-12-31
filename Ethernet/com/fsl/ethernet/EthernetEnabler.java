@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Freescale Semiconductor, Inc.
+ * Copyright (C) 2013-2014 Freescale Semiconductor, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,8 @@ public class EthernetEnabler {
     public EthernetEnabler(Context context) {
         mContext = context;
         mEthManager = new EthernetManager(context);
+
+        mEthManager.resetInterface();
     }
 
     public EthernetManager getManager() {
