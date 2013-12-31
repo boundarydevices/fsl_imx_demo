@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Freescale Semiconductor, Inc.
+ * Copyright (C) 2013-2014 Freescale Semiconductor, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,8 +89,6 @@ public class EthernetConfigDialog extends AlertDialog implements
                 mDns.setEnabled(true);
                 mIpaddr.setText(mEthEnabler.getManager().getSharedPreIpAddress(),TextView.BufferType.EDITABLE);
                 mDns.setText(mEthEnabler.getManager().getSharedPreDnsAddress(),TextView.BufferType.EDITABLE);
-                mEthEnabler.getManager().updateDevInfo(info);
-                mEthEnabler.setEthEnabled();
             }
         } else {
             mEthEnabler.getManager().setMode(EthernetDevInfo.ETHERNET_CONN_MODE_DHCP);
@@ -140,15 +138,7 @@ public class EthernetConfigDialog extends AlertDialog implements
         info.setIfName(mDevList.getSelectedItem().toString());
         if (localLOGV)
             Log.d(TAG, "Config device for " + mDevList.getSelectedItem().toString());
-        if (mConTypeDhcp.isChecked()) {
-            info.setConnectMode(EthernetDevInfo.ETHERNET_CONN_MODE_DHCP);
-            info.setIpAddress(null);
-            info.setDnsAddr(null);
-            mEthEnabler.getManager().sharedPreferencesStore(EthernetDevInfo.ETHERNET_CONN_MODE_DHCP, null, null);
-            mEthEnabler.getManager().updateDevInfo(info);
-            mEthEnabler.setEthEnabled();
-
-        } else {
+        if (mConTypeManual.isChecked()) {
             if ((mIpaddr.getText().toString().equals(""))||(mDns.getText().toString().equals("")))
             {
                 Toast.makeText(this.getContext(), R.string.show_need_setting,Toast.LENGTH_SHORT).show();
@@ -156,13 +146,14 @@ public class EthernetConfigDialog extends AlertDialog implements
                 info.setConnectMode(EthernetDevInfo.ETHERNET_CONN_MODE_MANUAL);
                 info.setIpAddress(mIpaddr.getText().toString());
                 info.setDnsAddr(mDns.getText().toString());
-                mEthEnabler.getManager().sharedPreferencesStore(EthernetDevInfo.ETHERNET_CONN_MODE_MANUAL,
-                    mIpaddr.getText().toString(), mDns.getText().toString());
-                mEthEnabler.getManager().updateDevInfo(info);
-                mEthEnabler.setEthEnabled();
-
             }
+        } else {
+            info.setConnectMode(EthernetDevInfo.ETHERNET_CONN_MODE_DHCP);
+            info.setIpAddress(null);
+            info.setDnsAddr(null);
         }
+        mEthEnabler.getManager().updateDevInfo(info);
+        mEthEnabler.setEthEnabled();
     }
 
     public void onClick(DialogInterface dialog, int which) {
