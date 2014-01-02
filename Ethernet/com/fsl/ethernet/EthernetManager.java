@@ -39,6 +39,7 @@ import android.net.NetworkInfo;
 import android.net.NetworkInfo.DetailedState;
 import android.net.LinkProperties;
 import android.net.InterfaceConfiguration;
+import android.net.ProxyProperties;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
@@ -144,6 +145,8 @@ public class EthernetManager {
         }
         info.setIpAddress(getSharedPreIpAddress());
         info.setDnsAddr(getSharedPreDnsAddress());
+        info.setProxyAddr(getSharedPreProxyAddress());
+        info.setProxyPort(getSharedPreProxyPort());
         return info;
     }
 
@@ -161,17 +164,6 @@ public class EthernetManager {
      */
     public String[] getDeviceNameList() {
         return (scanDevice() > 0) ? DevName : null;
-    }
-
-    /**
-     * Set the ethernet interface configuration mode
-     * @param mode {@code ETHERNET_CONN_MODE_DHCP} for dhcp {@code ETHERNET_CONN_MODE_MANUAL} for manual configure
-     */
-    public synchronized void setMode(String mode) {
-        final ContentResolver cr = mContext.getContentResolver();
-        if (DevName != null) {
-            SystemProperties.set("net." + DevName[0] + ".mode", mode);
-        }
     }
 
     private void setInterfaceUp(String InterfaceName)
@@ -220,14 +212,16 @@ public class EthernetManager {
             updateDevInfo(info);
         }
     }
+
     public EthernetDevInfo getDhcpInfo() {
         EthernetDevInfo infotemp = new EthernetDevInfo();
         infotemp.setIfName(mTracker.getLinkProperties().getInterfaceName());
         infotemp.setConnectMode(EthernetDevInfo.ETHERNET_CONN_MODE_DHCP);
         String ip;
         ip = mConnMgr.getLinkProperties(ConnectivityManager.TYPE_ETHERNET).getAddresses().toString();
-        Log.d(TAG, "===========IP=" + ip.substring(2, ip.length()-1));
-        infotemp.setIpAddress(ip.substring(2, ip.length()-1));
+        Log.d(TAG, "===========IP=" + ip);
+        if (ip != "[]" )
+            infotemp.setIpAddress(ip.substring(2, ip.length()-1));
         String dns = " ";
         int i = 0;
         for( InetAddress d : mConnMgr.getLinkProperties(ConnectivityManager.TYPE_ETHERNET).getDnses()) {
@@ -294,6 +288,8 @@ public class EthernetManager {
             editor.putString("conn_mode",info.getConnectMode());
             editor.putString("mIpaddr",info.getIpAddress());
             editor.putString("mDns",info.getDnsAddr());
+            editor.putString("mProxyIp",info.getProxyAddr());
+            editor.putString("mProxyPort", info.getProxyPort());
             } catch (NumberFormatException e) {
                 e.printStackTrace();
             }
@@ -302,32 +298,65 @@ public class EthernetManager {
     }
 
     public String getSharedPreMode(){
+        String temp = null;
         try {
-            mode = sharedPreferences().getString("conn_mode",null);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        return mode;
+            temp = sharedPreferences().getString("conn_mode",null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return temp;
     }
 
     public String getSharedPreIpAddress(){
-
+        String temp = null;
         try {
-            ip_address = sharedPreferences().getString("mIpaddr",null);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        return ip_address;
+            temp = sharedPreferences().getString("mIpaddr",null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return temp;
     }
 
     public String getSharedPreDnsAddress(){
-
+        String temp = null;
         try {
-            dns_address = sharedPreferences().getString("mDns",null);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        return dns_address;
+            temp = sharedPreferences().getString("mDns",null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return temp;
+    }
+
+    public String getSharedPreProxyAddress(){
+        String temp = null;
+        try {
+            temp = sharedPreferences().getString("mProxyIp",null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return temp;
+    }
+
+    public String getSharedPreProxyPort(){
+        String temp = null;
+        try {
+            temp = sharedPreferences().getString("mProxyPort",null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return temp;
+    }
+
+    public void setProxy(){
+        String exclusionList = null;
+        if (getSharedPreProxyAddress() == null || getSharedPreProxyPort() == null)
+            return;
+        LinkProperties lp = mTracker.getLinkProperties();
+        if (lp == null)
+            return;
+        ProxyProperties proxyProperties =
+            new ProxyProperties(getSharedPreProxyAddress(), Integer.parseInt(getSharedPreProxyPort()), exclusionList);
+        lp.setHttpProxy(proxyProperties);
     }
 
 }
