@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Freescale Semiconductor, Inc.
+ * Copyright (C) 2013-2014 Freescale Semiconductor, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,8 @@ public class EthernetDevInfo {
     private String route;
     private String dns;
     private String mode;
+    private String proxyIp;
+    private String proxyPort;
 
     public EthernetDevInfo () {
         dev_name = null;
@@ -45,6 +47,8 @@ public class EthernetDevInfo {
         route = null;
         netmask = null;
         mode = ETHERNET_CONN_MODE_DHCP;
+        proxyIp = null;
+        proxyPort = null;
     }
 
     /**
@@ -94,6 +98,21 @@ public class EthernetDevInfo {
         return this.dns;
     }
 
+    public void setProxyAddr(String ip) {
+        this.proxyIp = ip;
+    }
+
+    public String getProxyAddr() {
+        return this.proxyIp;
+    }
+
+    public void setProxyPort(String port) {
+        this.proxyIp = port;
+    }
+
+    public String getProxyPort() {
+        return this.proxyPort;
+    }
     /**
      * Set ethernet configuration mode
      * @param mode {@code ETHERNET_CONN_MODE_DHCP} for dhcp {@code ETHERNET_CONN_MODE_MANUAL} for manual configure
@@ -111,34 +130,4 @@ public class EthernetDevInfo {
         return this.mode;
     }
 
-    public int describeContents() {
-        return 0;
-    }
-
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.dev_name);
-        dest.writeString(this.ipaddr);
-        dest.writeString(this.netmask);
-        dest.writeString(this.route);
-        dest.writeString(this.dns);
-        dest.writeString(this.mode);
-    }
-
-    /** Implement the Parcelable interface {@hide} */
-    public static final Creator<EthernetDevInfo> CREATOR = new Creator<EthernetDevInfo>() {
-        public EthernetDevInfo createFromParcel(Parcel in) {
-            EthernetDevInfo info = new EthernetDevInfo();
-            info.setIfName(in.readString());
-            info.setIpAddress(in.readString());
-            info.setNetMask(in.readString());
-            info.setRouteAddr(in.readString());
-            info.setDnsAddr(in.readString());
-            info.setConnectMode(in.readString());
-            return info;
-        }
-
-        public EthernetDevInfo[] newArray(int size) {
-            return new EthernetDevInfo[size];
-        }
-    };
 }
