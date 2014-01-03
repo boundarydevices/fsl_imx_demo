@@ -5,6 +5,7 @@
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
     <string name="eth_config_title" translatable="false">Configure Ethernet device</string>
+    <string name="eth_advanced_title" translatable="false">Advanced Ethernet setting</string>
     <string name="eth_setting" translatable="false">Ethernet setting</string>
     <string name="eth_dev_list" translatable="false">Ethernet Devices:</string>
     <string name="eth_con_type" translatable="false">Connection Type</string>
@@ -29,4 +30,5 @@
     <string name="proxy_port">Proxy port</string> 
     <string name="eth_proxy_address">Proxy address</string>
     <string name="show_need_setting">You should setting the static IP and DNS address in this mode</string>
+    <string name="advanced_need_setting">You should not set the Proxy address and Proxy port null</string>
 </resources>
