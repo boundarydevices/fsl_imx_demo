@@ -107,7 +107,7 @@ public class EthernetDevInfo {
     }
 
     public void setProxyPort(String port) {
-        this.proxyIp = port;
+        this.proxyPort = port;
     }
 
     public String getProxyPort() {
