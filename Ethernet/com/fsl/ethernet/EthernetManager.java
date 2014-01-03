@@ -231,6 +231,10 @@ public class EthernetManager {
             break;
         }
         infotemp.setDnsAddr(dns);// now only use dns1, need optimization later here.
+        String proxyAddress = getSharedPreProxyAddress();
+        String proxyPort = getSharedPreProxyPort();
+        infotemp.setProxyAddr(proxyAddress);
+        infotemp.setProxyPort(proxyPort);
         return infotemp;
     }
 
