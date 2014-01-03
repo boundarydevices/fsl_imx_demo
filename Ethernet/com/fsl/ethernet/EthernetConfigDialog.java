@@ -51,11 +51,7 @@ public class EthernetConfigDialog extends AlertDialog implements
     private RadioButton mConTypeManual;
     private EditText mIpaddr;
     private EditText mDns;
-    private CheckBox mProxy;
-    private EditText mProxyIp;
-    private EditText mProxyPort;
     private LinearLayout ip_dns_setting;
-    private LinearLayout address_port_setting;
     private static String Mode_dhcp = "dhcp";
 
     public EthernetConfigDialog(Context context, EthernetEnabler Enabler) {
@@ -71,14 +67,9 @@ public class EthernetConfigDialog extends AlertDialog implements
         mDevList = (Spinner) mView.findViewById(R.id.eth_dev_spinner);
         mConTypeDhcp = (RadioButton) mView.findViewById(R.id.dhcp_radio);
         mConTypeManual = (RadioButton) mView.findViewById(R.id.manual_radio);
-        mProxy = (CheckBox) mView.findViewById(R.id.eth_proxy);
         mIpaddr = (EditText)mView.findViewById(R.id.ipaddr_edit);
         mDns = (EditText)mView.findViewById(R.id.eth_dns_edit);
         ip_dns_setting = (LinearLayout)mView.findViewById(R.id.ip_dns_setting);
-        address_port_setting = (LinearLayout)mView.findViewById(R.id.address_port_setting);
-        address_port_setting.setVisibility(View.GONE);
-        mProxyIp = (EditText)mView.findViewById(R.id.proxy_address_edit);
-        mProxyPort = (EditText)mView.findViewById(R.id.proxy_port_edit);
 
         if (mEthEnabler.getManager().isConfigured()) {
             EthernetDevInfo info = mEthEnabler.getManager().getSavedConfig();
@@ -106,16 +97,6 @@ public class EthernetConfigDialog extends AlertDialog implements
         mConTypeDhcp.setOnClickListener(new RadioButton.OnClickListener() {
             public void onClick(View v) {
                 ip_dns_setting.setVisibility(View.GONE);
-            }
-        });
-        mProxy.setOnCheckedChangeListener(new OnCheckedChangeListener(){
-            public void onCheckedChanged(CompoundButton buttonView,boolean isChecked) {
-                if (!isChecked)
-                {
-                    address_port_setting.setVisibility(View.GONE);
-                }else{
-                    address_port_setting.setVisibility(View.VISIBLE);
-                }
             }
         });
 
@@ -149,15 +130,6 @@ public class EthernetConfigDialog extends AlertDialog implements
             info.setConnectMode(EthernetDevInfo.ETHERNET_CONN_MODE_DHCP);
             info.setIpAddress(null);
             info.setDnsAddr(null);
-        }
-        if (mProxy.isChecked()) {
-            if ((mProxyIp.getText().toString().equals(""))||(mProxyPort.getText().toString().equals("")))
-            {
-                Toast.makeText(this.getContext(), R.string.show_need_setting,Toast.LENGTH_SHORT).show();
-            }else{
-                info.setProxyAddr(mProxyIp.getText().toString());
-                info.setProxyPort(mProxyPort.getText().toString());
-            }
         }
 
         mEthEnabler.getManager().updateDevInfo(info);
