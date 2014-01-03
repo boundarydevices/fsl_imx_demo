@@ -4,7 +4,7 @@
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:layout_width="610dp"
+        android:layout_width="900dp"
         android:layout_height="300dp"
         android:orientation="vertical"
         android:layout_centerVertical="true"
@@ -14,19 +14,8 @@
             android:id="@+id/grid"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:columnCount="1"
+            android:columnCount="2"
             android:rowCount="1" >
-
-            <Button
-                android:id="@+id/btnConfig"
-                android:layout_width="300dp"
-                android:layout_height="300dp"
-                android:layout_column="0"
-                android:layout_gravity="right|top"
-                android:layout_row="0"
-                android:clickable="true"
-                android:focusable="true"
-                android:background = "@drawable/btnconfig_background" />
 
             <Button
                 android:id="@+id/btnCheck"
@@ -37,6 +26,28 @@
                 android:layout_row="0"
                 android:clickable="true"
                 android:background="@drawable/btncheck_background" />
+
+            <Button
+                android:id="@+id/btnAdvanced"
+                android:layout_width="300dp"
+                android:layout_height="300dp"
+                android:layout_column="1"
+                android:layout_gravity="right|center_vertical"
+                android:layout_row="0"
+                android:background="@drawable/btnadvanced_background"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <Button
+                android:id="@+id/btnConfig"
+                android:layout_width="300dp"
+                android:layout_height="300dp"
+                android:layout_column="1"
+                android:layout_gravity="left|top"
+                android:layout_row="0"
+                android:background="@drawable/btnconfig_background"
+                android:clickable="true"
+                android:focusable="true" />
 
         </GridLayout>
 
