@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Freescale Semiconductor, Inc.
+ * Copyright (C) 2013-2014 Freescale Semiconductor, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,8 @@ public class MainActivity extends Activity {
     private boolean shareprefences_flag = false;
     private boolean first_run = true;
     public static final String FIRST_RUN = "ethernet";
+    private Button mBtnAdvanced;
+    private EthernetAdvDialog mEthAdvancedDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,8 +60,11 @@ public class MainActivity extends Activity {
         mEthEnabler = new EthernetEnabler(this);
         mEthConfigDialog = new EthernetConfigDialog(this, mEthEnabler);
         mEthEnabler.setConfigDialog(mEthConfigDialog);
+        mEthAdvancedDialog = new EthernetAdvDialog(this, mEthEnabler);
+        mEthEnabler.setmEthAdvancedDialog(mEthAdvancedDialog);
         addListenerOnBtnConfig();
         addListenerOnBtnCheck();
+        addListenerOnBtnAdvanced();
     }
 
 
@@ -91,11 +96,27 @@ public class MainActivity extends Activity {
                 text.setMovementMethod(ScrollingMovementMethod.getInstance());
                 mSaveConfig = mEthEnabler.getManager().getSavedConfig();
                 if (mSaveConfig != null) {
-                    final String config_detail = "IP address : " + mEthEnabler.getManager().getSharedPreIpAddress() + "\n"
-                            + "DNS address: " + mEthEnabler.getManager().getSharedPreDnsAddress() + "\n"
-                            + "IP mode    : " + mEthEnabler.getManager().getSharedPreMode() + "\n";
+                    final String config_detail = "IP Mode       : " + mEthEnabler.getManager().getSharedPreMode() + "\n"
+                            + "IP Address    : " +  mEthEnabler.getManager().getSharedPreIpAddress() + "\n"
+                            + "DNS Address   : " + mEthEnabler.getManager().getSharedPreDnsAddress() + "\n"
+                            + "Proxy Address : " + mEthEnabler.getManager().getSharedPreProxyAddress() + "\n"
+                            + "Proxy Port    : " + mEthEnabler.getManager().getSharedPreProxyPort() + "\n";
                     text.setText(config_detail);
                 }
+            }
+        });
+    }
+
+    public void addListenerOnBtnAdvanced() {
+        mBtnAdvanced = (Button) findViewById(R.id.btnAdvanced);
+
+        mBtnAdvanced.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSaveConfig = mEthEnabler.getManager().getSavedConfig();
+                if (mSaveConfig != null) {
+                    mEthAdvancedDialog.show();
+                }           
             }
         });
     }

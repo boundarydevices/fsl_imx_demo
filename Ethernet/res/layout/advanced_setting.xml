@@ -8,33 +8,8 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingBottom="8dip">
-        <LinearLayout
-                android:id="@+id/table"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-        </LinearLayout>
 
-        <!-- Device list -->
-
-        <TextView android:id="@+id/eth_dev_list_text"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:layout_marginTop="8dip"
-                  android:layout_marginStart="16dip"
-                  android:layout_marginEnd="16dip"
-                  android:orientation="vertical"
-                  android:gravity="start"
-                  android:text="@string/eth_dev_list"
-                  android:textAppearance="?android:attr/textAppearanceMedium" />
-
-        <!-- The entries will be set programmatically -->
-        <Spinner android:id="@+id/eth_dev_spinner"
-                 android:layout_width="match_parent"
-                 android:layout_height="wrap_content" />
-
-        <!-- Connection type -->
-        <TextView android:id="@+id/eth_con_type"
+        <TextView android:id="@+id/eth_proxy_text"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
                   android:layout_marginTop="8dip"
@@ -43,25 +18,7 @@
                   android:orientation="vertical"
                   android:gravity="start"
                   android:textAppearance="?android:attr/textAppearanceMedium"
-                  android:text="@string/eth_con_type" />
-        <RadioGroup android:id="@+id/con_type"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-            <RadioButton android:id="@+id/dhcp_radio"
-                         android:layout_width="wrap_content"
-                         android:layout_height="wrap_content"
-                         android:textSize="14sp"
-                         android:textAlignment="viewStart"
-                         android:text="@string/eth_con_type_dhcp">
-            </RadioButton>
-            <RadioButton android:id="@+id/manual_radio"
-                         android:layout_width="wrap_content"
-                         android:layout_height="wrap_content"
-                         android:textSize="14sp"
-                         android:textAlignment="viewStart"
-                         android:text="@string/eth_con_type_manual">
-            </RadioButton>
-        </RadioGroup>
+                  android:text="@string/proxy_setting" />
 
         <!-- IP address -->
         <LinearLayout android:id="@+id/enterprise_wrapper"
@@ -74,8 +31,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical" >
-                
-            <TextView android:id="@+id/ipaddr_text"
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/address_port_setting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+            <TextView android:id="@+id/eth_proxy_address"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
                       android:layout_marginTop="8dip"
@@ -83,15 +47,16 @@
                       android:layout_marginEnd="16dip"
                       android:orientation="vertical"
                       android:gravity="start"
-                      android:text="@string/eth_ipaddr" />
-            <EditText android:id="@+id/ipaddr_edit"
+                      android:text="@string/proxy_address" />
+            <EditText android:id="@+id/proxy_address_edit"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
                       android:textSize="18sp"
                       android:textAlignment="viewStart"
                       android:singleLine="true"
                       android:inputType="phone" />
-            <TextView android:id="@+id/dns_text"
+
+            <TextView android:id="@+id/eth_proxy_port"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
                       android:layout_marginTop="8dip"
@@ -99,16 +64,18 @@
                       android:layout_marginEnd="16dip"
                       android:orientation="vertical"
                       android:gravity="start"
-                      android:text="@string/eth_dns" />
-            <EditText android:id="@+id/eth_dns_edit"
+                      android:text="@string/proxy_port" />
+            <EditText android:id="@+id/proxy_port_edit"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
                       android:textSize="18sp"
                       android:textAlignment="viewStart"
                       android:singleLine="true"
-                      android:inputType="none" />
+                      android:inputType="number" />            
             </LinearLayout>
+
         </LinearLayout>
+
     </LinearLayout>
 </ScrollView>
 
