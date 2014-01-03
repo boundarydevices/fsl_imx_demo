@@ -29,9 +29,14 @@ public class EthernetEnabler {
     private Context mContext;
     private EthernetManager mEthManager;
     private EthernetConfigDialog mEthConfigDialog;
+    private EthernetAdvDialog mEthAdvancedDialog;
 
     public void setConfigDialog (EthernetConfigDialog Dialog) {
         mEthConfigDialog = Dialog;
+    }
+
+    public void setmEthAdvancedDialog(EthernetAdvDialog Dialog) {
+        this.mEthAdvancedDialog = Dialog;
     }
 
     public EthernetEnabler(Context context) {
