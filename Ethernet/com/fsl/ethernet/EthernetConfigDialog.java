@@ -118,7 +118,7 @@ public class EthernetConfigDialog extends AlertDialog implements
         if (localLOGV)
             Log.d(TAG, "Config device for " + mDevList.getSelectedItem().toString());
         if (mConTypeManual.isChecked()) {
-            if ((mIpaddr.getText().toString().equals(""))||(mDns.getText().toString().equals("")))
+            if ((mIpaddr.getText().toString().equals(""))&&(mDns.getText().toString().equals("")))
             {
                 Toast.makeText(this.getContext(), R.string.show_need_setting,Toast.LENGTH_SHORT).show();
             }else{
