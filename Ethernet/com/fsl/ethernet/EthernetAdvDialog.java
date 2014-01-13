@@ -15,6 +15,10 @@
  */
 package com.fsl.ethernet;
 
+import android.net.ConnectivityManager;
+import android.net.Proxy;
+import android.net.LinkProperties;
+import android.net.ProxyProperties;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -38,11 +42,16 @@ public class EthernetAdvDialog extends AlertDialog implements DialogInterface.On
     private View mView;
     private EditText mProxyIp;
     private EditText mProxyPort;
+    private EditText mProxyExclusionList;
+    private LinkProperties mLinkProperties;
+    private ProxyProperties mHttpProxy;
+    private static ConnectivityManager sConnectivityManager = null;
 
     protected EthernetAdvDialog(Context context,EthernetEnabler Enabler) {
         super(context);
         mContext = context;
         mEthEnabler = Enabler;
+        LinkProperties mLinkProperties = new LinkProperties();
         buildDialogContent(context);
     }
 
@@ -52,12 +61,14 @@ public class EthernetAdvDialog extends AlertDialog implements DialogInterface.On
 
         mProxyIp = (EditText)mView.findViewById(R.id.proxy_address_edit);
         mProxyPort = (EditText)mView.findViewById(R.id.proxy_port_edit);
+        mProxyExclusionList = (EditText)mView.findViewById(R.id.proxy_exclusionlist);
 
         this.setInverseBackgroundForced(true);
         this.setButton(BUTTON_POSITIVE, context.getText(R.string.menu_save), this);
         this.setButton(BUTTON_NEGATIVE, context.getText(R.string.menu_cancel), this);
         mProxyIp.setText(mEthEnabler.getManager().getSharedPreProxyAddress(),TextView.BufferType.EDITABLE);
         mProxyPort.setText(mEthEnabler.getManager().getSharedPreProxyPort(),TextView.BufferType.EDITABLE);
+        mProxyExclusionList.setText(mEthEnabler.getManager().getSharedPreProxyExclusionList(),TextView.BufferType.EDITABLE);
         this.setInverseBackgroundForced(true);
         this.setButton(BUTTON_POSITIVE, context.getText(R.string.menu_save), this);
         this.setButton(BUTTON_NEGATIVE, context.getText(R.string.menu_cancel), this);
@@ -65,6 +76,7 @@ public class EthernetAdvDialog extends AlertDialog implements DialogInterface.On
     }
 
     public void handle_saveconf() {
+        //mLinkProperties.clear();
         EthernetDevInfo info = new EthernetDevInfo();
 
         if ((mProxyIp.getText().toString().equals(""))||(mProxyPort.getText().toString().equals("")))
@@ -76,9 +88,18 @@ public class EthernetAdvDialog extends AlertDialog implements DialogInterface.On
             info.setDnsAddr(mEthEnabler.getManager().getSharedPreDnsAddress());
             info.setProxyAddr(mProxyIp.getText().toString());
             info.setProxyPort(mProxyPort.getText().toString());
+            info.setProxyExclusionList(mProxyExclusionList.getText().toString());
         } mEthEnabler.getManager().updateDevInfo(info);
 
-        mEthEnabler.getManager().setProxy();
+        String proxyAddress = mProxyIp.getText().toString();
+        String proxyPort = mProxyPort.getText().toString();
+        String exclusionList = mProxyExclusionList.getText().toString();
+        int port = 0;
+        try {
+            port = Integer.parseInt(proxyPort);
+        } catch(NumberFormatException e){
+        }
+        Proxy.setHttpProxySystemProperty(proxyAddress,proxyPort,exclusionList,null);
     }
 
     public void onClick(DialogInterface dialog, int which) {

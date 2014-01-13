@@ -39,6 +39,7 @@ public class EthernetDevInfo {
     private String mode;
     private String proxyIp;
     private String proxyPort;
+    private String proxyExclusionList;
 
     public EthernetDevInfo () {
         dev_name = null;
@@ -112,6 +113,14 @@ public class EthernetDevInfo {
 
     public String getProxyPort() {
         return this.proxyPort;
+    }
+
+    public String getProxyExclusionList() {
+        return proxyExclusionList;
+    }
+
+    public void setProxyExclusionList(String proxyExclusionList) {
+        this.proxyExclusionList = proxyExclusionList;
     }
     /**
      * Set ethernet configuration mode
