@@ -53,8 +53,7 @@
                       android:layout_height="wrap_content"
                       android:textSize="18sp"
                       android:textAlignment="viewStart"
-                      android:singleLine="true"
-                      android:inputType="phone" />
+                      android:singleLine="true" />
 
             <TextView android:id="@+id/eth_proxy_port"
                       android:layout_width="match_parent"
@@ -71,7 +70,24 @@
                       android:textSize="18sp"
                       android:textAlignment="viewStart"
                       android:singleLine="true"
-                      android:inputType="number" />            
+                      android:inputType="number" />
+
+           <TextView android:id="@+id/eth_proxy_exclusionlist"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_marginTop="8dip"
+                      android:layout_marginStart="16dip"
+                      android:layout_marginEnd="16dip"
+                      android:orientation="vertical"
+                      android:gravity="start"
+                      android:text="@string/proxy_exclusionlist" />
+            <EditText android:id="@+id/proxy_exclusionlist"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:textSize="18sp"
+                      android:textAlignment="viewStart"
+                      android:singleLine="true"
+                      android:inputType="number" />
             </LinearLayout>
 
         </LinearLayout>
