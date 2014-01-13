@@ -116,7 +116,7 @@ public class MainActivity extends Activity {
                 mSaveConfig = mEthEnabler.getManager().getSavedConfig();
                 if (mSaveConfig != null) {
                     mEthAdvancedDialog.show();
-                }           
+                }
             }
         });
     }
