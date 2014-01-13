@@ -294,6 +294,7 @@ public class EthernetManager {
             editor.putString("mDns",info.getDnsAddr());
             editor.putString("mProxyIp",info.getProxyAddr());
             editor.putString("mProxyPort", info.getProxyPort());
+            editor.putString("mProxyExclusionList", info.getProxyExclusionList());
             } catch (NumberFormatException e) {
                 e.printStackTrace();
             }
@@ -351,6 +352,16 @@ public class EthernetManager {
         return temp;
     }
 
+    public String getSharedPreProxyExclusionList(){
+        String temp = null;
+        try {
+            temp = sharedPreferences().getString("mProxyExclusionList",null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return temp;
+    }
+
     public void setProxy(){
         String exclusionList = null;
         if (getSharedPreProxyAddress() == null || getSharedPreProxyPort() == null)
@@ -358,9 +369,15 @@ public class EthernetManager {
         LinkProperties lp = mTracker.getLinkProperties();
         if (lp == null)
             return;
+        int port = 0;
+        try {
+            port = Integer.parseInt(getSharedPreProxyPort());
+        } catch(NumberFormatException e){
+        }
         ProxyProperties proxyProperties =
-            new ProxyProperties(getSharedPreProxyAddress(), Integer.parseInt(getSharedPreProxyPort()), exclusionList);
+            new ProxyProperties(getSharedPreProxyAddress(), port, exclusionList);
         lp.setHttpProxy(proxyProperties);
+        Log.i(TAG,"=============getHttpProxy==============" + lp.getHttpProxy());
     }
 
 }
