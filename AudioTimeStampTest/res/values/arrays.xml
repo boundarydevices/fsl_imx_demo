@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string-array name="musics">
+		<item>Xvid_SP1_640x480_29.97_1079_a_PCM_48_1534_16bits_2_KoreaDance_audio.pcm</item>
+		<item>raw-48k-2chn-16bits.pcm</item>
+	</string-array>
+ </resources>
+
