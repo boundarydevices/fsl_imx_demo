@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Hello World, TestAudioTrackActivity!</string>
+    <string name="app_name">AudioTimeStampTest</string>
+    <string name="play">PLAY</string>
+    <string name="stop">STOP</string>
+    <string name="exit">EXIT</string>
+    <string name="result">The test result</string>
+    <string name="ready">ready</string>
+</resources>
