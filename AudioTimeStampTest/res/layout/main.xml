@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+    >
+    
+	  <Spinner
+	    android:id="@+id/Spinner"
+		android:layout_width="fill_parent" 
+		android:layout_height="100dp"
+		android:textSize="55dp"
+                android:background="#ffffff"/>
+	  
+      <TextView
+          android:id="@+id/textview01"
+          android:layout_width="106dp"
+          android:layout_height="55dp"
+          android:layout_below="@+id/Spinner"
+          android:layout_marginTop="30dp"
+          android:text="@string/ready" 
+          android:textSize="32dp"/>
+      
+      <Button
+          android:id="@+id/buttonPlay"
+          android:layout_width="160dp"
+          android:layout_height="70dp"
+          android:layout_below="@+id/textview01"
+          android:layout_marginTop="15dp"
+          android:text="@string/play"
+          android:textSize="45dp" />
+      
+      <Button
+          android:id="@+id/buttonStop"
+          android:layout_width="160dp"
+          android:layout_height="70dp"
+          android:layout_below="@+id/buttonPlay"
+          android:layout_marginTop="38dp"
+          android:text="@string/stop" 
+          android:textSize="45dp"/>
+      
+      <TextView
+          android:id="@+id/textview02"
+          android:layout_width="500dp"
+          android:layout_height="80dp"
+          android:layout_below="@+id/Spinner"
+          android:layout_marginLeft="260dp"
+           android:layout_marginTop="18dp"
+          android:layout_toRightOf="@+id/textview01"
+          android:text="@string/result" 
+          android:textSize="50dp"/>
+      
+      <TextView
+          android:id="@+id/textview03"
+          android:layout_width="500dp"
+          android:layout_height="wrap_content"
+          android:layout_below="@+id/textview02"
+          android:layout_marginTop="20dp"
+          android:layout_alignLeft="@+id/textview02"
+          android:textSize="32dp" />
+
+     <TextView
+          android:id="@+id/textview04"
+          android:layout_width="500dp"
+          android:layout_height="wrap_content"
+          android:layout_below="@+id/textview03" 
+          android:layout_marginTop="15dp"
+          android:layout_alignLeft="@+id/textview03" 
+          android:textSize="32dp"/>
+     
+      <TextView
+          android:id="@+id/textview05"
+          android:layout_width="500dp"
+          android:layout_height="wrap_content"
+          android:layout_below="@+id/textview04"
+          android:layout_marginTop="15dp"
+          android:layout_alignLeft="@+id/textview04" 
+          android:textSize="32dp"/>
+  
+</RelativeLayout>
