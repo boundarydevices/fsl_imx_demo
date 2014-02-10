@@ -76,7 +76,6 @@ public class EthernetAdvDialog extends AlertDialog implements DialogInterface.On
     }
 
     public void handle_saveconf() {
-        //mLinkProperties.clear();
         EthernetDevInfo info = new EthernetDevInfo();
 
         if ((mProxyIp.getText().toString().equals(""))||(mProxyPort.getText().toString().equals("")))
@@ -89,17 +88,9 @@ public class EthernetAdvDialog extends AlertDialog implements DialogInterface.On
             info.setProxyAddr(mProxyIp.getText().toString());
             info.setProxyPort(mProxyPort.getText().toString());
             info.setProxyExclusionList(mProxyExclusionList.getText().toString());
-        } mEthEnabler.getManager().updateDevInfo(info);
-
-        String proxyAddress = mProxyIp.getText().toString();
-        String proxyPort = mProxyPort.getText().toString();
-        String exclusionList = mProxyExclusionList.getText().toString();
-        int port = 0;
-        try {
-            port = Integer.parseInt(proxyPort);
-        } catch(NumberFormatException e){
         }
-        Proxy.setHttpProxySystemProperty(proxyAddress,proxyPort,exclusionList,null);
+        mEthEnabler.getManager().updateDevInfo(info);
+        mEthEnabler.getManager().setProxy( );
     }
 
     public void onClick(DialogInterface dialog, int which) {
