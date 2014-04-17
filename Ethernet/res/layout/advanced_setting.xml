@@ -86,8 +86,8 @@
                       android:layout_height="wrap_content"
                       android:textSize="18sp"
                       android:textAlignment="viewStart"
-                      android:singleLine="true"
-                      android:inputType="number" />
+                      android:hint="@string/bypass_hint"
+                      android:singleLine="true"/>
             </LinearLayout>
 
         </LinearLayout>

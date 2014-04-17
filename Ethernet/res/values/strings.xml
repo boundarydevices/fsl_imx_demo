@@ -32,4 +32,5 @@
     <string name="eth_proxy_address">Proxy address</string>
     <string name="show_need_setting">You should setting the static IP and DNS address in this mode</string>
     <string name="advanced_need_setting">You should not set the Proxy address and Proxy port null</string>
+    <string name="bypass_hint">You should put valid addresses split by \",\"</string>
 </resources>

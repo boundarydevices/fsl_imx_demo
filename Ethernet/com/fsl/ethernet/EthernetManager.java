@@ -364,6 +364,7 @@ public class EthernetManager {
 
     public void setProxy(){
         String exclusionList = null;
+        exclusionList=getSharedPreProxyExclusionList();
         if (getSharedPreProxyAddress() == null || getSharedPreProxyPort() == null)
             return;
         LinkProperties lp = mTracker.getLinkProperties();
