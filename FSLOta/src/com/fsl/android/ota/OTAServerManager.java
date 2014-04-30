@@ -1,5 +1,5 @@
 /*
-/* Copyright 2012-2013 Freescale Semiconductor, Inc.
+/* Copyright 2012-2014 Freescale Semiconductor, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,7 +89,8 @@ public class OTAServerManager  {
 	public boolean checkNetworkOnline() {
 		ConnectivityManager conMgr =  (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
 		
-		if ((conMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI)).isConnectedOrConnecting()) {
+		if (conMgr.getNetworkInfo(ConnectivityManager.TYPE_ETHERNET).isConnectedOrConnecting()||
+			conMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnectedOrConnecting()) {
 			return true;
 		} else {
 			return false;
@@ -107,7 +108,7 @@ public class OTAServerManager  {
                                 } 
 				else {
 					reportCheckingError(OTAStateChangeListener.ERROR_WIFI_NOT_AVALIBLE);
-                                        Log.v(TAG, "error wifi not avalible");
+                                        Log.v(TAG, "error wifi or ethernet not avalible");
                                 }  
 			}
 			
