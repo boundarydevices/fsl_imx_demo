@@ -90,7 +90,7 @@ public class EthernetAdvDialog extends AlertDialog implements DialogInterface.On
             info.setProxyExclusionList(mProxyExclusionList.getText().toString());
         }
         mEthEnabler.getManager().updateDevInfo(info);
-        mEthEnabler.getManager().setProxy( );
+        mEthEnabler.getManager().setProxy();
     }
 
     public void onClick(DialogInterface dialog, int which) {
