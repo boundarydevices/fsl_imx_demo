@@ -365,8 +365,10 @@ public class EthernetManager {
     public void setProxy(){
         String exclusionList = null;
         exclusionList=getSharedPreProxyExclusionList();
-        if (getSharedPreProxyAddress() == null || getSharedPreProxyPort() == null)
+        if (getSharedPreProxyAddress() == null || getSharedPreProxyPort() == null) {
+            mConnMgr.setGlobalProxy(null);
             return;
+        }
         LinkProperties lp = mTracker.getLinkProperties();
         if (lp == null)
             return;
