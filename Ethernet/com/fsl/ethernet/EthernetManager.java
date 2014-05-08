@@ -147,6 +147,7 @@ public class EthernetManager {
         info.setDnsAddr(getSharedPreDnsAddress());
         info.setProxyAddr(getSharedPreProxyAddress());
         info.setProxyPort(getSharedPreProxyPort());
+        info.setProxyExclusionList(getSharedPreProxyExclusionList());
         return info;
     }
 
@@ -233,8 +234,10 @@ public class EthernetManager {
         infotemp.setDnsAddr(dns);// now only use dns1, need optimization later here.
         String proxyAddress = getSharedPreProxyAddress();
         String proxyPort = getSharedPreProxyPort();
+        String proxyExclusionList=getSharedPreProxyExclusionList();
         infotemp.setProxyAddr(proxyAddress);
         infotemp.setProxyPort(proxyPort);
+        infotemp.setProxyExclusionList(proxyExclusionList);
         return infotemp;
     }
 
