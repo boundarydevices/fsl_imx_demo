@@ -77,11 +77,10 @@ public class EthernetAdvDialog extends AlertDialog implements DialogInterface.On
 
     public void handle_saveconf() {
         EthernetDevInfo info = new EthernetDevInfo();
-
         if ((mProxyIp.getText().toString().equals(""))||(mProxyPort.getText().toString().equals("")))
         {
-            Toast.makeText(this.getContext(), R.string.advanced_need_setting,Toast.LENGTH_SHORT).show();
         }else{
+            info.setIfName("eth0");
             info.setConnectMode(mEthEnabler.getManager().getSharedPreMode());
             info.setIpAddress(mEthEnabler.getManager().getSharedPreIpAddress());
             info.setDnsAddr(mEthEnabler.getManager().getSharedPreDnsAddress());
@@ -113,4 +112,11 @@ public class EthernetAdvDialog extends AlertDialog implements DialogInterface.On
     }
 
 
+  @Override
+    public void show() {
+          super.show();
+          mProxyIp.setText(mEthEnabler.getManager().getSharedPreProxyAddress(),TextView.BufferType.EDITABLE);
+          mProxyPort.setText(mEthEnabler.getManager().getSharedPreProxyPort(),TextView.BufferType.EDITABLE);
+          mProxyExclusionList.setText(mEthEnabler.getManager().getSharedPreProxyExclusionList(),TextView.BufferType.EDITABLE);
+    }
 }
