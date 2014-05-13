@@ -58,6 +58,7 @@ public class MainActivity extends Activity {
                 Context.MODE_WORLD_WRITEABLE);
 
         mEthEnabler = new EthernetEnabler(this);
+        mEthEnabler.getManager().initProxy();
         mEthConfigDialog = new EthernetConfigDialog(this, mEthEnabler);
         mEthEnabler.setConfigDialog(mEthConfigDialog);
         mEthAdvancedDialog = new EthernetAdvDialog(this, mEthEnabler);
