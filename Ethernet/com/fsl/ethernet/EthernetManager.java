@@ -382,8 +382,16 @@ public class EthernetManager {
         }
         ProxyProperties proxyProperties =
             new ProxyProperties(getSharedPreProxyAddress(), port, exclusionList);
+        mConnMgr.setGlobalProxy(null);
         mConnMgr.setGlobalProxy(proxyProperties);
         Log.i(TAG,"=============getHttpProxy==============" + proxyProperties);
     }
 
+    public void initProxy(){
+        EthernetDevInfo info = getSavedConfig();
+        if (info != null) {
+            updateDevInfo(info);
+            setProxy();
+	}
+    }
 }
