@@ -1,5 +1,5 @@
 /*
-/* Copyright 2012 Freescale Semiconductor, Inc.
+/* Copyright 2012-2014 Freescale Semiconductor, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,9 @@ package com.fsl.android.ota;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 import android.util.Log;
 
@@ -33,15 +36,28 @@ public class OTAServerConfig {
 	String product;
 	final String TAG = "OTA";
 	final String configFile = "/system/etc/ota.conf";
+	final String machineFile = "/sys/devices/soc0/machine";
 	final String server_ip_config = "server";
 	final String port_config_str = "port";
+	String machineString = null;
 	
 	public OTAServerConfig (String productname) throws MalformedURLException {
 		
 		if (loadConfigureFromFile(configFile, productname) == false)
 			defaultConfigure(productname);
 	}
-	
+	void readMachine() {
+		File file = new File(machineFile);
+		BufferedReader reader = null;
+		try {
+			reader = new BufferedReader(new FileReader(file));
+			machineString = reader.readLine();
+			reader.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	boolean loadConfigureFromFile (String configFile, String product) {
 		try {
 			BuildPropParser parser = new BuildPropParser(new File(configFile), null);
@@ -49,7 +65,20 @@ public class OTAServerConfig {
 			String port_str = parser.getProp(port_config_str);
 			int port = new Long(port_str).intValue();
 			String fileaddr = new String(product + "/" + product + ".ota.zip");
-			String buildconfigAddr = new String(product + "/" + "build.prop"); 
+			String buildconfigAddr = new String(product + "/" + "build.prop");
+
+			readMachine();
+
+			if (machineString.indexOf("DualLite") != -1) {
+				fileaddr = fileaddr + ".imx6dl";
+			} else if (machineString.indexOf("Quad") != -1) {
+				fileaddr = fileaddr + ".imx6q";
+			} else if (machineString.indexOf("SoloLite") != -1) {
+				fileaddr = fileaddr + ".imx6sl";
+			} else if (machineString.indexOf("SoloX") != -1) {
+				fileaddr = fileaddr + ".imx6sx";
+			}
+
 			updatePackageURL = new URL(default_protocol, server, port, fileaddr);
 			buildpropURL = new URL(default_protocol, server, port, buildconfigAddr);
 		} catch (Exception e) {
