@@ -49,7 +49,7 @@
             android:layout_height="wrap_content"
             android:layout_column="1"
             android:layout_columnSpan="5"
-            android:layout_gravity="right"
+            android:layout_gravity="fill"
             android:layout_row="3"
             android:layout_rowSpan="3" />
 
@@ -90,9 +90,4 @@
             android:layout_row="4" />
     </GridLayout>
 
-        android:id="@+id/linearLayout1"
-        android:layout_width="318dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="center_horizontal"
-        android:orientation="vertical" >
 </LinearLayout>
