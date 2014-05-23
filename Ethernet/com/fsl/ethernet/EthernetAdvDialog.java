@@ -77,13 +77,14 @@ public class EthernetAdvDialog extends AlertDialog implements DialogInterface.On
 
     public void handle_saveconf() {
         EthernetDevInfo info = new EthernetDevInfo();
-	info.setIfName("eth0");
-	info.setConnectMode(mEthEnabler.getManager().getSharedPreMode());
-	info.setIpAddress(mEthEnabler.getManager().getSharedPreIpAddress());
-	info.setDnsAddr(mEthEnabler.getManager().getSharedPreDnsAddress());
-	info.setProxyAddr(mProxyIp.getText().toString());
-	info.setProxyPort(mProxyPort.getText().toString());
-	info.setProxyExclusionList(mProxyExclusionList.getText().toString());
+        String [] DevName = mEthEnabler.getManager().getDeviceNameList();
+        info.setIfName(DevName[0]);
+        info.setConnectMode(mEthEnabler.getManager().getSharedPreMode());
+        info.setIpAddress(mEthEnabler.getManager().getSharedPreIpAddress());
+        info.setDnsAddr(mEthEnabler.getManager().getSharedPreDnsAddress());
+        info.setProxyAddr(mProxyIp.getText().toString());
+        info.setProxyPort(mProxyPort.getText().toString());
+        info.setProxyExclusionList(mProxyExclusionList.getText().toString());
         mEthEnabler.getManager().updateDevInfo(info);
         mEthEnabler.getManager().setProxy();
     }
