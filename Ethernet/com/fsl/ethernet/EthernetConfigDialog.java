@@ -132,6 +132,9 @@ public class EthernetConfigDialog extends AlertDialog implements
             info.setDnsAddr(null);
         }
 
+        info.setProxyAddr(mEthEnabler.getManager().getSharedPreProxyAddress());
+        info.setProxyPort(mEthEnabler.getManager().getSharedPreProxyPort());
+        info.setProxyExclusionList(mEthEnabler.getManager().getSharedPreProxyExclusionList());
         mEthEnabler.getManager().updateDevInfo(info);
         mEthEnabler.setEthEnabled();
     }
