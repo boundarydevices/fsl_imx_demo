@@ -184,6 +184,7 @@ public class EthernetManager {
 
             try {
                 mNMService.setInterfaceDown(info.getIfName());
+                mNMService.clearInterfaceAddresses(info.getIfName());
                 mNMService.setInterfaceUp(info.getIfName());
             } catch (RemoteException re){
                 Log.e(TAG,"DHCP configuration failed: " + re);
@@ -216,7 +217,8 @@ public class EthernetManager {
 
     public EthernetDevInfo getDhcpInfo() {
         EthernetDevInfo infotemp = new EthernetDevInfo();
-        infotemp.setIfName(mTracker.getLinkProperties().getInterfaceName());
+        String [] DevName = getDeviceNameList();
+        infotemp.setIfName(DevName[0]);
         infotemp.setConnectMode(EthernetDevInfo.ETHERNET_CONN_MODE_DHCP);
         String ip;
         ip = mConnMgr.getLinkProperties(ConnectivityManager.TYPE_ETHERNET).getAddresses().toString();
