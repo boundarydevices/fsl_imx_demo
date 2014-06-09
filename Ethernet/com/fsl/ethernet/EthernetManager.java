@@ -47,6 +47,7 @@ import android.os.Parcel;
 import android.os.SystemProperties;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.widget.Toast;
 /**
  * Created by B38613 on 9/27/13.
  */
@@ -206,6 +207,9 @@ public class EthernetManager {
                 Log.e(TAG,"Static IP configuration failed: " + re);
             } catch (IllegalStateException e) {
                 Log.e(TAG,"Static IP configuration fialed: " + e);
+            }catch (IllegalArgumentException e) {
+                Log.e(TAG,"Wrong Static IP: " + e);
+                Toast.makeText(mContext, "Illegal address inputed. You can not access the Internet.",Toast.LENGTH_SHORT).show();
             }
             Log.d(TAG, "set ip manually " + info.toString());
             SystemProperties.set("net.dns1", info.getDnsAddr());
