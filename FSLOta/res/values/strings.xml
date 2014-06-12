@@ -9,7 +9,7 @@
         <string name="error_server_no_package">Error: server don\'t have upgrade package</string>
         <string name="error_write_file">Error: write file error</string>
         <string name="already_up_to_date">\nYour software is up to date</string>
-        <string name="have_new">Have new release</string>
+        <string name="have_new">Have a new release</string>
         <string name="error_package_install_failed">package install failed</string>
         <string name="error_needs_wifi">Error: needs wifi network.</string>
         <string name="error_cannot_connect_server">Error: Can not connect to server</string>
