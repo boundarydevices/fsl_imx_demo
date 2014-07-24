@@ -145,7 +145,7 @@ public class EthernetConfigDialog extends AlertDialog implements
                 handle_saveconf();
                 break;
             case BUTTON_NEGATIVE:
-                //Don't need to do anything
+                dialog.cancel();
                 break;
             default:
                 Log.e(TAG,"Unknow button");
