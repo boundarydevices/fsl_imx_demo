@@ -95,7 +95,7 @@ public class EthernetAdvDialog extends AlertDialog implements DialogInterface.On
                 handle_saveconf();
                 break;
             case BUTTON_NEGATIVE:
-                //Don't need to do anything
+                dialog.cancel();
                 break;
             default:
                 Log.e(TAG,"Unknow button");
@@ -108,12 +108,4 @@ public class EthernetAdvDialog extends AlertDialog implements DialogInterface.On
 
     }
 
-
-  @Override
-    public void show() {
-          super.show();
-          mProxyIp.setText(mEthEnabler.getManager().getSharedPreProxyAddress(),TextView.BufferType.EDITABLE);
-          mProxyPort.setText(mEthEnabler.getManager().getSharedPreProxyPort(),TextView.BufferType.EDITABLE);
-          mProxyExclusionList.setText(mEthEnabler.getManager().getSharedPreProxyExclusionList(),TextView.BufferType.EDITABLE);
-    }
 }
