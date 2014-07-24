@@ -83,10 +83,6 @@ public class MainActivity extends Activity {
                 Context.MODE_WORLD_WRITEABLE);
 
         mEthEnabler = new EthernetEnabler(this);
-        mEthConfigDialog = new EthernetConfigDialog(this, mEthEnabler);
-        mEthEnabler.setConfigDialog(mEthConfigDialog);
-        mEthAdvancedDialog = new EthernetAdvDialog(this, mEthEnabler);
-        mEthEnabler.setmEthAdvancedDialog(mEthAdvancedDialog);
         addListenerOnBtnConfig();
         addListenerOnBtnCheck();
         addListenerOnBtnAdvanced();
@@ -110,6 +106,8 @@ public class MainActivity extends Activity {
         mBtnConfig.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                mEthConfigDialog = new EthernetConfigDialog(MainActivity.this, mEthEnabler);
+                mEthEnabler.setConfigDialog(mEthConfigDialog);
                 mEthConfigDialog.show();
             }
         });
@@ -144,6 +142,8 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 mSaveConfig = mEthEnabler.getManager().getSavedConfig();
                 if (mSaveConfig != null) {
+                    mEthAdvancedDialog = new EthernetAdvDialog(MainActivity.this,mEthEnabler);
+                    mEthEnabler.setmEthAdvancedDialog(mEthAdvancedDialog);
                     mEthAdvancedDialog.show();
                 }
             }
