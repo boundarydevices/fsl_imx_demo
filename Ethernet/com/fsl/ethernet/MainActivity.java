@@ -27,11 +27,17 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.DialogInterface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.NetworkInfo.State;
+import android.content.BroadcastReceiver;
 import com.fsl.ethernet.EthernetDevInfo;
 import android.view.View.OnClickListener;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Window;
 import android.view.WindowManager;
+import android.content.IntentFilter;
+import android.content.Intent;
 
 public class MainActivity extends Activity {
     private EthernetEnabler mEthEnabler;
@@ -39,13 +45,32 @@ public class MainActivity extends Activity {
     private Button mBtnConfig;
     private Button mBtnCheck;
     private EthernetDevInfo  mSaveConfig;
-    private String TAG = "MainActivity";
+    private ConnectivityManager  mConnMgr;
+    private String TAG = "EthernetMainActivity";
     private static String Mode_dhcp = "dhcp";
     private boolean shareprefences_flag = false;
     private boolean first_run = true;
     public static final String FIRST_RUN = "ethernet";
     private Button mBtnAdvanced;
     private EthernetAdvDialog mEthAdvancedDialog;
+    private final BroadcastReceiver mEthernetReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            if(ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())){
+                NetworkInfo info =
+                    intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
+                if (info != null) {
+                    Log.i(TAG,"getState()="+info.getState() + "getType()=" +
+                            info.getType());
+                    if (info.getType() == ConnectivityManager.TYPE_ETHERNET) {
+                        if (info.getState() == State.DISCONNECTED)
+                            mConnMgr.setGlobalProxy(null);
+                        if (info.getState() == State.CONNECTED)
+                            mEthEnabler.getManager().initProxy();
+                    }
+                }
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +83,6 @@ public class MainActivity extends Activity {
                 Context.MODE_WORLD_WRITEABLE);
 
         mEthEnabler = new EthernetEnabler(this);
-        mEthEnabler.getManager().initProxy();
         mEthConfigDialog = new EthernetConfigDialog(this, mEthEnabler);
         mEthEnabler.setConfigDialog(mEthConfigDialog);
         mEthAdvancedDialog = new EthernetAdvDialog(this, mEthEnabler);
@@ -66,6 +90,10 @@ public class MainActivity extends Activity {
         addListenerOnBtnConfig();
         addListenerOnBtnCheck();
         addListenerOnBtnAdvanced();
+        mConnMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(mEthernetReceiver, filter);
     }
 
 
@@ -120,5 +148,12 @@ public class MainActivity extends Activity {
                 }
             }
         });
+    }
+
+    public void onDestroy() {
+        super.onDestroy();
+        Log.i(TAG, "onStop() will force clear global proxy set by ethernet");
+        mConnMgr.setGlobalProxy(null);
+        unregisterReceiver(mEthernetReceiver);
     }
 }
