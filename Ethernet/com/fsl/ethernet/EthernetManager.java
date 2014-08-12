@@ -400,4 +400,7 @@ public class EthernetManager {
             setProxy();
 	}
     }
+    public boolean isEthernetConnect(){
+        return mConnMgr.getNetworkInfo(ConnectivityManager.TYPE_ETHERNET).isConnected();
+    }
 }

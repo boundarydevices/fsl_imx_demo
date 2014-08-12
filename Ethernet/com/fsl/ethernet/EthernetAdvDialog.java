@@ -76,17 +76,21 @@ public class EthernetAdvDialog extends AlertDialog implements DialogInterface.On
     }
 
     public void handle_saveconf() {
-        EthernetDevInfo info = new EthernetDevInfo();
-        String [] DevName = mEthEnabler.getManager().getDeviceNameList();
-        info.setIfName(DevName[0]);
-        info.setConnectMode(mEthEnabler.getManager().getSharedPreMode());
-        info.setIpAddress(mEthEnabler.getManager().getSharedPreIpAddress());
-        info.setDnsAddr(mEthEnabler.getManager().getSharedPreDnsAddress());
-        info.setProxyAddr(mProxyIp.getText().toString());
-        info.setProxyPort(mProxyPort.getText().toString());
-        info.setProxyExclusionList(mProxyExclusionList.getText().toString());
-        mEthEnabler.getManager().updateDevInfo(info);
-        mEthEnabler.getManager().setProxy();
+        if(mEthEnabler.getManager().isEthernetConnect()){
+            EthernetDevInfo info = new EthernetDevInfo();
+            String [] DevName = mEthEnabler.getManager().getDeviceNameList();
+            info.setIfName(DevName[0]);
+            info.setConnectMode(mEthEnabler.getManager().getSharedPreMode());
+            info.setIpAddress(mEthEnabler.getManager().getSharedPreIpAddress());
+            info.setDnsAddr(mEthEnabler.getManager().getSharedPreDnsAddress());
+            info.setProxyAddr(mProxyIp.getText().toString());
+            info.setProxyPort(mProxyPort.getText().toString());
+            info.setProxyExclusionList(mProxyExclusionList.getText().toString());
+            mEthEnabler.getManager().updateDevInfo(info);
+            mEthEnabler.getManager().setProxy();
+        }else{
+           Toast.makeText(this.getContext(),R.string.show_connect_ethernet,Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void onClick(DialogInterface dialog, int which) {
