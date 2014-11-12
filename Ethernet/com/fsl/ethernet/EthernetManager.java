@@ -25,7 +25,6 @@ import android.os.Handler;
 import android.os.RemoteException;
 import android.util.Log;
 import android.content.Context;
-import android.net.EthernetDataTracker;
 import android.provider.Settings;
 import android.os.ServiceManager;
 import android.os.IBinder;
@@ -39,7 +38,7 @@ import android.net.NetworkInfo;
 import android.net.NetworkInfo.DetailedState;
 import android.net.LinkProperties;
 import android.net.InterfaceConfiguration;
-import android.net.ProxyProperties;
+import android.net.ProxyInfo;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
@@ -97,10 +96,8 @@ public class EthernetManager {
     private Context mContext;
     private String[] DevName;
     private int mEthState= ETHERNET_STATE_UNKNOWN;
-    private EthernetDataTracker mTracker;
     private INetworkManagementService mNMService;
     private DhcpInfo mDhcpInfo;
-    private Handler mTrackerTarget;
     private String mode;
     private String ip_address;
     private String dns_address;
@@ -108,7 +105,6 @@ public class EthernetManager {
 
     public EthernetManager(Context context) {
         mContext = context;
-        mTracker = EthernetDataTracker.getInstance();
 
         DevName = new String[1];
 
@@ -231,7 +227,7 @@ public class EthernetManager {
             infotemp.setIpAddress(ip.substring(2, ip.length()-1));
         String dns = " ";
         int i = 0;
-        for( InetAddress d : mConnMgr.getLinkProperties(ConnectivityManager.TYPE_ETHERNET).getDnses()) {
+        for( InetAddress d : mConnMgr.getLinkProperties(ConnectivityManager.TYPE_ETHERNET).getDnsServers()) {
             String temp = d.toString();
             if (temp != null)
                 dns = temp.substring(1, temp.length()-1);
@@ -378,7 +374,7 @@ public class EthernetManager {
             mConnMgr.setGlobalProxy(null);
             return;
         }
-        LinkProperties lp = mTracker.getLinkProperties();
+        LinkProperties lp = mConnMgr.getLinkProperties(ConnectivityManager.TYPE_ETHERNET);
         if (lp == null)
             return;
         int port = 0;
@@ -386,8 +382,8 @@ public class EthernetManager {
             port = Integer.parseInt(getSharedPreProxyPort());
         } catch(NumberFormatException e){
         }
-        ProxyProperties proxyProperties =
-            new ProxyProperties(getSharedPreProxyAddress(), port, exclusionList);
+        ProxyInfo proxyProperties =
+            new ProxyInfo(getSharedPreProxyAddress(), port, exclusionList);
         mConnMgr.setGlobalProxy(null);
         mConnMgr.setGlobalProxy(proxyProperties);
         Log.i(TAG,"=============getHttpProxy==============" + proxyProperties);
