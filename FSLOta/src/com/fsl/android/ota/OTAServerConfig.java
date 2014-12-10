@@ -39,6 +39,7 @@ public class OTAServerConfig {
 	final String machineFile = "/sys/devices/soc0/machine";
 	final String server_ip_config = "server";
 	final String port_config_str = "port";
+	final String android_nickname = "ota_folder_suffix";
 	String machineString = null;
 	
 	public OTAServerConfig (String productname) throws MalformedURLException {
@@ -63,9 +64,10 @@ public class OTAServerConfig {
 			BuildPropParser parser = new BuildPropParser(new File(configFile), null);
 			String server = parser.getProp(server_ip_config);
 			String port_str = parser.getProp(port_config_str);
+			String android_name = parser.getProp(android_nickname);
 			int port = new Long(port_str).intValue();
-			String fileaddr = new String(product + "/" + product + ".ota.zip");
-			String buildconfigAddr = new String(product + "/" + "build.prop");
+			String fileaddr = new String(product + "_" + android_name + "/" + product + ".ota.zip");
+			String buildconfigAddr = new String(product + "_" + android_name + "/" + "build.prop");
 
 			readMachine();
 
