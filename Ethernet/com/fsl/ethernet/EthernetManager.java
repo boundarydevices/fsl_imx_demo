@@ -109,6 +109,8 @@ public class EthernetManager {
     public EthernetManager(Context context) {
         mContext = context;
         mTracker = EthernetDataTracker.getInstance();
+        String sIfaceMatch = context.getResources().getString(
+                       com.android.internal.R.string.config_ethernet_iface_regex);
 
         DevName = new String[1];
 
@@ -117,6 +119,20 @@ public class EthernetManager {
         mConnMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         IBinder b = ServiceManager.getService(Context.NETWORKMANAGEMENT_SERVICE);
         mNMService = INetworkManagementService.Stub.asInterface(b);
+
+        try {
+            final String[] ifaces = mNMService.listInterfaces();
+            for (String iface : ifaces) {
+                if (iface.matches(sIfaceMatch)) {
+                    DevName[0] = iface;
+                    Log.d(TAG, "We will operate iface:" + DevName[0]);
+                    break;
+                }
+            }
+        } catch (RemoteException e) {
+            Log.e(TAG, "Could not get list of interfaces " + e);
+        }
+
         HandlerThread dhcpThread = new HandlerThread("DHCP Handler Thread");
         dhcpThread.start();
         mDhcpInfo = new DhcpInfo();
