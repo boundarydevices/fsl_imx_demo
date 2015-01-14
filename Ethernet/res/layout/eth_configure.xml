@@ -107,6 +107,38 @@
                       android:textAlignment="viewStart"
                       android:singleLine="true"
                       android:inputType="none" />
+            <TextView android:id="@+id/netmask_text"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_marginTop="8dip"
+                      android:layout_marginStart="16dip"
+                      android:layout_marginEnd="16dip"
+                      android:orientation="vertical"
+                      android:gravity="start"
+                      android:text="@string/eth_mask" />
+            <EditText android:id="@+id/eth_netmask_edit"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:textSize="18sp"
+                      android:textAlignment="viewStart"
+                      android:singleLine="true"
+                      android:inputType="none" />
+            <TextView android:id="@+id/gateway_text"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_marginTop="8dip"
+                      android:layout_marginStart="16dip"
+                      android:layout_marginEnd="16dip"
+                      android:orientation="vertical"
+                      android:gravity="start"
+                      android:text="@string/eth_gw" />
+            <EditText android:id="@+id/eth_gateway_edit"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:textSize="18sp"
+                      android:textAlignment="viewStart"
+                      android:singleLine="true"
+                      android:inputType="none" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
