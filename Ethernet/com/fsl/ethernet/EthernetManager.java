@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 Freescale Semiconductor, Inc.
+ * Copyright (C) 2013-2015 Freescale Semiconductor, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,14 @@ import android.os.SystemProperties;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.widget.Toast;
+import android.net.LinkAddress;
+import android.net.StaticIpConfiguration;
+import android.net.IpConfiguration;
+import android.net.IpConfiguration.*;
+import java.util.ArrayList;
+import java.net.Inet4Address;
+import java.lang.Integer;
+
 /**
  * Created by B38613 on 9/27/13.
  */
@@ -93,6 +101,7 @@ public class EthernetManager {
     /** @hide */
     public static final int DATA_ACTIVITY_INOUT        = 0x03;
 
+    private android.net.EthernetManager ethernetService;
     private Context mContext;
     private String[] DevName;
     private int mEthState= ETHERNET_STATE_UNKNOWN;
@@ -112,6 +121,7 @@ public class EthernetManager {
 
         mConnMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         IBinder b = ServiceManager.getService(Context.NETWORKMANAGEMENT_SERVICE);
+        ethernetService = (android.net.EthernetManager) context.getSystemService(Context.ETHERNET_SERVICE);
         mNMService = INetworkManagementService.Stub.asInterface(b);
         HandlerThread dhcpThread = new HandlerThread("DHCP Handler Thread");
         dhcpThread.start();
@@ -142,6 +152,8 @@ public class EthernetManager {
         }
         info.setIpAddress(getSharedPreIpAddress());
         info.setDnsAddr(getSharedPreDnsAddress());
+        info.setGateway(getSharedPreGateway());
+        info.setNetMask(getSharedPreNetMask());
         info.setProxyAddr(getSharedPreProxyAddress());
         info.setProxyPort(getSharedPreProxyPort());
         info.setProxyExclusionList(getSharedPreProxyExclusionList());
@@ -178,29 +190,32 @@ public class EthernetManager {
 
     void configureInterface(EthernetDevInfo info) {
         if (info.getConnectMode().equals(EthernetDevInfo.ETHERNET_CONN_MODE_DHCP)) {
-
-            try {
-                mNMService.setInterfaceDown(info.getIfName());
-                mNMService.clearInterfaceAddresses(info.getIfName());
-                mNMService.setInterfaceUp(info.getIfName());
-            } catch (RemoteException re){
-                Log.e(TAG,"DHCP configuration failed: " + re);
-            } catch (IllegalStateException e) {
-                Log.e(TAG,"DHCP configuration fialed: " + e);
-            }
+            IpConfiguration ipcfg = new IpConfiguration();
+            ipcfg.ipAssignment = IpAssignment.DHCP;
+            ethernetService.setConfiguration(ipcfg);
         } else {
             InterfaceConfiguration ifcg = null;
             Log.d(TAG, "Static IP =" + info.getIpAddress());
             try {
-                ifcg = mNMService.getInterfaceConfig(info.getIfName());
-                ifcg.setLinkAddress(new LinkAddress(NetworkUtils.numericToInetAddress(
-                        info.getIpAddress()), 24));
-                ifcg.setInterfaceUp();
-                mNMService.setInterfaceConfig(info.getIfName(), ifcg);
+                IpConfiguration ipcfg = ethernetService.getConfiguration();
+                ipcfg.ipAssignment = IpAssignment.STATIC;
+
+                Inet4Address iNetmask = (Inet4Address)InetAddress.getByName(info.getNetMask());
+                int netmask = NetworkUtils.inetAddressToInt(iNetmask);
+                int prefixLength = NetworkUtils.netmaskIntToPrefixLength(netmask);
+                LinkAddress ipAddr = new LinkAddress(info.getIpAddress()+"/"+ Integer.toString(prefixLength));
+                InetAddress gwAddr = InetAddress.getByName(info.getGateway());
+                StaticIpConfiguration config = new StaticIpConfiguration();
+                config.ipAddress = ipAddr;
+                config.gateway = gwAddr;
+                if (info.getDnsAddr() != null)
+                    config.dnsServers.add(InetAddress.getByName(info.getDnsAddr()));
+                   ipcfg.staticIpConfiguration = config;
+                  ethernetService.setConfiguration(ipcfg);
 
                 Log.d(TAG,"Static IP configuration succeeded");
-            } catch (RemoteException re){
-                Log.e(TAG,"Static IP configuration failed: " + re);
+            } catch (UnknownHostException e){
+                Log.e(TAG,"Static IP configuration failed: " + e);
             } catch (IllegalStateException e) {
                 Log.e(TAG,"Static IP configuration fialed: " + e);
             }catch (IllegalArgumentException e) {
@@ -210,7 +225,6 @@ public class EthernetManager {
             Log.d(TAG, "set ip manually " + info.toString());
             SystemProperties.set("net.dns1", info.getDnsAddr());
             SystemProperties.set("net." + info.getIfName() + ".dns1",info.getDnsAddr());
-            SystemProperties.set("net." + info.getIfName() + ".dns2", "0.0.0.0");
             updateDevInfo(info);
         }
     }
@@ -222,7 +236,6 @@ public class EthernetManager {
         infotemp.setConnectMode(EthernetDevInfo.ETHERNET_CONN_MODE_DHCP);
         String ip;
         ip = mConnMgr.getLinkProperties(ConnectivityManager.TYPE_ETHERNET).getAddresses().toString();
-        Log.d(TAG, "===========IP=" + ip);
         if (ip != "[]" )
             infotemp.setIpAddress(ip.substring(2, ip.length()-1));
         String dns = " ";
@@ -280,9 +293,6 @@ public class EthernetManager {
         SystemProperties.set("net.dns1", info.getDnsAddr());
         SystemProperties.set("net." + info.getIfName() + ".dns1",info.getDnsAddr());
         SystemProperties.set("net." + info.getIfName() + ".dns2", "0.0.0.0");
-        SystemProperties.set("net." + info.getIfName() + ".config", "1");
-        SystemProperties.set("net." + info.getIfName() + ".mode", info.getConnectMode());
-        SystemProperties.set("net." + info.getIfName() + ".ip", info.getIpAddress());
     }
 
     public SharedPreferences sharedPreferences(){
@@ -297,6 +307,8 @@ public class EthernetManager {
             editor.putString("conn_mode",info.getConnectMode());
             editor.putString("mIpaddr",info.getIpAddress());
             editor.putString("mDns",info.getDnsAddr());
+            editor.putString("mGateway", info.getGateway());
+            editor.putString("mNetMask", info.getNetMask());
             editor.putString("mProxyIp",info.getProxyAddr());
             editor.putString("mProxyPort", info.getProxyPort());
             editor.putString("mProxyExclusionList", info.getProxyExclusionList());
@@ -331,6 +343,26 @@ public class EthernetManager {
         String temp = null;
         try {
             temp = sharedPreferences().getString("mDns",null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return temp;
+    }
+
+    public String getSharedPreGateway(){
+        String temp = null;
+        try {
+            temp = sharedPreferences().getString("mGateway",null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return temp;
+    }
+
+    public String getSharedPreNetMask(){
+        String temp = null;
+        try {
+            temp = sharedPreferences().getString("mNetMask",null);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -386,7 +418,6 @@ public class EthernetManager {
             new ProxyInfo(getSharedPreProxyAddress(), port, exclusionList);
         mConnMgr.setGlobalProxy(null);
         mConnMgr.setGlobalProxy(proxyProperties);
-        Log.i(TAG,"=============getHttpProxy==============" + proxyProperties);
     }
 
     public void initProxy(){
