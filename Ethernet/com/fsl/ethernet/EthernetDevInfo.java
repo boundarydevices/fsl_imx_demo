@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 Freescale Semiconductor, Inc.
+ * Copyright (C) 2013-2015 Freescale Semiconductor, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ public class EthernetDevInfo {
     private String proxyIp;
     private String proxyPort;
     private String proxyExclusionList;
+    private String gateway;
 
     public EthernetDevInfo () {
         dev_name = null;
@@ -50,6 +51,7 @@ public class EthernetDevInfo {
         mode = ETHERNET_CONN_MODE_DHCP;
         proxyIp = null;
         proxyPort = null;
+        gateway = null;
     }
 
     /**
@@ -73,6 +75,14 @@ public class EthernetDevInfo {
 
     public String getIpAddress() {
         return this.ipaddr;
+    }
+
+    public void setGateway(String gw) {
+        this.gateway = gw;
+    }
+
+    public String getGateway() {
+        return this.gateway;
     }
 
     public void setNetMask(String ip) {

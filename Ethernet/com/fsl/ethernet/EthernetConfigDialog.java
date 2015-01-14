@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 Freescale Semiconductor, Inc.
+ * Copyright (C) 2013-2015 Freescale Semiconductor, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,8 @@ public class EthernetConfigDialog extends AlertDialog implements
     private RadioButton mConTypeManual;
     private EditText mIpaddr;
     private EditText mDns;
+    private EditText mMask;
+    private EditText mGateway;
     private LinearLayout ip_dns_setting;
     private static String Mode_dhcp = "dhcp";
 
@@ -69,6 +71,9 @@ public class EthernetConfigDialog extends AlertDialog implements
         mConTypeManual = (RadioButton) mView.findViewById(R.id.manual_radio);
         mIpaddr = (EditText)mView.findViewById(R.id.ipaddr_edit);
         mDns = (EditText)mView.findViewById(R.id.eth_dns_edit);
+        mMask = (EditText)mView.findViewById(R.id.eth_netmask_edit);
+        mGateway = (EditText)mView.findViewById(R.id.eth_gateway_edit);
+
         ip_dns_setting = (LinearLayout)mView.findViewById(R.id.ip_dns_setting);
 
         if (mEthEnabler.getManager().isConfigured()) {
@@ -83,6 +88,8 @@ public class EthernetConfigDialog extends AlertDialog implements
                 ip_dns_setting.setVisibility(View.VISIBLE);
                 mIpaddr.setText(mEthEnabler.getManager().getSharedPreIpAddress(),TextView.BufferType.EDITABLE);
                 mDns.setText(mEthEnabler.getManager().getSharedPreDnsAddress(),TextView.BufferType.EDITABLE);
+                mMask.setText(mEthEnabler.getManager().getSharedPreNetMask(),TextView.BufferType.EDITABLE);
+                mGateway.setText(mEthEnabler.getManager().getSharedPreGateway(),TextView.BufferType.EDITABLE);
             }
         } else {
             mConTypeDhcp.setChecked(true);
@@ -125,6 +132,8 @@ public class EthernetConfigDialog extends AlertDialog implements
                 info.setConnectMode(EthernetDevInfo.ETHERNET_CONN_MODE_MANUAL);
                 info.setIpAddress(mIpaddr.getText().toString());
                 info.setDnsAddr(mDns.getText().toString());
+                info.setNetMask(mMask.getText().toString());
+                info.setGateway(mGateway.getText().toString());
             }
         } else {
             info.setConnectMode(EthernetDevInfo.ETHERNET_CONN_MODE_DHCP);
