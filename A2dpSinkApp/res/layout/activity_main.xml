@@ -5,65 +5,170 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/start"
-        android:id="@+id/btn_start"
-        android:layout_marginBottom="161dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true" />
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="center">
+    <!--<Button-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="@string/start"-->
+        <!--android:id="@+id/btn_start"-->
+        <!--android:layout_marginBottom="161dp"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_alignParentStart="true" />-->
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/stop"
-        android:id="@+id/btn_stop"
-        android:layout_alignTop="@+id/btn_start"
-        android:layout_toEndOf="@+id/linearLayout" />
+    <!--<Button-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="@string/stop"-->
+        <!--android:id="@+id/btn_stop"-->
+        <!--android:layout_alignTop="@+id/btn_start"-->
+        <!--android:layout_toEndOf="@+id/linearLayout" />-->
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/pause"
-        android:id="@+id/btn_pause"
-        android:onClick="btn_click_pause"
-        android:layout_above="@+id/btn_start"
-        android:layout_alignEnd="@+id/btn_start"
-        android:layout_marginEnd="158dp"
-        android:visibility="invisible"/>
+    <!--<Button-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="@string/pause"-->
+        <!--android:id="@+id/btn_pause"-->
+        <!--android:onClick="btn_click_pause"-->
+        <!--android:layout_below="@+id/etxt_keystate"-->
+        <!--android:layout_toEndOf="@+id/etxt_keystate"-->
+        <!--android:visibility="invisible"/>-->
+        <!--&lt;!&ndash;&ndash;&gt;-->
 
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/play"
-        android:id="@+id/btn_play"
-        android:layout_marginStart="112dp"
-        android:layout_alignTop="@+id/btn_pause"
-        android:layout_toEndOf="@+id/btn_stop"
-        android:visibility="invisible"/>
+
+    <!--<Button-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="@string/play"-->
+        <!--android:id="@+id/btn_play"-->
+        <!--android:layout_marginStart="112dp"-->
+        <!--android:layout_alignTop="@+id/btn_pause"-->
+        <!--android:layout_toEndOf="@+id/btn_stop"-->
+        <!--android:visibility="invisible"/>-->
 
     <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="250dp"
+        android:gravity="center"
+        android:id="@+id/linearLayout">
+        <LinearLayout
         android:orientation="vertical"
         android:layout_width="250dp"
         android:layout_height="250dp"
-        android:weightSum="1"
-        android:id="@+id/linearLayout">
+        android:gravity="center"
+        android:weightSum="1">
 
 
-        <ImageView
-            android:layout_width="200dp"
-            android:id="@+id/img_a2dpState"
-            android:layout_height="200dp"
-            android:background="@drawable/noconnect"/>
-        <TextView
-            android:layout_width="200dp"
-            android:layout_height="50dp"
-            android:text="@string/noConnected"
-            android:textAlignment="center"
-            android:id="@+id/txt_a2dpState"/>
+            <ImageView
+                android:layout_width="200dp"
+                android:id="@+id/img_a2dpState"
+                android:layout_height="200dp"
+                android:background="@drawable/a2dp_no_connected"/>
+            <TextView
+                android:layout_width="200dp"
+                android:layout_height="30dp"
+                android:text="@string/noConnected"
+                android:id="@+id/txt_a2dpState"
+                android:textStyle="bold"
+                android:gravity="top|center" />
 
+        </LinearLayout>
     </LinearLayout>
 
+
+    <!--<EditText-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:inputType="number"-->
+        <!--android:ems="10"-->
+        <!--android:id="@+id/etxt_keyid"-->
+        <!--android:layout_alignTop="@+id/linearLayout"-->
+        <!--android:layout_alignStart="@+id/btn_pause"-->
+        <!--android:layout_marginTop="38dp"-->
+        <!--android:visibility="invisible"/>-->
+
+    <!--<EditText-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:inputType="number"-->
+        <!--android:ems="10"-->
+        <!--android:id="@+id/etxt_keystate"-->
+        <!--android:layout_marginStart="200dp"-->
+        <!--android:layout_below="@+id/etxt_keyid"-->
+        <!--android:layout_toEndOf="@+id/btn_play"-->
+        <!--android:layout_marginTop="42dp"-->
+        <!--android:visibility="invisible"/>-->
+
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="120dp"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/linearLayout"
+        android:gravity="center">
+
+        <ImageButton
+            android:layout_marginLeft="10dp"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:id="@+id/btn_previous"
+            android:background="@drawable/previous"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@+id/btn_play" />
+        <ImageButton
+            android:layout_marginLeft="10dp"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:id="@+id/btn_playi"
+            android:background="@drawable/play"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@+id/btn_play" />
+        <ImageButton
+            android:layout_marginLeft="10dp"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:id="@+id/btn_pausei"
+            android:background="@drawable/pause"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@+id/btn_play" />
+        <ImageButton
+            android:layout_marginLeft="10dp"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:id="@+id/btn_next"
+            android:background="@drawable/next"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@+id/btn_play" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="100dp"
+            android:gravity="center">
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/start"
+                android:id="@+id/btn_start"
+                android:visibility="invisible"
+                />
+            <ImageButton
+                android:layout_marginLeft="15dp"
+                android:layout_width="110dp"
+                android:layout_height="110dp"
+                android:id="@+id/btn_power"
+                android:background="@drawable/power_off"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/stop"
+                android:id="@+id/btn_stop"
+                android:visibility="invisible"/>
+            </LinearLayout>
+    </LinearLayout>
 </RelativeLayout>
