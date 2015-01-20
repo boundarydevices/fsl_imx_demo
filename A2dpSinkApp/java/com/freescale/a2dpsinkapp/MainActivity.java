@@ -15,23 +15,30 @@ import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
+import android.media.Image;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.MessageQueue;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.os.AsyncTask;
 import android.widget.Button;
 import android.content.Intent;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.bluetooth.BluetoothAvrcpController;
 import android.content.BroadcastReceiver;
 
+import java.util.HashMap;
 import java.util.List;
 
 import javax.xml.transform.Result;
@@ -49,12 +56,154 @@ public class MainActivity extends Activity {
     A2dpSinkWorkTask mPlayTask;
     Button btn_start;
     Button btn_stop;
+    ImageButton btn_power;
     BluetoothA2dpSink mA2dpSinkService;
     BluetoothAvrcpController mAvrcpControllerService;
     BroadcastReceiverA2dpSink mBroadcastReceiverA2dpSink;
     int a2dpState = BluetoothA2dpSink.STATE_DISCONNECTED;
     BluetoothDevice a2dpRemoteDevice = null;
     String connectDeviceInfo = null;
+    HashMap<Integer,Integer> button_release_icon = new HashMap<Integer,Integer>();
+    HashMap<Integer,Integer> button_press_icon = new HashMap<Integer, Integer>();
+    HashMap<Integer,Integer> button_avrcp_cmd = new HashMap<Integer, Integer>();
+    Handler avrcpHandler = new Handler();
+
+
+    class PowerButtonlistener implements OnClickListener, OnTouchListener {
+        public void onClick(View v) {
+            if (DBG) Log.d(TAG, "power Button clicked");
+        }
+
+        public boolean onTouch(View v, MotionEvent event) {
+
+            int action = event.getAction();
+            if (action == MotionEvent.ACTION_DOWN) {
+                if (isPlaying) {
+                    btn_power.setBackgroundResource(R.drawable.power_on_pressed);
+                } else
+                    btn_power.setBackgroundResource(R.drawable.power_off_pressed);
+            } else if (action == MotionEvent.ACTION_UP) {
+                if (a2dpState == BluetoothA2dpSink.STATE_DISCONNECTED) {
+                    isPlaying = false;
+                    Log.i(TAG, "Stop!!!");
+                    uiSetA2dpConnectState(a2dpState == BluetoothA2dpSink.STATE_CONNECTED,
+                            connectDeviceInfo);
+                    btn_power.setBackgroundResource(R.drawable.power_off);
+                }
+                if (a2dpState == BluetoothA2dpSink.STATE_CONNECTED) {
+                    if (isPlaying) {
+                        isPlaying = false;
+                        Log.i(TAG, "Stop!!!");
+                        uiSetA2dpConnectState(a2dpState == BluetoothA2dpSink.STATE_CONNECTED,
+                                connectDeviceInfo);
+                        btn_power.setBackgroundResource(R.drawable.power_off);
+                    } else {
+                        Log.i(TAG, "start");
+
+                        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+                        if (adapter != null) {
+                            if (adapter.getProfileConnectionState(BluetoothProfile.A2DP_SINK) !=
+                                    BluetoothProfile.STATE_CONNECTED) {
+                                Log.i(TAG, "No a2dp connected");
+                                ShowToast("No A2dp connected!");
+                                btn_power.setBackgroundResource(R.drawable.power_off);
+                                return false;
+                            }
+                        } else {
+                            btn_power.setBackgroundResource(R.drawable.power_off);
+                            return false;
+                        }
+                        mPlayTask = new A2dpSinkWorkTask();
+                        mPlayTask.execute();
+                        btn_power.setBackgroundResource(R.drawable.power_on);
+
+
+                    }
+                }
+            }
+
+            return false;
+        }
+    }
+
+    class AvrcpButtonListener implements OnClickListener, OnTouchListener {
+        public void onClick(View v) {
+            if (DBG) Log.d(TAG, v + " is clicked");
+            if (a2dpState != BluetoothA2dpSink.STATE_CONNECTED)
+                return;
+            if (!isPlaying)
+                return;
+            if (mAvrcpControllerService == null)
+                return;
+            int cmd = button_avrcp_cmd.get(v.getId());
+
+            avrcpHandler.postDelayed(new AvrcpHandler(cmd), 1000);
+
+
+        }
+
+        public boolean onTouch(View v, MotionEvent event) {
+            int id = v.getId();
+            int img = 0, cmd;
+            //if (DBG) Log.d(TAG, v + " is touched, event=" + event.getAction());
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                img = button_press_icon.get(id);
+                //cmd = button_avrcp_cmd.get(id);
+            } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                img = button_release_icon.get(id);
+            } else
+                return false;
+            ImageButton btn = (ImageButton)findViewById(id);
+            Drawable draw = getResources().getDrawable(img);
+            btn.setBackgroundDrawable(draw);
+
+            return false;
+        }
+    }
+    private void initButtonDictionary() {
+        AvrcpButtonListener listener = new AvrcpButtonListener();
+
+        initButtonListener(R.id.btn_next,listener);
+        initButtonListener(R.id.btn_pausei,listener);
+        initButtonListener(R.id.btn_playi,listener);
+        initButtonListener(R.id.btn_previous,listener);
+
+        button_release_icon.clear();
+        button_release_icon.put(R.id.btn_next, R.drawable.next);
+        button_release_icon.put(R.id.btn_previous, R.drawable.previous);
+        button_release_icon.put(R.id.btn_playi, R.drawable.play);
+        button_release_icon.put(R.id.btn_pausei,R.drawable.pause);
+
+
+        button_press_icon.clear();
+        button_press_icon.put(R.id.btn_next, R.drawable.next_pressed);
+        button_press_icon.put(R.id.btn_previous, R.drawable.previous_pressed);
+        button_press_icon.put(R.id.btn_playi, R.drawable.play_pressed);
+        button_press_icon.put(R.id.btn_pausei,R.drawable.pause_pressed);
+
+        button_avrcp_cmd.clear();
+        button_avrcp_cmd.put(R.id.btn_next, 0x4b);
+        button_avrcp_cmd.put(R.id.btn_previous, 0x4c);
+        button_avrcp_cmd.put(R.id.btn_playi, 0x44);
+        button_avrcp_cmd.put(R.id.btn_pausei, 0x46);
+
+        initPowerButton();
+
+
+    }
+
+    private void initPowerButton() {
+        btn_power = (ImageButton)findViewById(R.id.btn_power);
+        PowerButtonlistener listener = new PowerButtonlistener();
+        btn_power.setOnTouchListener(listener);
+
+    }
+
+    private void initButtonListener(int id, AvrcpButtonListener listener) {
+        ImageButton btn = (ImageButton)findViewById(id);
+        btn.setOnClickListener(listener);
+        btn.setOnTouchListener(listener);
+    }
     private void ShowToast(String info) {
         Toast toast = Toast.makeText(getApplicationContext(),info,Toast.LENGTH_SHORT);
         toast.show();
@@ -62,8 +211,8 @@ public class MainActivity extends Activity {
 
     private void uiSetA2dpConnectState(boolean state, String info) {
         ImageView img = (ImageView)findViewById(R.id.img_a2dpState);
-        Drawable btconnect = getApplication().getResources().getDrawable(R.drawable.btconnected);
-        Drawable btnoconnect = getApplication().getResources().getDrawable(R.drawable.noconnect);
+        Drawable btconnect = getApplication().getResources().getDrawable(R.drawable.a2dp_connected);
+        Drawable btnoconnect = getApplication().getResources().getDrawable(R.drawable.a2dp_no_connected);
         TextView text = (TextView)findViewById(R.id.txt_a2dpState);
 
         if (state) {
@@ -99,6 +248,8 @@ public class MainActivity extends Activity {
         btn_start = (Button)findViewById(R.id.btn_start);
         btn_stop = (Button)findViewById(R.id.btn_stop);
         final BluetoothAdapter mBluetoothAdapter;
+        initButtonDictionary();
+
         Log.i(TAG, "onCreate");
         btn_start.setOnClickListener(new OnClickListener() {
             @Override
@@ -145,6 +296,7 @@ public class MainActivity extends Activity {
 
             }
             else {
+                a2dpState = BluetoothA2dpSink.STATE_CONNECTED;
                 ShowToast("We have A2dp connection");
                 Log.i(TAG, "we have a2dp");
             }
@@ -170,6 +322,8 @@ public class MainActivity extends Activity {
         a2dpSinkIntentFilter.addAction(BluetoothA2dpSink.ACTION_AUDIO_CONFIG_CHANGED);
         mBroadcastReceiverA2dpSink = new BroadcastReceiverA2dpSink();
         registerReceiver(mBroadcastReceiverA2dpSink,a2dpSinkIntentFilter);
+
+
     }
 
     @Override
@@ -209,7 +363,7 @@ public class MainActivity extends Activity {
     }
     */
     public void btn_click_pause(View view) {
-
+/*
         if (DBG) Log.d(TAG, "AVRCP Pause");
         if (mAvrcpControllerService != null)
         {
@@ -230,7 +384,37 @@ public class MainActivity extends Activity {
                 mAvrcpControllerService.sendPassThroughCmd(device, 201,0);
             }
         }
+        */
     }
+
+    class AvrcpHandler implements Runnable {
+        int cmd = 0;
+        public AvrcpHandler(int cmd) {
+            this.cmd = cmd;
+        }
+
+        public void run() {
+            if (DBG) Log.d(TAG, "will send avrcp " + cmd);
+            if (mAvrcpControllerService != null) {
+                List<BluetoothDevice> devices = mAvrcpControllerService.getConnectedDevices();
+                for (BluetoothDevice device : devices) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException ex) {
+
+                    }
+                    mAvrcpControllerService.sendPassThroughCmd(device, cmd, 0);
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException ex) {
+
+                    }
+                    mAvrcpControllerService.sendPassThroughCmd(device, cmd, 1);
+                }
+            }
+        }
+    }
+
 
     class A2dpSinkWorkTask extends AsyncTask<Void, Integer, Void> {
         @Override
@@ -242,12 +426,12 @@ public class MainActivity extends Activity {
             int minRecBufSize = AudioRecord.getMinBufferSize(44100,
                     AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_16BIT);
             if (DBG) Log.d(TAG, "background play 2");
-            if (mRecord == null)
+            //if (mRecord == null)
                 mRecord = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, 44100,
                         AudioFormat.CHANNEL_IN_STEREO,
                         AudioFormat.ENCODING_PCM_16BIT, minRecBufSize);
             if (DBG) Log.d(TAG, "background play 3");
-            if (mTrack == null)
+            //if (mTrack == null)
                 mTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
                         44100,
                         AudioFormat.CHANNEL_IN_STEREO,
@@ -359,6 +543,8 @@ public class MainActivity extends Activity {
                             mRecord.release();
                         }*/
                         isPlaying = false;
+                        if (btn_power !=null)
+                            btn_power.setBackgroundResource(R.drawable.power_off);
                     }
                     a2dpRemoteDevice = null;
                 }
