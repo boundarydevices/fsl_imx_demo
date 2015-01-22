@@ -10,46 +10,6 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:gravity="center">
-    <!--<Button-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="@string/start"-->
-        <!--android:id="@+id/btn_start"-->
-        <!--android:layout_marginBottom="161dp"-->
-        <!--android:layout_alignParentBottom="true"-->
-        <!--android:layout_alignParentStart="true" />-->
-
-    <!--<Button-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="@string/stop"-->
-        <!--android:id="@+id/btn_stop"-->
-        <!--android:layout_alignTop="@+id/btn_start"-->
-        <!--android:layout_toEndOf="@+id/linearLayout" />-->
-
-    <!--<Button-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="@string/pause"-->
-        <!--android:id="@+id/btn_pause"-->
-        <!--android:onClick="btn_click_pause"-->
-        <!--android:layout_below="@+id/etxt_keystate"-->
-        <!--android:layout_toEndOf="@+id/etxt_keystate"-->
-        <!--android:visibility="invisible"/>-->
-        <!--&lt;!&ndash;&ndash;&gt;-->
-
-
-
-    <!--<Button-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="@string/play"-->
-        <!--android:id="@+id/btn_play"-->
-        <!--android:layout_marginStart="112dp"-->
-        <!--android:layout_alignTop="@+id/btn_pause"-->
-        <!--android:layout_toEndOf="@+id/btn_stop"-->
-        <!--android:visibility="invisible"/>-->
-
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="250dp"
@@ -78,32 +38,6 @@
 
         </LinearLayout>
     </LinearLayout>
-
-
-    <!--<EditText-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:inputType="number"-->
-        <!--android:ems="10"-->
-        <!--android:id="@+id/etxt_keyid"-->
-        <!--android:layout_alignTop="@+id/linearLayout"-->
-        <!--android:layout_alignStart="@+id/btn_pause"-->
-        <!--android:layout_marginTop="38dp"-->
-        <!--android:visibility="invisible"/>-->
-
-    <!--<EditText-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:inputType="number"-->
-        <!--android:ems="10"-->
-        <!--android:id="@+id/etxt_keystate"-->
-        <!--android:layout_marginStart="200dp"-->
-        <!--android:layout_below="@+id/etxt_keyid"-->
-        <!--android:layout_toEndOf="@+id/btn_play"-->
-        <!--android:layout_marginTop="42dp"-->
-        <!--android:visibility="invisible"/>-->
-
-
 
     <LinearLayout
         android:orientation="horizontal"
@@ -161,7 +95,7 @@
                 android:layout_marginLeft="15dp"
                 android:layout_width="110dp"
                 android:layout_height="110dp"
-                android:id="@+id/btn_power"
+                android:id="@+id/btn_enable"
                 android:background="@drawable/power_off"/>
             <Button
                 android:layout_width="wrap_content"

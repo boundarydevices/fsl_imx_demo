@@ -15,15 +15,10 @@ import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
-import android.media.Image;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.MessageQueue;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -41,8 +36,6 @@ import android.content.BroadcastReceiver;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.xml.transform.Result;
-
 /*Created by b50027 Jan.19 2015 */
 
 public class MainActivity extends Activity {
@@ -56,7 +49,7 @@ public class MainActivity extends Activity {
     A2dpSinkWorkTask mPlayTask;
     Button btn_start;
     Button btn_stop;
-    ImageButton btn_power;
+    ImageButton btn_enable;
     BluetoothA2dpSink mA2dpSinkService;
     BluetoothAvrcpController mAvrcpControllerService;
     BroadcastReceiverA2dpSink mBroadcastReceiverA2dpSink;
@@ -67,9 +60,15 @@ public class MainActivity extends Activity {
     HashMap<Integer,Integer> button_press_icon = new HashMap<Integer, Integer>();
     HashMap<Integer,Integer> button_avrcp_cmd = new HashMap<Integer, Integer>();
     Handler avrcpHandler = new Handler();
+    static int AVRCP_CMD_PREVIOUS = 0x4c;
+    static int AVRCP_CMD_NEXT = 0x4b;
+    static int AVRCP_CMD_PLAY  = 0x44;
+    static int AVRCP_CMD_PAUSE = 0x46;
+    static int AVRCP_BTN_PRESS = 0;
+    static int AVRCP_BTN_RELEASE = 1;
 
 
-    class PowerButtonlistener implements OnClickListener, OnTouchListener {
+    class EnableButtonlistener implements OnClickListener, OnTouchListener {
         public void onClick(View v) {
             if (DBG) Log.d(TAG, "power Button clicked");
         }
@@ -79,16 +78,16 @@ public class MainActivity extends Activity {
             int action = event.getAction();
             if (action == MotionEvent.ACTION_DOWN) {
                 if (isPlaying) {
-                    btn_power.setBackgroundResource(R.drawable.power_on_pressed);
+                    btn_enable.setBackgroundResource(R.drawable.power_on_pressed);
                 } else
-                    btn_power.setBackgroundResource(R.drawable.power_off_pressed);
+                    btn_enable.setBackgroundResource(R.drawable.power_off_pressed);
             } else if (action == MotionEvent.ACTION_UP) {
                 if (a2dpState == BluetoothA2dpSink.STATE_DISCONNECTED) {
                     isPlaying = false;
                     Log.i(TAG, "Stop!!!");
                     uiSetA2dpConnectState(a2dpState == BluetoothA2dpSink.STATE_CONNECTED,
                             connectDeviceInfo);
-                    btn_power.setBackgroundResource(R.drawable.power_off);
+                    btn_enable.setBackgroundResource(R.drawable.power_off);
                 }
                 if (a2dpState == BluetoothA2dpSink.STATE_CONNECTED) {
                     if (isPlaying) {
@@ -96,7 +95,7 @@ public class MainActivity extends Activity {
                         Log.i(TAG, "Stop!!!");
                         uiSetA2dpConnectState(a2dpState == BluetoothA2dpSink.STATE_CONNECTED,
                                 connectDeviceInfo);
-                        btn_power.setBackgroundResource(R.drawable.power_off);
+                        btn_enable.setBackgroundResource(R.drawable.power_off);
                     } else {
                         Log.i(TAG, "start");
 
@@ -106,16 +105,16 @@ public class MainActivity extends Activity {
                                     BluetoothProfile.STATE_CONNECTED) {
                                 Log.i(TAG, "No a2dp connected");
                                 ShowToast("No A2dp connected!");
-                                btn_power.setBackgroundResource(R.drawable.power_off);
+                                btn_enable.setBackgroundResource(R.drawable.power_off);
                                 return false;
                             }
                         } else {
-                            btn_power.setBackgroundResource(R.drawable.power_off);
+                            btn_enable.setBackgroundResource(R.drawable.power_off);
                             return false;
                         }
                         mPlayTask = new A2dpSinkWorkTask();
                         mPlayTask.execute();
-                        btn_power.setBackgroundResource(R.drawable.power_on);
+                        btn_enable.setBackgroundResource(R.drawable.power_on);
 
 
                     }
@@ -125,34 +124,33 @@ public class MainActivity extends Activity {
             return false;
         }
     }
-
-    class AvrcpButtonListener implements OnClickListener, OnTouchListener {
-        public void onClick(View v) {
-            if (DBG) Log.d(TAG, v + " is clicked");
-            if (a2dpState != BluetoothA2dpSink.STATE_CONNECTED)
-                return;
-            if (!isPlaying)
-                return;
-            if (mAvrcpControllerService == null)
-                return;
-            int cmd = button_avrcp_cmd.get(v.getId());
-
-            avrcpHandler.postDelayed(new AvrcpHandler(cmd), 1000);
-
-
+    private void AvrcpCmdSend(int cmd, int action) {
+        if (a2dpState != BluetoothA2dpSink.STATE_CONNECTED)
+            return;
+        if (!isPlaying)
+            return;
+        if (mAvrcpControllerService == null)
+            return;
+        if (action == MotionEvent.ACTION_DOWN) {
+            avrcpHandler.post(new AvrcpHandler(cmd, MainActivity.AVRCP_BTN_PRESS));
+        } else if (action == MotionEvent.ACTION_UP) {
+            avrcpHandler.post(new AvrcpHandler(cmd, MainActivity.AVRCP_BTN_RELEASE));
         }
+    }
+
+    class AvrcpButtonListener implements OnTouchListener {
 
         public boolean onTouch(View v, MotionEvent event) {
             int id = v.getId();
             int img = 0, cmd;
-            //if (DBG) Log.d(TAG, v + " is touched, event=" + event.getAction());
+            cmd = button_avrcp_cmd.get(v.getId());
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 img = button_press_icon.get(id);
-                //cmd = button_avrcp_cmd.get(id);
             } else if (event.getAction() == MotionEvent.ACTION_UP) {
                 img = button_release_icon.get(id);
             } else
                 return false;
+            AvrcpCmdSend(cmd, event.getAction());
             ImageButton btn = (ImageButton)findViewById(id);
             Drawable draw = getResources().getDrawable(img);
             btn.setBackgroundDrawable(draw);
@@ -182,10 +180,10 @@ public class MainActivity extends Activity {
         button_press_icon.put(R.id.btn_pausei,R.drawable.pause_pressed);
 
         button_avrcp_cmd.clear();
-        button_avrcp_cmd.put(R.id.btn_next, 0x4b);
-        button_avrcp_cmd.put(R.id.btn_previous, 0x4c);
-        button_avrcp_cmd.put(R.id.btn_playi, 0x44);
-        button_avrcp_cmd.put(R.id.btn_pausei, 0x46);
+        button_avrcp_cmd.put(R.id.btn_next, MainActivity.AVRCP_CMD_NEXT);
+        button_avrcp_cmd.put(R.id.btn_previous, MainActivity.AVRCP_CMD_PREVIOUS);
+        button_avrcp_cmd.put(R.id.btn_playi, MainActivity.AVRCP_CMD_PLAY);
+        button_avrcp_cmd.put(R.id.btn_pausei, MainActivity.AVRCP_CMD_PAUSE);
 
         initPowerButton();
 
@@ -193,15 +191,14 @@ public class MainActivity extends Activity {
     }
 
     private void initPowerButton() {
-        btn_power = (ImageButton)findViewById(R.id.btn_power);
-        PowerButtonlistener listener = new PowerButtonlistener();
-        btn_power.setOnTouchListener(listener);
+        btn_enable = (ImageButton)findViewById(R.id.btn_enable);
+        EnableButtonlistener listener = new EnableButtonlistener();
+        btn_enable.setOnTouchListener(listener);
 
     }
 
     private void initButtonListener(int id, AvrcpButtonListener listener) {
         ImageButton btn = (ImageButton)findViewById(id);
-        btn.setOnClickListener(listener);
         btn.setOnTouchListener(listener);
     }
     private void ShowToast(String info) {
@@ -329,66 +326,40 @@ public class MainActivity extends Activity {
     @Override
     public void onStop() {
         super.onStop();
+        isPlaying = false;
+        if(DBG) Log.d(TAG, "onStop");
+        uiSetA2dpConnectState(a2dpState == BluetoothA2dpSink.STATE_CONNECTED,
+                connectDeviceInfo);
+        btn_enable.setBackgroundResource(R.drawable.power_off);
         if (mTrack != null) {
-            mTrack.stop();
+            try {
+                mTrack.stop();
+            } catch (IllegalStateException err) {
+                Log.e(TAG, err.toString());
+            }
             mTrack.release();
         }
         if (mRecord != null) {
-            mRecord.stop();
+            try {
+                mRecord.stop();
+            } catch (IllegalStateException err) {
+                Log.e(TAG, err.toString());
+            }
             mRecord.release();
         }
-    }
-
-/*
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-    */
-    public void btn_click_pause(View view) {
-/*
-        if (DBG) Log.d(TAG, "AVRCP Pause");
-        if (mAvrcpControllerService != null)
-        {
-            List<BluetoothDevice> devices = mAvrcpControllerService.getConnectedDevices();
-            for (BluetoothDevice device : devices) {
-                if (DBG) Log.d(TAG, "will pause device:" + device);
-//201 FAST_FORWARD
-//200 REWIND
-                mAvrcpControllerService.sendPassThroughCmd(device, 201,1);
-
-                try {
-                    Thread.sleep(1);
-                } catch (InterruptedException in)
-                {
-
-                }
-
-                mAvrcpControllerService.sendPassThroughCmd(device, 201,0);
-            }
-        }
-        */
+        mPlayTask.cancel(true);
+        mTrack = null;
+        mRecord = null;
     }
 
     class AvrcpHandler implements Runnable {
         int cmd = 0;
+        int action = -1;
+
+        public AvrcpHandler(int cmd, int action) {
+            this.cmd = cmd;
+            this.action = action;
+        }
         public AvrcpHandler(int cmd) {
             this.cmd = cmd;
         }
@@ -398,18 +369,13 @@ public class MainActivity extends Activity {
             if (mAvrcpControllerService != null) {
                 List<BluetoothDevice> devices = mAvrcpControllerService.getConnectedDevices();
                 for (BluetoothDevice device : devices) {
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException ex) {
-
+                    if (action == -1) {
+                        mAvrcpControllerService.sendPassThroughCmd(device, cmd,
+                                MainActivity.AVRCP_BTN_PRESS);
+                        mAvrcpControllerService.sendPassThroughCmd(device, cmd, MainActivity.AVRCP_BTN_RELEASE);
+                    } else {
+                        mAvrcpControllerService.sendPassThroughCmd(device, cmd, action);
                     }
-                    mAvrcpControllerService.sendPassThroughCmd(device, cmd, 0);
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException ex) {
-
-                    }
-                    mAvrcpControllerService.sendPassThroughCmd(device, cmd, 1);
                 }
             }
         }
@@ -426,12 +392,10 @@ public class MainActivity extends Activity {
             int minRecBufSize = AudioRecord.getMinBufferSize(44100,
                     AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_16BIT);
             if (DBG) Log.d(TAG, "background play 2");
-            //if (mRecord == null)
                 mRecord = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, 44100,
                         AudioFormat.CHANNEL_IN_STEREO,
                         AudioFormat.ENCODING_PCM_16BIT, minRecBufSize);
             if (DBG) Log.d(TAG, "background play 3");
-            //if (mTrack == null)
                 mTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
                         44100,
                         AudioFormat.CHANNEL_IN_STEREO,
@@ -450,10 +414,22 @@ public class MainActivity extends Activity {
                 mTrack.write(recData, 0, ReadSize);
 
             }
-            mTrack.stop();
-            mRecord.stop();
-            mTrack.release();
-            mRecord.release();
+            if (mTrack != null) {
+                try {
+                    mTrack.stop();
+                } catch (IllegalStateException err) {
+                    Log.e(TAG, "playback task " + err.toString());
+                }
+                mTrack.release();
+            }
+            if (mRecord != null) {
+                try {
+                    mRecord.stop();
+                } catch (IllegalStateException err) {
+                    Log.e(TAG, "playback task " + err.toString());
+                }
+                mRecord.release();
+            }
             mTrack = null;
             mRecord = null;
             Log.i(TAG, "stop on task!");
@@ -535,16 +511,9 @@ public class MainActivity extends Activity {
                 } else {
                     ShowToast("A2dp source disconnected!");
                     if (isPlaying) {
-                        /*
-                        if (mTrack != null && mRecord != null) {
-                            mTrack.stop();
-                            mRecord.stop();
-                            mTrack.release();
-                            mRecord.release();
-                        }*/
                         isPlaying = false;
-                        if (btn_power !=null)
-                            btn_power.setBackgroundResource(R.drawable.power_off);
+                        if (btn_enable !=null)
+                            btn_enable.setBackgroundResource(R.drawable.power_off);
                     }
                     a2dpRemoteDevice = null;
                 }
