@@ -347,7 +347,13 @@ public class MainActivity extends Activity {
             }
             mRecord.release();
         }
-        mPlayTask.cancel(true);
+        if (mPlayTask != null) {
+            try {
+                mPlayTask.cancel(true);
+            } catch (Exception err) {
+                Log.e(TAG, "onStop cannot cancel task because" + err);
+            }
+        }
         mTrack = null;
         mRecord = null;
     }
