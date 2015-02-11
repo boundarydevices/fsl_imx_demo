@@ -20,6 +20,7 @@
     <string name="eth_do_config" translatable="false">Configure Ethernet</string>
     <string name="eth_conf_summary" translatable="false">Configure Ethernet devices</string>
     <string name="eth_mask" translatable="false">Netmask</string>
+    <string name="eth_mask_pre" translatable="false">255.255.255.0</string>
     <string name="eth_toggle_summary_off" translatable="false">Turn off Ethernet</string>
     <string name="eth_toggle_summary_on" translatable="false">Turn on Ethernet</string>
     <string name="menu_save">confirm</string>
@@ -30,7 +31,7 @@
     <string name="proxy_port">Proxy port</string>
     <string name="proxy_exclusionlist">Bypass proxy for</string> 
     <string name="eth_proxy_address">Proxy address</string>
-    <string name="show_need_setting">You should setting the static IP and DNS address in this mode</string>
+    <string name="show_need_setting">You should set the static IP, Gateway and Mask in this mode</string>
     <string name="advanced_need_setting">You should not set the Proxy address and Proxy port null</string>
     <string name="bypass_hint">You should put valid addresses split by \",\"</string>
     <string name="show_connect_ethernet">Connect the Ethernet before setting the proxy.</string>
