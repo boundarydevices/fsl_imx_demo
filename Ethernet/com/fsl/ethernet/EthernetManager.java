@@ -236,9 +236,12 @@ public class EthernetManager {
                 Log.e(TAG,"Static IP configuration failed: " + e);
             } catch (IllegalStateException e) {
                 Log.e(TAG,"Static IP configuration fialed: " + e);
-            }catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException e) {
                 Log.e(TAG,"Wrong Static IP: " + e);
                 Toast.makeText(mContext, "Illegal address inputed. You can not access the Internet.",Toast.LENGTH_SHORT).show();
+            } catch (Exception err) {
+                Log.e(TAG, "Exception in setting Static IP");
+                Toast.makeText(mContext, "We got exception when set the static IP.",Toast.LENGTH_SHORT).show();
             }
             Log.d(TAG, "set ip manually " + info.toString());
             SystemProperties.set("net.dns1", info.getDnsAddr());
