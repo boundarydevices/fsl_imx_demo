@@ -1,5 +1,5 @@
 /*
-/* Copyright 2012-2014 Freescale Semiconductor, Inc.
+/* Copyright 2012-2015 Freescale Semiconductor, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package com.fsl.android.ota;
 
+import android.os.SystemProperties;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -41,9 +42,7 @@ public class OTAServerConfig {
 	final String port_config_str = "port";
 	final String android_nickname = "ota_folder_suffix";
 	String machineString = null;
-	
 	public OTAServerConfig (String productname) throws MalformedURLException {
-		
 		if (loadConfigureFromFile(configFile, productname) == false)
 			defaultConfigure(productname);
 	}
@@ -71,14 +70,29 @@ public class OTAServerConfig {
 
 			readMachine();
 
+                        String boottype = SystemProperties.get("ro.boot.storage_type");
 			if (machineString.indexOf("DualLite") != -1) {
-				fileaddr = fileaddr + ".imx6dl";
+                               if (boottype.equals("sd"))
+                                  {fileaddr = fileaddr + ".imx6dl_sd";}
+                              else if (boottype.equals("nand"))
+                                  {fileaddr = fileaddr + ".imx6dl_nand";}
+                              else
+                              fileaddr = fileaddr + ".imx6dl";
 			} else if (machineString.indexOf("Quad") != -1) {
-				fileaddr = fileaddr + ".imx6q";
+                               if (boottype.equals("sd"))
+                                  {fileaddr = fileaddr + ".imx6q_sd";}
+                              else if (boottype.equals("nand"))
+                                  {fileaddr = fileaddr + ".imx6q_nand";}
+                              else
+                              fileaddr = fileaddr + ".imx6q";
 			} else if (machineString.indexOf("SoloLite") != -1) {
 				fileaddr = fileaddr + ".imx6sl";
 			} else if (machineString.indexOf("SoloX") != -1) {
-				fileaddr = fileaddr + ".imx6sx";
+                               if (boottype.equals("nand"))
+                                  {fileaddr = fileaddr + ".imx6sx_nand";
+                        }
+                              else
+			      fileaddr = fileaddr + ".imx6sx";
 			}
 
 			updatePackageURL = new URL(default_protocol, server, port, fileaddr);

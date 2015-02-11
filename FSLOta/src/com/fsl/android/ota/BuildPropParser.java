@@ -1,5 +1,5 @@
 /*
-/* Copyright 2012 Freescale Semiconductor, Inc.
+/* Copyright 2012-2015 Freescale Semiconductor, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,7 +91,7 @@ public class BuildPropParser {
     
     public String getRelease() { 
     	if (propHM != null) 
-    		return propHM.get("ro.build.version.release"); 
+               return propHM.get("ro.build.version.release");
     	else 
     		return null;
     }
@@ -101,5 +101,6 @@ public class BuildPropParser {
     	else
     		return null;
     }
+
 
 }
