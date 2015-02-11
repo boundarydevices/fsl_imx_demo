@@ -1,5 +1,5 @@
 /*
-/* Copyright 2012-2014 Freescale Semiconductor, Inc.
+/* Copyright 2012-2015 Freescale Semiconductor, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.net.*;
 import java.security.GeneralSecurityException;
 import java.io.*;
 
+import android.os.SystemProperties;
 import android.content.*;
 import android.net.ConnectivityManager;
 import android.os.Build;
@@ -137,6 +138,7 @@ public class OTAServerManager  {
 		Long remoteBuildUTC = (Long.parseLong(parser.getProp("ro.build.date.utc"))) * 1000;
 		// *1000 because Build.java also *1000, align with it.
 		Log.d(TAG, "Local Version:" + Build.VERSION.INCREMENTAL + "server Version:" + parser.getNumRelease());
+                 Log.d(TAG, "BOARD BOOTTYPE:" + SystemProperties.get("ro.boot.storage_type"));
 		boolean upgrade = false;
 		upgrade = remoteBuildUTC > buildutc;
 		// here only check build time, in your case, you may also check build id, etc.
