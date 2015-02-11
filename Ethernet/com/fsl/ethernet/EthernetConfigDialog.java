@@ -29,6 +29,7 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.os.Handler;
 import com.fsl.ethernet.EthernetDevInfo;
 import android.widget.LinearLayout;
 import android.widget.CompoundButton;
@@ -55,6 +56,7 @@ public class EthernetConfigDialog extends AlertDialog implements
     private EditText mGateway;
     private LinearLayout ip_dns_setting;
     private static String Mode_dhcp = "dhcp";
+    private Handler configHandler = new Handler();
 
     public EthernetConfigDialog(Context context, EthernetEnabler Enabler) {
         super(context);
@@ -125,10 +127,11 @@ public class EthernetConfigDialog extends AlertDialog implements
         if (localLOGV)
             Log.d(TAG, "Config device for " + mDevList.getSelectedItem().toString());
         if (mConTypeManual.isChecked()) {
-            if ((mIpaddr.getText().toString().equals(""))&&(mDns.getText().toString().equals("")))
-            {
+            if ((mIpaddr.getText().toString().equals("")) || (mMask.getText().toString().equals("")) ||
+                        mGateway.getText().toString().equals("")) {
                 Toast.makeText(this.getContext(), R.string.show_need_setting,Toast.LENGTH_SHORT).show();
-            }else{
+                return;
+            } else {
                 info.setConnectMode(EthernetDevInfo.ETHERNET_CONN_MODE_MANUAL);
                 info.setIpAddress(mIpaddr.getText().toString());
                 info.setDnsAddr(mDns.getText().toString());
@@ -144,8 +147,22 @@ public class EthernetConfigDialog extends AlertDialog implements
         info.setProxyAddr(mEthEnabler.getManager().getSharedPreProxyAddress());
         info.setProxyPort(mEthEnabler.getManager().getSharedPreProxyPort());
         info.setProxyExclusionList(mEthEnabler.getManager().getSharedPreProxyExclusionList());
-        mEthEnabler.getManager().updateDevInfo(info);
-        mEthEnabler.setEthEnabled();
+        configHandler.post(new ConfigHandler(info));
+    }
+
+    class ConfigHandler implements Runnable {
+        EthernetDevInfo info;
+
+        public ConfigHandler(EthernetDevInfo info) {
+            this.info = info;
+        }
+
+        public void run() {
+            mEthEnabler.getManager().updateDevInfo(info);
+            mEthEnabler.setEthEnabled();
+
+        }
+
     }
 
     public void onClick(DialogInterface dialog, int which) {
