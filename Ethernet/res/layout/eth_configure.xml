@@ -122,7 +122,8 @@
                       android:textSize="18sp"
                       android:textAlignment="viewStart"
                       android:singleLine="true"
-                      android:inputType="none" />
+                      android:text="@string/eth_mask_pre"
+                      android:inputType="phone" />
             <TextView android:id="@+id/gateway_text"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
@@ -138,7 +139,7 @@
                       android:textSize="18sp"
                       android:textAlignment="viewStart"
                       android:singleLine="true"
-                      android:inputType="none" />
+                      android:inputType="phone" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
