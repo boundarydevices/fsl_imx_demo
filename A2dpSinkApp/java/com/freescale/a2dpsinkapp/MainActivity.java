@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.os.AsyncTask;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.content.Intent;
 import android.widget.ImageButton;
@@ -240,8 +241,8 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        int a = BluetoothProfile.A2DP_SINK;
 
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         btn_start = (Button)findViewById(R.id.btn_start);
         btn_stop = (Button)findViewById(R.id.btn_stop);
         final BluetoothAdapter mBluetoothAdapter;
