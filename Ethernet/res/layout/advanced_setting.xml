@@ -52,6 +52,7 @@
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
                       android:textSize="18sp"
+                      android:paddingLeft="10dip"
                       android:textAlignment="viewStart"
                       android:singleLine="true" />
 
@@ -68,6 +69,7 @@
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
                       android:textSize="18sp"
+                      android:paddingLeft="10dip"
                       android:textAlignment="viewStart"
                       android:singleLine="true"
                       android:inputType="number" />
@@ -85,6 +87,7 @@
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
                       android:textSize="18sp"
+                      android:paddingLeft="10dip"
                       android:textAlignment="viewStart"
                       android:hint="@string/bypass_hint"
                       android:singleLine="true"/>
