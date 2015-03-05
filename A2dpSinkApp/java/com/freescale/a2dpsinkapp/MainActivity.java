@@ -68,6 +68,18 @@ public class MainActivity extends Activity {
     static int AVRCP_BTN_PRESS = 0;
     static int AVRCP_BTN_RELEASE = 1;
 
+    private void requestAudio() {
+        AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        int result = am.requestAudioFocus(null,
+                AudioManager.STREAM_MUSIC,
+                AudioManager.AUDIOFOCUS_GAIN);
+        if (result != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            Log.w(TAG, "requestAudioFocus failed result is (" + result + ")");
+        } else {
+            Log.i(TAG, "requestAudioFocus Successfully!");
+        }
+
+    }
 
     class EnableButtonlistener implements OnClickListener, OnTouchListener {
         public void onClick(View v) {
@@ -76,6 +88,7 @@ public class MainActivity extends Activity {
 
         public boolean onTouch(View v, MotionEvent event) {
 
+            requestAudio();
             int action = event.getAction();
             if (action == MotionEvent.ACTION_DOWN) {
                 if (isPlaying) {
