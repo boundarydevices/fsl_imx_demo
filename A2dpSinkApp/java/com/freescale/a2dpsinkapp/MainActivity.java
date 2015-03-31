@@ -118,7 +118,7 @@ public class MainActivity extends Activity {
                             if (adapter.getProfileConnectionState(BluetoothProfile.A2DP_SINK) !=
                                     BluetoothProfile.STATE_CONNECTED) {
                                 Log.i(TAG, "No a2dp connected");
-                                ShowToast("No A2dp connected!");
+                                ShowToast(getResources().getString(R.string.No_A2dp_connected));
                                 btn_enable.setBackgroundResource(R.drawable.power_off);
                                 return false;
                             }
@@ -272,7 +272,7 @@ public class MainActivity extends Activity {
                     if (adapter.getProfileConnectionState(BluetoothProfile.A2DP_SINK) !=
                             BluetoothProfile.STATE_CONNECTED) {
                         Log.i(TAG, "No a2dp connected");
-                        ShowToast("No A2dp connected!");
+                        ShowToast(getResources().getString(R.string.No_A2dp_connected));
                         return;
                     }
                 } else
@@ -303,12 +303,12 @@ public class MainActivity extends Activity {
             if (mBluetoothAdapter.getProfileConnectionState(BluetoothProfile.A2DP_SINK) !=
                     BluetoothProfile.STATE_CONNECTED) {
                 Log.i(TAG, "no a2dp");
-                ShowToast("No A2dp connected!");
+                ShowToast(getResources().getString(R.string.No_A2dp_connected));
 
             }
             else {
                 a2dpState = BluetoothA2dpSink.STATE_CONNECTED;
-                ShowToast("We have A2dp connection");
+                ShowToast(getResources().getString(R.string.A2dp_connection));
                 Log.i(TAG, "we have a2dp");
             }
             if(mBluetoothAdapter.getProfileProxy(getApplicationContext(),
@@ -524,12 +524,12 @@ public class MainActivity extends Activity {
                 String info = null;
                 boolean connected = false;
                 if (state == BluetoothA2dpSink.STATE_CONNECTED) {
-                    ShowToast("A2dp source connected!");
+                    ShowToast(getResources().getString(R.string.A2dp_source_connected));
                     connected = true;
                     info = device.getAliasName() + " " + device.getAddress();
                     a2dpRemoteDevice = device;
                 } else {
-                    ShowToast("A2dp source disconnected!");
+                    ShowToast(getResources().getString(R.string.A2dp_source_disconnected));
                     if (isPlaying) {
                         isPlaying = false;
                         if (btn_enable !=null)
@@ -548,9 +548,9 @@ public class MainActivity extends Activity {
                 int previous_state =
                         intent.getIntExtra(BluetoothA2dpSink.EXTRA_PREVIOUS_STATE,-1);
                 if (state == BluetoothA2dpSink.STATE_PLAYING) {
-                    ShowToast("A2dp Source is playing!");
+                    ShowToast(getResources().getString(R.string.A2dp_is_playing));
                 } else {
-                    ShowToast("A2dp Source paused.");
+                    ShowToast(getResources().getString(R.string.A2dp_source_pause));
                 }
 
             }

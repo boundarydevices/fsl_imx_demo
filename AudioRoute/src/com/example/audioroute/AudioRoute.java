@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- * Copyright (C) 2012 Freescale Semiconductor, Inc.
+ * Copyright (C) 2012-2015 Freescale Semiconductor, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,9 +56,9 @@ public class AudioRoute extends Activity {
         mSpdifIn = (CheckBox)findViewById(R.id.spdif_in);
 
 
-        mCommand.setText("Please select input device");
+        mCommand.setText(getResources().getString(R.string.device_choose));
 
-        mSpdifIn.setText("Enable SPDIF In");
+        mSpdifIn.setText(getResources().getString(R.string.Enable_SPDIF_In));
 
         if (AudioSystem.getDeviceConnectionState(AudioSystem.DEVICE_IN_AUX_DIGITAL, "") == AudioSystem.DEVICE_STATE_AVAILABLE)
             mSpdifIn.setChecked(true);
