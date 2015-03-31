@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">AudioRoute</string>
+    <string name="device_choose">Please select input device</string>
+    <string name="Enable_SPDIF_In">Enable SPDIF In</string>
 </resources>

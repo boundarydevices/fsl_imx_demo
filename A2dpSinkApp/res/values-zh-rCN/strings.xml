@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">蓝牙音频</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">设置</string>
+    <string name="stop">停止</string>
+    <string name="start">开始</string>
+    <string name="pause">暂停</string>
+    <string name="play">播放</string>
+    <string name="noConnected">蓝牙音频无连接</string>
+    <string name="No_A2dp_connected">无蓝牙音频连接</string>
+    <string name="A2dp_connection">蓝牙音频已连接</string> 
+    <string name="A2dp_source_connected">蓝牙源端已连接</string>
+    <string name="A2dp_source_disconnected">蓝牙源端已断开</string>
+    <string name="A2dp_is_playing">蓝牙音频正在播放</string>
+    <string name="A2dp_source_pause">蓝牙源端已暂停</string>
+</resources>
