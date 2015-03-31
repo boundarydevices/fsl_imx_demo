@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">A2dpSinkApp</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
@@ -9,5 +8,10 @@
     <string name="pause">Pause</string>
     <string name="play">Play</string>
     <string name="noConnected">No A2dp connected</string>
-
-</resources>
+    <string name="No_A2dp_connected">No A2dp connected!</string>
+    <string name="A2dp_connection">We have A2dp connection</string>
+    <string name="A2dp_source_connected">A2dp source connected!</string>
+    <string name="A2dp_source_disconnected">A2dp source disconnected!</string>
+    <string name="A2dp_is_playing">A2dp Source is playing!</string>
+    <string name="A2dp_source_pause">A2dp Source paused.</string>
+ </resources>
