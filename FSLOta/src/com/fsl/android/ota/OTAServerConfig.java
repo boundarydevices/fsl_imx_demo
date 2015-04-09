@@ -65,11 +65,13 @@ public class OTAServerConfig {
 			String port_str = parser.getProp(port_config_str);
 			String android_name = parser.getProp(android_nickname);
 			int port = new Long(port_str).intValue();
-			String fileaddr = new String(product + "_" + android_name + "/" + product + ".ota.zip");
-			String buildconfigAddr = new String(product + "_" + android_name + "/" + "build.prop");
+			String fileaddr;
+			String buildconfigAddr;
 
 			readMachine();
-
+			String version = SystemProperties.get("ro.build.version.release");
+			fileaddr = new String(product + "_" + android_name + "_" + version + "/" + product + ".ota.zip");
+			buildconfigAddr = new String(product + "_" + android_name + "_" + version + "/" + "build.prop");
                         String boottype = SystemProperties.get("ro.boot.storage_type");
 			if (machineString.indexOf("DualLite") != -1) {
                                if (boottype.equals("sd"))
