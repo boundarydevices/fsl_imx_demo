@@ -256,16 +256,25 @@ public class EthernetManager {
         infotemp.setIfName(DevName[0]);
         infotemp.setConnectMode(EthernetDevInfo.ETHERNET_CONN_MODE_DHCP);
         String ip;
-        ip = mConnMgr.getLinkProperties(ConnectivityManager.TYPE_ETHERNET).getAddresses().toString();
+        try {
+            ip = mConnMgr.getLinkProperties(ConnectivityManager.TYPE_ETHERNET).getAddresses().toString();
+        } catch (Exception err) {
+            ip = "[]";
+            Log.w(TAG, "getDhcpInfo error:" + err.toString());
+        }
         if (ip != "[]" )
             infotemp.setIpAddress(ip.substring(2, ip.length()-1));
         String dns = " ";
+        try {
         int i = 0;
-        for( InetAddress d : mConnMgr.getLinkProperties(ConnectivityManager.TYPE_ETHERNET).getDnsServers()) {
-            String temp = d.toString();
-            if (temp != null)
-                dns = temp.substring(1, temp.length()-1);
-            break;
+            for( InetAddress d : mConnMgr.getLinkProperties(ConnectivityManager.TYPE_ETHERNET).getDnsServers()) {
+                String temp = d.toString();
+                if (temp != null)
+                    dns = temp.substring(1, temp.length()-1);
+                break;
+            }
+        } catch (Exception err) {
+            Log.w(TAG, "getDhcpInfo error:" + err.toString());
         }
         infotemp.setDnsAddr(dns);// now only use dns1, need optimization later here.
         String proxyAddress = getSharedPreProxyAddress();
