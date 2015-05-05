@@ -73,6 +73,7 @@ public class OTAServerConfig {
 			fileaddr = new String(product + "_" + android_name + "_" + version + "/" + product + ".ota.zip");
 			buildconfigAddr = new String(product + "_" + android_name + "_" + version + "/" + "build.prop");
                         String boottype = SystemProperties.get("ro.boot.storage_type");
+			if (machineString.indexOf("i.MX6") != -1) {
 			if (machineString.indexOf("DualLite") != -1) {
                                if (boottype.equals("sd"))
                                   {fileaddr = fileaddr + ".imx6dl_sd";}
@@ -96,7 +97,9 @@ public class OTAServerConfig {
                               else
 			      fileaddr = fileaddr + ".imx6sx";
 			}
-
+			} else if (machineString.indexOf("i.MX7") != -1) {
+			      fileaddr = fileaddr + ".imx7d";	
+			}
 			updatePackageURL = new URL(default_protocol, server, port, fileaddr);
 			buildpropURL = new URL(default_protocol, server, port, buildconfigAddr);
 		} catch (Exception e) {
