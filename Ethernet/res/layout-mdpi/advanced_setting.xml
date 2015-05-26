@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="8dip">
+
+        <TextView android:id="@+id/eth_proxy_text"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_marginTop="8dip"
+                  android:layout_marginStart="16dip"
+                  android:layout_marginEnd="16dip"
+                  android:orientation="vertical"
+                  android:gravity="start"
+                  android:textAppearance="?android:attr/textAppearanceMedium"
+                  android:text="@string/proxy_setting" />
+
+        <!-- IP address -->
+        <LinearLayout android:id="@+id/enterprise_wrapper"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:padding="0dip"
+                      android:orientation="vertical">
+            <LinearLayout
+                android:id="@+id/ip_dns_setting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/address_port_setting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+            <TextView android:id="@+id/eth_proxy_address"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_marginTop="8dip"
+                      android:layout_marginStart="16dip"
+                      android:layout_marginEnd="16dip"
+                      android:orientation="vertical"
+                      android:gravity="start"
+                      android:text="@string/proxy_address" />
+            <EditText android:id="@+id/proxy_address_edit"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:textSize="18sp"
+                      android:paddingLeft="10dip"
+                      android:textAlignment="viewStart"
+                      android:singleLine="true" />
+
+            <TextView android:id="@+id/eth_proxy_port"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_marginTop="8dip"
+                      android:layout_marginStart="16dip"
+                      android:layout_marginEnd="16dip"
+                      android:orientation="vertical"
+                      android:gravity="start"
+                      android:text="@string/proxy_port" />
+            <EditText android:id="@+id/proxy_port_edit"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:textSize="18sp"
+                      android:paddingLeft="10dip"
+                      android:textAlignment="viewStart"
+                      android:singleLine="true"
+                      android:inputType="number" />
+
+           <TextView android:id="@+id/eth_proxy_exclusionlist"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_marginTop="8dip"
+                      android:layout_marginStart="16dip"
+                      android:layout_marginEnd="16dip"
+                      android:orientation="vertical"
+                      android:gravity="start"
+                      android:text="@string/proxy_exclusionlist" />
+            <EditText android:id="@+id/proxy_exclusionlist"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:textSize="18sp"
+                      android:paddingLeft="10dip"
+                      android:textAlignment="viewStart"
+                      android:hint="@string/bypass_hint"
+                      android:singleLine="true"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>
+

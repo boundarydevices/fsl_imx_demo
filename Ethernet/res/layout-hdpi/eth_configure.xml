@@ -73,8 +73,7 @@
                 android:id="@+id/ip_dns_setting"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" >
-                
+                android:orientation="vertical">
             <TextView android:id="@+id/ipaddr_text"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
