@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="8dip">
+        <LinearLayout
+                android:id="@+id/table"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+        </LinearLayout>
+
+        <!-- Device list -->
+
+        <TextView android:id="@+id/eth_dev_list_text"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_marginTop="8dip"
+                  android:layout_marginStart="16dip"
+                  android:layout_marginEnd="16dip"
+                  android:orientation="vertical"
+                  android:gravity="start"
+                  android:text="@string/eth_dev_list"
+                  android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <!-- The entries will be set programmatically -->
+        <Spinner android:id="@+id/eth_dev_spinner"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content" />
+
+        <!-- Connection type -->
+        <TextView android:id="@+id/eth_con_type"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_marginTop="8dip"
+                  android:layout_marginStart="16dip"
+                  android:layout_marginEnd="16dip"
+                  android:orientation="vertical"
+                  android:gravity="start"
+                  android:textAppearance="?android:attr/textAppearanceMedium"
+                  android:text="@string/eth_con_type" />
+        <RadioGroup android:id="@+id/con_type"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+            <RadioButton android:id="@+id/dhcp_radio"
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:textSize="14sp"
+                         android:textAlignment="viewStart"
+                         android:text="@string/eth_con_type_dhcp">
+            </RadioButton>
+            <RadioButton android:id="@+id/manual_radio"
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:textSize="14sp"
+                         android:textAlignment="viewStart"
+                         android:text="@string/eth_con_type_manual">
+            </RadioButton>
+        </RadioGroup>
+
+        <!-- IP address -->
+        <LinearLayout android:id="@+id/enterprise_wrapper"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:padding="0dip"
+                      android:orientation="vertical">
+            <LinearLayout
+                android:id="@+id/ip_dns_setting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+            <TextView android:id="@+id/ipaddr_text"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_marginTop="8dip"
+                      android:layout_marginStart="16dip"
+                      android:layout_marginEnd="16dip"
+                      android:orientation="vertical"
+                      android:gravity="start"
+                      android:text="@string/eth_ipaddr" />
+            <EditText android:id="@+id/ipaddr_edit"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:textSize="18sp"
+                      android:paddingLeft="10dip"
+                      android:textAlignment="viewStart"
+                      android:singleLine="true"
+                      android:inputType="phone" />
+            <TextView android:id="@+id/dns_text"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_marginTop="8dip"
+                      android:layout_marginStart="16dip"
+                      android:layout_marginEnd="16dip"
+                      android:orientation="vertical"
+                      android:gravity="start"
+                      android:text="@string/eth_dns" />
+            <EditText android:id="@+id/eth_dns_edit"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:textSize="18sp"
+                      android:paddingLeft="10dip"
+                      android:textAlignment="viewStart"
+                      android:singleLine="true"
+                      android:inputType="none" />
+            <TextView android:id="@+id/netmask_text"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_marginTop="8dip"
+                      android:layout_marginStart="16dip"
+                      android:layout_marginEnd="16dip"
+                      android:orientation="vertical"
+                      android:gravity="start"
+                      android:text="@string/eth_mask" />
+            <EditText android:id="@+id/eth_netmask_edit"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:textSize="18sp"
+                      android:paddingLeft="10dip"
+                      android:textAlignment="viewStart"
+                      android:singleLine="true"
+                      android:text="@string/eth_mask_pre"
+                      android:inputType="phone" />
+            <TextView android:id="@+id/gateway_text"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_marginTop="8dip"
+                      android:layout_marginStart="16dip"
+                      android:layout_marginEnd="16dip"
+                      android:orientation="vertical"
+                      android:gravity="start"
+                      android:text="@string/eth_gw" />
+            <EditText android:id="@+id/eth_gateway_edit"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:textSize="18sp"
+                      android:paddingLeft="10dip"
+                      android:textAlignment="viewStart"
+                      android:singleLine="true"
+                      android:inputType="phone" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
+
