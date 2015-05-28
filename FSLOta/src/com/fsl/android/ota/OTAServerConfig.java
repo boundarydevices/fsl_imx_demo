@@ -82,12 +82,21 @@ public class OTAServerConfig {
                               else
                               fileaddr = fileaddr + ".imx6dl";
 			} else if (machineString.indexOf("Quad") != -1) {
-                               if (boottype.equals("sd"))
-                                  {fileaddr = fileaddr + ".imx6q_sd";}
-                              else if (boottype.equals("nand"))
-                                  {fileaddr = fileaddr + ".imx6q_nand";}
-                              else
-                              fileaddr = fileaddr + ".imx6q";
+				if(machineString.indexOf("Plus") != -1){
+                               		if (boottype.equals("sd"))
+                                  		{fileaddr = fileaddr + ".imx6qp_sd";}
+                              		else if (boottype.equals("nand"))
+                                  		{fileaddr = fileaddr + ".imx6qp_nand";}
+                              		else
+                              	  		fileaddr = fileaddr + ".imx6qp";
+				} else {
+					if (boottype.equals("sd"))
+                                  		{fileaddr = fileaddr + ".imx6q_sd";}
+                                	else if (boottype.equals("nand"))
+                                  		{fileaddr = fileaddr + ".imx6q_nand";}
+                                	else
+                                  		fileaddr = fileaddr + ".imx6q";
+				}
 			} else if (machineString.indexOf("SoloLite") != -1) {
 				fileaddr = fileaddr + ".imx6sl";
 			} else if (machineString.indexOf("SoloX") != -1) {
