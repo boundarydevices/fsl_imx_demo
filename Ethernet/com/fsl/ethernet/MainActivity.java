@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2014 Freescale Semiconductor, Inc.
+ * Copyright (C) 2013-2015 Freescale Semiconductor, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -153,7 +153,6 @@ public class MainActivity extends Activity {
     public void onDestroy() {
         super.onDestroy();
         Log.i(TAG, "onStop() will force clear global proxy set by ethernet");
-        mConnMgr.setGlobalProxy(null);
         unregisterReceiver(mEthernetReceiver);
     }
 }
