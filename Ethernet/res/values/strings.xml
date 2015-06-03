@@ -35,4 +35,5 @@
     <string name="advanced_need_setting">You should not set the Proxy address and Proxy port null</string>
     <string name="bypass_hint">You should put valid addresses split by \",\"</string>
     <string name="show_connect_ethernet">Connect the Ethernet before setting the proxy.</string>
+    <string name="proxy_enable_checkbox">Enable Http Proxy</string>
 </resources>

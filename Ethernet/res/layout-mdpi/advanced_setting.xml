@@ -20,6 +20,14 @@
                   android:textAppearance="?android:attr/textAppearanceMedium"
                   android:text="@string/proxy_setting" />
 
+        <CheckBox
+                  android:id="@+id/proxy_enable_checkbox"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_marginTop="8dip"
+                  android:layout_marginEnd="16dip"
+                  android:text="@string/proxy_enable_checkbox" />
+
         <!-- IP address -->
         <LinearLayout android:id="@+id/enterprise_wrapper"
                       android:layout_width="match_parent"
