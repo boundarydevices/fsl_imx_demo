@@ -11,7 +11,7 @@
                 android:background="#ffffff"/>
       <TextView
           android:id="@+id/textview01"
-          android:layout_width="53dp"
+          android:layout_width="80dp"
           android:layout_height="25dp"
           android:layout_below="@+id/Spinner"
           android:layout_marginLeft="2dp"
