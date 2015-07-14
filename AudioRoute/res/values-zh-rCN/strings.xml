@@ -4,5 +4,7 @@
     <string name="app_name">录音源选择</string>
     <string name="device_choose">请选择输入设备</string>
     <string name="Enable_SPDIF_In">开启数字音频接口</string>
+    <string name="output_choose">请选择输出设备</string>
+    <string name="Enable_Passthrough">开启 Passthrough</string>
 
 </resources>
