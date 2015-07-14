@@ -3,4 +3,6 @@
     <string name="app_name">AudioRoute</string>
     <string name="device_choose">Please select input device</string>
     <string name="Enable_SPDIF_In">Enable SPDIF In</string>
+    <string name="output_choose">Please select output device</string>
+    <string name="Enable_Passthrough">Enable Passthrough</string>
 </resources>

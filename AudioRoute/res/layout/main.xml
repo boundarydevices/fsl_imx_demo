@@ -38,4 +38,13 @@
               android:layout_height="wrap_content"
               android:layout_marginLeft="10dip"/>
 
+    <TextView android:id="@+id/AudioOutputText"
+		  android:layout_width="wrap_content"
+		  android:layout_height="wrap_content"
+		  android:textSize="6pt"/>
+
+    <CheckBox android:id="@+id/CheckPassthrough"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginLeft="10dip"/>
 </LinearLayout>
