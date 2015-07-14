@@ -33,6 +33,7 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.media.AudioManager;
 import android.media.AudioSystem;
+import android.os.SystemProperties;
 
 public class AudioRoute extends Activity {
 
@@ -40,6 +41,8 @@ public class AudioRoute extends Activity {
 
     private TextView mCommand;
     private CheckBox mSpdifIn;
+    private TextView mTextViewOutputChoose;
+    private CheckBox mCheckBoxPassthrough;
 
     private AudioManager mAudioManager;
 
@@ -54,11 +57,16 @@ public class AudioRoute extends Activity {
         setContentView(R.layout.main);
         mCommand = (TextView) findViewById(R.id.commandText);
         mSpdifIn = (CheckBox)findViewById(R.id.spdif_in);
+        mTextViewOutputChoose = (TextView) findViewById(R.id.AudioOutputText);
+        mCheckBoxPassthrough = (CheckBox)findViewById(R.id.CheckPassthrough);
 
 
         mCommand.setText(getResources().getString(R.string.device_choose));
 
         mSpdifIn.setText(getResources().getString(R.string.Enable_SPDIF_In));
+
+        mTextViewOutputChoose.setText(getResources().getString(R.string.output_choose));
+        mCheckBoxPassthrough.setText(getResources().getString(R.string.Enable_Passthrough));
 
         if (AudioSystem.getDeviceConnectionState(AudioSystem.DEVICE_IN_AUX_DIGITAL, "") == AudioSystem.DEVICE_STATE_AVAILABLE)
             mSpdifIn.setChecked(true);
@@ -72,6 +80,21 @@ public class AudioRoute extends Activity {
                 setupAudioRoute();
             }
         });
+
+        String value = SystemProperties.get("persist.audio.pass.through");
+        Log.d(TAG,"property persist.audio.pass.through is " + value);
+        if(value.equals("2000"))
+            mCheckBoxPassthrough.setChecked(true);
+        else
+            mCheckBoxPassthrough.setChecked(false);
+
+        mCheckBoxPassthrough.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                Log.d(TAG, "CheckBox Passthrough is clicked");
+                SystemProperties.set("persist.audio.pass.through",mCheckBoxPassthrough.isChecked() ? "2000" : "0" );
+            }
+        });
+
 
     }
 
