@@ -27,24 +27,8 @@
                   android:layout_height="wrap_content"
                   android:orientation="vertical">
 
-        <TextView android:id="@+id/commandText"
-                  android:layout_width="fill_parent"
-                  android:layout_height="wrap_content"
-                  android:textSize="6pt"/>
+   
     </LinearLayout>
 
-    <CheckBox android:id="@+id/spdif_in"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_marginLeft="10dip"/>
 
-    <TextView android:id="@+id/AudioOutputText"
-		  android:layout_width="wrap_content"
-		  android:layout_height="wrap_content"
-		  android:textSize="6pt"/>
-
-   <CheckBox android:id="@+id/CheckPassthrough"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_marginLeft="10dip"/>
 </LinearLayout>
