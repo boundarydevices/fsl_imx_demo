@@ -38,6 +38,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.content.IntentFilter;
 import android.content.Intent;
+import android.os.SystemProperties;
 
 public class MainActivity extends Activity {
     private EthernetEnabler mEthEnabler;
@@ -64,6 +65,7 @@ public class MainActivity extends Activity {
                     if (info.getType() == ConnectivityManager.TYPE_ETHERNET) {
                         if (info.getState() == State.DISCONNECTED)
                             mConnMgr.setGlobalProxy(null);
+                            SystemProperties.set("rw.HTTP_PROXY", "");
                         if (info.getState() == State.CONNECTED)
                             mEthEnabler.getManager().initProxy();
                     }
