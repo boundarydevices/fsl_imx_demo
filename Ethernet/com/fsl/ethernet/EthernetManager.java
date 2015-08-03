@@ -434,6 +434,7 @@ public class EthernetManager {
         exclusionList=getSharedPreProxyExclusionList();
         if (getSharedPreProxyAddress() == null || getSharedPreProxyPort() == null) {
             mConnMgr.setGlobalProxy(null);
+            SystemProperties.set("rw.HTTP_PROXY", "");
             return;
         }
         LinkProperties lp = mConnMgr.getLinkProperties(ConnectivityManager.TYPE_ETHERNET);
@@ -448,6 +449,7 @@ public class EthernetManager {
             new ProxyInfo(getSharedPreProxyAddress(), port, exclusionList);
         mConnMgr.setGlobalProxy(null);
         mConnMgr.setGlobalProxy(proxyProperties);
+        SystemProperties.set("rw.HTTP_PROXY", proxyProperties.getHost() + ":" + proxyProperties.getPort());
     }
 
     public void initProxy(){
