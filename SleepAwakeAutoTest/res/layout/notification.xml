@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:padding="3dp" >
+
+    <Button
+        android:id="@+id/cancelButton"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:layout_alignBottom="@+id/notificationTitle"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/notificationTitle"
+        android:gravity="center"
+        android:text="@string/cancel"
+        android:textSize="15sp" />
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/lock" />
+
+    <TextView
+        android:id="@+id/notificationTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:layout_alignBottom="@+id/imageView1"
+        android:layout_alignTop="@+id/imageView1"
+        android:layout_toRightOf="@+id/imageView1"
+        android:gravity="center"
+        android:paddingLeft="6dp"
+        android:text="@string/sleepawake"
+        android:textColor="#ffffffff"
+        android:textSize="20sp" />
+
+
+</RelativeLayout>
