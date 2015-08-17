@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">SleepAwakeAutoTest</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="awake">Awake Time:</string>
+    <string name="second">Second(s)</string>
+    <string name="sleep">Sleep Time:</string>
+    <string name="start">StartTest</string>
+    <string name="instruction">Instructions:</string>
+    <string name="time_instruction">	Awake time is the time of the unsuspend state, Sleep time is of suspend</string>
+    <string name="operate">		Press Start to start the auto test. Press the Cancel in the nofitcation to stop this test</string>
+    <string name="sleepawake">SleepAwake</string>
+    <string name="cancel">Cancel</string>
+     <string name="action_settings">Settings</string>
+
+</resources>
