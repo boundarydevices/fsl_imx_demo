@@ -15,15 +15,6 @@
  */
 package com.freescale.sleepawake;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -31,7 +22,6 @@ import android.app.Service;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
-import android.util.Log;
 import android.widget.RemoteViews;
 
 public class MyService extends Service {
@@ -41,27 +31,28 @@ public class MyService extends Service {
 	private int sleeptime;
 	private int awaketime;
 
+
 	@Override
 	public IBinder onBind(Intent intent) {
-		// TODO Auto-generated method stub
+		// TODO Auto-generated method stub	
 		return null;
 	}
 
 	@Override
 	public void onCreate() {
 		receiver = new MyReceiver();
-		IntentFilter filter = new IntentFilter();
+		IntentFilter filter = new IntentFilter();  
 		filter.addAction("android.intent.action.MY_SLEEP_AWAKE");
 		filter.addAction("android.intent.action.CANCEL_MY_SLEEP_AWAKE");
 		registerReceiver(receiver, filter); 
 	}
 
-	@Override
-	public void onStart(Intent intent, int startId) {
+	@Override  
+	public void onStart(Intent intent, int startId) {  
 		//Get sleeptime and awaketime from the EditView
-		sleeptime = intent.getIntExtra("sleeptime", 5)*1000;
-		awaketime = intent.getIntExtra("awaketime", 5)*1000;
-		
+		sleeptime = intent.getIntExtra("sleeptime", 5);
+		awaketime = intent.getIntExtra("awaketime", 5);
+
 		//Set the notification
 		notificationManager = (NotificationManager)this.getSystemService(android.content.Context.NOTIFICATION_SERVICE);
 		Notification notification = new Notification(R.drawable.lock, "sleepawake", System.currentTimeMillis());
