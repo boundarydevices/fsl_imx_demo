@@ -1,92 +1,147 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:layout_height="wrap_content" >
 
     <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal" >
-
-        <TextView
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:text="@string/awake"
-            android:textSize="25sp" />
-
-        <EditText
-            android:id="@+id/et_awake"
-            android:layout_width="220dp"
-            android:layout_height="wrap_content"
-            android:singleLine="true"
-            android:textSize="25sp" 
-            android:numeric="integer"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/second"
-            android:textSize="25sp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="6" >
-
-        <TextView
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:text="@string/sleep"
-            android:textSize="25sp" />
-
-        <EditText
-            android:id="@+id/et_sleep"
-            android:layout_width="220dp"
-            android:layout_height="wrap_content"
-            android:singleLine="true"
-            android:textSize="25sp"
-	    android:numeric="integer" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/second"
-            android:textSize="25sp" />
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/btn_start"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="startTest"
-        android:text="@string/start"
-        android:textSize="25sp" />
-
-    <TextView
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-         />
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/instruction"
-        android:textSize="25sp" />
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/time_instruction"
-        android:textSize="15sp" />
-\
+            <TextView
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:text="@string/awake"
+                android:textSize="25sp" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/operate"
-        android:textSize="15sp" />
+            <EditText
+                android:id="@+id/et_awake"
+                android:layout_width="220dp"
+                android:layout_height="wrap_content"
+                android:numeric="integer"
+                android:singleLine="true"
+                android:textSize="25sp" />
 
-</LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/second"
+                android:textSize="25sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="6" >
+
+            <TextView
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:text="@string/sleep"
+                android:textSize="25sp" />
+
+            <EditText
+                android:id="@+id/et_sleep"
+                android:layout_width="220dp"
+                android:layout_height="wrap_content"
+                android:numeric="integer"
+                android:singleLine="true"
+                android:textSize="25sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/second"
+                android:textSize="25sp" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <CheckBox
+                android:id="@+id/cb_random"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/random" />
+
+            <TextView
+                android:id="@+id/tv_times"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="@string/TestTimes"
+                android:textSize="20sp" />
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <Button
+                android:enabled="false"
+                android:id="@+id/btn_start"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:onClick="startTest"
+                android:text="@string/start"
+                android:textSize="25sp" />
+
+            <Button
+                android:enabled="false"
+                android:id="@+id/btn_stop"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:onClick="stopTest"
+                android:text="@string/stop"
+                android:textSize="25sp" />
+            
+            <Button
+                android:id="@+id/btn_setAdmin"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:onClick="setAdmin"
+                android:text="@string/Enable"
+                android:textSize="25sp" />
+            
+            <Button
+                android:id="@+id/btn_disenable"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:onClick="uninstall"
+                android:text="@string/Disable"
+                android:textSize="25sp" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="100dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/instruction"
+            android:textSize="25sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/time_instruction"
+            android:textSize="15sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/operate"
+            android:textSize="15sp" />
+    </LinearLayout>
+
+</ScrollView>

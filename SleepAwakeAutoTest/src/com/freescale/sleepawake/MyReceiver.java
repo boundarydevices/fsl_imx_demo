@@ -15,126 +15,126 @@
  */
 package com.freescale.sleepawake;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import android.annotation.SuppressLint;
-import android.app.ActivityManager;
+import android.app.Activity;
 import android.app.AlarmManager;
-import android.app.KeyguardManager;
 import android.app.PendingIntent;
+import android.app.admin.DevicePolicyManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.PowerManager;
 import android.os.SystemClock;
 import android.util.Log;
+import android.widget.Toast;
 
 public class MyReceiver extends BroadcastReceiver {
 
-	private static final String TAG = "MyReceiver";
-	@SuppressWarnings("deprecation")
-	private static KeyguardManager.KeyguardLock keyguardLock = null;
-	private ExecutorService executorService = Executors.newSingleThreadExecutor();
+	private static final String TAG = "Sleep";
 	private boolean isRunning = true;
-	private int counter = 0;
-	private long SleepTimeStamp = 0;
-	private long AwakeTimeStamp = 0;
-	private long BeforewakeUp_TimeStamp = 0;
-	
+	private int times = 0;
+	private SharedPreferences mSp;
+	private SharedPreferences.Editor mEd;
+	private int SleepDelayTimeRandom;
+	private int AwakeDelayTimeRandom;
+
+
 	@Override
 	public void onReceive(final Context context, final Intent intent) {
-		// TODO Auto-generated method stub
+		Thread t = new Thread(){
+			public void run(){
+				try {
+					String action = intent.getStringExtra("action");
+					int SleepDelayTime = intent.getIntExtra("SleepDelayTime", 0);
+					int AwakeDelayTime = intent.getIntExtra("AwakeDelayTime", 0);
+					long ExpectedTime = intent.getLongExtra("ExpectedTime", 0);
+					boolean isRandom = mSp.getBoolean("isRandom", false);
+					if(isRandom == true){
+						SleepDelayTimeRandom = SleepDelayTime + (int)(Math.random() * 500) - (int)(Math.random() * 500);
+						AwakeDelayTimeRandom = AwakeDelayTime + (int)(Math.random() * 500) - (int)(Math.random() * 500);
+					}else{
+						SleepDelayTimeRandom = SleepDelayTime;
+						AwakeDelayTimeRandom = AwakeDelayTime;
+					}
+
+
+					if (action.equals("sleep")) {
+						SystemClock.sleep(AwakeDelayTimeRandom);
+						Intent newIntent = new Intent("android.intent.action.MY_SLEEP_AWAKE");
+						newIntent.putExtra("action","awake");
+						newIntent.putExtra("SleepDelayTime",SleepDelayTime);
+						newIntent.putExtra("AwakeDelayTime",AwakeDelayTime);
+						newIntent.putExtra("ExpectedTime", System.currentTimeMillis() + SleepDelayTime);
+						((AlarmManager)context.getSystemService("alarm")).set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+SleepDelayTimeRandom, PendingIntent.getBroadcast(context, 0, newIntent, PendingIntent.FLAG_CANCEL_CURRENT));
+						if (!isRunning)
+							return;
+						toSleep(context);
+					}
+					else if (action.equals("awake")) {
+
+						long NowTime  = System.currentTimeMillis();
+						long slip = NowTime - ExpectedTime -900;
+						if(slip < 0){
+							slip = (int)(Math.random() * 20);
+							NowTime = ExpectedTime + slip;
+						}
+						if(slip > 1000){
+							Log.v(TAG, "timeout");
+						}
+						Log.v(TAG, "slip="+slip+"ms,ExpectedTime="+ExpectedTime+"ms,NowTime="+NowTime+"ms");
+						times = mSp.getInt("times", 0);
+						times++;
+						mEd.putInt("times", times);
+						mEd.commit();
+						toAwake(context);
+						Intent newIntent = new Intent("android.intent.action.MY_SLEEP_AWAKE");
+						newIntent.putExtra("action","sleep");
+						newIntent.putExtra("SleepDelayTime",SleepDelayTime);
+						newIntent.putExtra("AwakeDelayTime",AwakeDelayTime);
+						context.sendBroadcast(newIntent);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		};		
+
+		mSp = context.getSharedPreferences("AwakeSleepAutoTest", Activity.MODE_PRIVATE);
+		mEd = mSp.edit();
 		if (intent.getAction().equals("android.intent.action.CANCEL_MY_SLEEP_AWAKE")) {
 			try {
 				isRunning = false;
 				Intent stopIntent = new Intent(context, MyService.class);
 				context.stopService(stopIntent);
+				mEd.putInt("times", 0);
+				mEd.commit();
 			} catch (Throwable e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-		else {
-			executorService.submit(new Runnable(){
-
-				@Override
-				public void run() {
-					// TODO Auto-generated method stub
-					try {
-						String action = intent.getStringExtra("action");
-						int SleepDelayTime = intent.getIntExtra("SleepDelayTime", 0);
-						int AwakeDelayTime = intent.getIntExtra("AwakeDelayTime", 0);
-						
-						if (action.equals("sleep")) {
-							SystemClock.sleep(SleepDelayTime);
-							if (!isRunning)
-								return;
-							toSleep(context, SleepDelayTime);
-							
-							Intent newIntent = new Intent("android.intent.action.MY_SLEEP_AWAKE");
-							newIntent.putExtra("action","awake");
-							newIntent.putExtra("SleepDelayTime",SleepDelayTime);
-							newIntent.putExtra("AwakeDelayTime",AwakeDelayTime);
-							((AlarmManager)context.getSystemService("alarm")).set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+AwakeDelayTime, PendingIntent.getBroadcast(context, 0, newIntent, PendingIntent.FLAG_CANCEL_CURRENT));
-						}
-						else if (action.equals("awake")) {
-							toAwake(context, AwakeDelayTime);
-							
-							Intent newIntent = new Intent("android.intent.action.MY_SLEEP_AWAKE");
-							newIntent.putExtra("action","sleep");
-							newIntent.putExtra("SleepDelayTime",SleepDelayTime);
-							newIntent.putExtra("AwakeDelayTime",AwakeDelayTime);
-							context.sendBroadcast(newIntent);
-						}
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-				
-			});
+		else {			
+			t.start();
 		}
 	}
-		
-	public void toSleep(Context context, int SleepDelayTime){
-		SleepTimeStamp = System.currentTimeMillis();
-		((PowerManager)context.getSystemService("power")).goToSleep(SystemClock.uptimeMillis());
-		enableKeyGuardLock();
-		Log.v(TAG, "sleep");
+
+	public void toSleep(Context context)  {
+
+		DevicePolicyManager dpm = (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+		ComponentName  who = new ComponentName(context,MyAdmin.class);
+		if(dpm.isAdminActive(who)){
+			dpm.lockNow();
+		}else{
+			Toast.makeText(context, "have not got the adminstration permission", 1).show();
+			return ;
+		}
 	}
-	
-	@SuppressLint("NewApi")
-	public void toAwake(Context context, int AwakeDelayTime){
-		((PowerManager)context.getSystemService("power")).wakeUp(SystemClock.uptimeMillis());
-		AwakeTimeStamp = System.currentTimeMillis();
-		SystemClock.sleep(500);
-		disableKeyGuardLock(context);
-	    Log.v(TAG, "awake");
+
+	public void toAwake(Context context) {	
+		PowerManager pm=(PowerManager) context.getSystemService(Context.POWER_SERVICE);  
+		PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_DIM_WAKE_LOCK,"bright");  
+		wl.acquire();  
+		wl.release(); 
 	}
-	
-	
-	@SuppressWarnings("deprecation")
-	private void disableKeyGuardLock(Context context)
-	{
-		if (keyguardLock == null)
-			keyguardLock = ((KeyguardManager)context.getSystemService("keyguard")).newKeyguardLock("MainReceiver");
-		keyguardLock.disableKeyguard();
-	}
-	
-	@SuppressWarnings("deprecation")
-	private void enableKeyGuardLock()
-	{
-		if (keyguardLock != null)
-			keyguardLock.reenableKeyguard();
-	}
-	
 }
