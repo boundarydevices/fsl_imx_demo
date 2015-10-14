@@ -169,7 +169,7 @@ public class AudioRoute extends Activity {
 
     private void setupAudioRoute() {
         Log.d(TAG, "SPDIF IN "+ mSpdifIn.isChecked());
-        mAudioManager.setWiredDeviceConnectionState(AudioSystem.DEVICE_IN_AUX_DIGITAL, mSpdifIn.isChecked() ? 1 : 0, "");
+        mAudioManager.setWiredDeviceConnectionState(AudioSystem.DEVICE_IN_AUX_DIGITAL, mSpdifIn.isChecked() ? 1 : 0, "", "");
     }
 
 }
