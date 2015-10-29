@@ -1,4 +1,4 @@
-ifeq (true,$(filter true,$(BOARD_USE_AR3K_BLUETOOTH) $(BOARD_HAVE_BLUETOOTH_BCM)))
+ifneq ($(BOARD_HAVE_BLUETOOTH_BCM),)
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
