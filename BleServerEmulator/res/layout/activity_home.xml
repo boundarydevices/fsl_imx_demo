@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <com.freescale.bleserver.view.NoScrollViewPager
+        android:id="@+id/vp_home"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" >
+    </com.freescale.bleserver.view.NoScrollViewPager>
+
+    <RadioGroup
+        android:id="@+id/rg_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" >
+
+        <RadioButton
+            android:id="@+id/rb_home"
+            style="@style/ButtonTabStyle"
+            android:checked="true"
+            android:drawableTop="@drawable/btn_home_select"
+            android:text="@string/home" />
+
+        <RadioButton
+            android:id="@+id/rb_setting"
+            style="@style/ButtonTabStyle"
+            android:drawableTop="@drawable/btn_setting_select"
+            android:text="@string/setting" />
+    </RadioGroup>
+
+</LinearLayout>
