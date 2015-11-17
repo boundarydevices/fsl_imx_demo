@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="top_bg">#0c343d</color>
+    <color name="top_text_color">#ffffff</color>
+    <color name="text_blue">#0b0bff</color>
+
+</resources>
