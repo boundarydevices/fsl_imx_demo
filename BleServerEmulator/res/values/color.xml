@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="title_bar_bg">#884a86e8</color>
+    <color name="text_color">#ffffff</color>
+    <color name="item_bg">#664a86e8</color>
+    <color name="text_gray">#cccccc</color>
+    <color name="text_dark_gray">#666666</color>
+    <color name="rl_pressed">#aac9daf8</color>
+
+</resources>
