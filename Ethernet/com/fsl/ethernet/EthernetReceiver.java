@@ -36,7 +36,12 @@ public class EthernetReceiver extends BroadcastReceiver {
         if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
             Log.d(TAG, "resetting interface");
             EthernetManager ethManager = new EthernetManager(context);
-            ethManager.resetInterface();
+            EthernetDevInfo ethInfo = ethManager.getSavedConfig();
+            /* Only force a reset for Fixed IP */
+            if (!ethInfo.getConnectMode().equals(
+                        EthernetDevInfo.ETHERNET_CONN_MODE_DHCP)) {
+                ethManager.resetInterface();
+            }
         } else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {
             NetworkInfo info =
                 intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
@@ -49,8 +54,13 @@ public class EthernetReceiver extends BroadcastReceiver {
                         connMgr.setGlobalProxy(null);
                     } else if (info.getState() == State.CONNECTED) {
                         EthernetManager ethManager = new EthernetManager(context);
-                        ethManager.resetInterface();
-                        ethManager.initProxy();
+                        EthernetDevInfo ethInfo = ethManager.getSavedConfig();
+                        /* Only force a reset for Fixed IP */
+                        if (!ethInfo.getConnectMode().equals(
+                                    EthernetDevInfo.ETHERNET_CONN_MODE_DHCP)) {
+                            ethManager.resetInterface();
+                            ethManager.initProxy();
+                        }
                     }
                 }
             }
