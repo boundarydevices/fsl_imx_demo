@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/title_bar_bg"
+        android:padding="10dp" >
+
+        <ImageView
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/bluetooth_default" />
+
+        <TextView
+            android:id="@+id/tv_home_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/device_info"
+            android:textColor="@color/text_color"
+            android:textSize="22sp" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/tv_edit_cpu"
+        style="@style/EditDataText"
+        android:text="@string/temperature" />
+
+    <View style="@style/HorLine" />
+
+    <TextView
+        android:id="@+id/tv_battery"
+        style="@style/EditDataText"
+        android:text="@string/battery" />
+
+    <View style="@style/HorLine" />
+
+    <TextView
+        android:id="@+id/tv_edit_date"
+        style="@style/EditDataText"
+        android:text="@string/Date" />
+
+    <View style="@style/HorLine" />
+
+</LinearLayout>

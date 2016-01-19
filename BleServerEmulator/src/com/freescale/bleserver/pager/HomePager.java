@@ -29,8 +29,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.freescale.bleserver.R;
-import com.freescale.bleserver.EditActivity;
+import com.freescale.bleserver.CpuInfoActivity;
+import com.freescale.bleserver.GuideAcitivity;
+import com.freescale.bleserver.HeartRateAcitivity;
 import com.freescale.bleserver.HomeActivity;
+import com.freescale.bleserver.MessageAcitivity;
 import com.freescale.bleserver.global.Attributes;
 import com.freescale.bleserver.utils.PrefUtils;
 import com.freescale.bleserver.utils.StreamUtil;
@@ -56,7 +59,7 @@ public class HomePager extends BasePager implements OnClickListener{
 	//handler of refreshing the temperature
 	private Handler mTempHandler = new Handler(){
 		public void handleMessage(android.os.Message msg) {
-			mTvTemp.setText(Attributes.cpuTemp + "'C");
+			mTvTemp.setText(Attributes.cpuTemp+"");
 		};
 	};
 
@@ -83,7 +86,7 @@ public class HomePager extends BasePager implements OnClickListener{
 		mRlCpuTempl = (RelativeLayout) mRootView.findViewById(R.id.rl_cpu_temp);
 		mRlMessage = (RelativeLayout) mRootView.findViewById(R.id.rl_cpu_message);
 		mRlHeart = (RelativeLayout) mRootView.findViewById(R.id.rl_cpu_heart);
-		mRlSetting = (RelativeLayout) mRootView.findViewById(R.id.rl_cpu_setting);
+		mRlSetting = (RelativeLayout) mRootView.findViewById(R.id.rl_cpu_guide);
 
 		//setListener
 		mTvBleState.setOnClickListener(this);
@@ -97,7 +100,7 @@ public class HomePager extends BasePager implements OnClickListener{
 
 	@Override
 	public void initData() {
-		new ScanTimeThread().start();
+		new ScanTempThread().start();
 		new HeartRateThread().start();
 		new DateThread().start();
 
@@ -118,7 +121,7 @@ public class HomePager extends BasePager implements OnClickListener{
 		}
 	}
 
-	class ScanTimeThread extends Thread{
+	class ScanTempThread extends Thread{
 		@Override
 		public void run() {
 			while(mIsRunTemp){
@@ -139,20 +142,7 @@ public class HomePager extends BasePager implements OnClickListener{
 		}
 	}
 
-	class HeartRateThread extends Thread{
-		@Override
-		public void run() {
-			while(mIsRunHeart){
-				Attributes.heartRate = (int) Math.floor(Math.random()*30 + 50);
-				mHeartRateHandler.sendEmptyMessage(0);
-				try {
-					sleep(60000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
+	
 
 	class DateThread extends Thread{
 		@Override
@@ -191,16 +181,47 @@ public class HomePager extends BasePager implements OnClickListener{
 			PrefUtils.setBoolean(mActivity, PrefUtils.BLE_STATE, mIsBleOn);
 			break;
 		case R.id.rl_cpu_temp:
-		case R.id.rl_cpu_setting:
+			Intent cpuInfo = new Intent(mActivity, CpuInfoActivity.class);
+			mActivity.startActivity(cpuInfo);
+			mActivity.overridePendingTransition(R.anim.tran_in, R.anim.tran_out);
+			break;
+		case R.id.rl_cpu_guide:
+			Intent guide = new Intent(mActivity, GuideAcitivity.class);
+			mActivity.startActivity(guide);
+			mActivity.overridePendingTransition(R.anim.tran_in, R.anim.tran_out);
+			break;
 		case R.id.rl_cpu_heart:
+			Intent heartRate = new Intent(mActivity, HeartRateAcitivity.class);
+			mActivity.startActivity(heartRate);
+			mActivity.overridePendingTransition(R.anim.tran_in, R.anim.tran_out);
+			break;
 		case R.id.rl_cpu_message:
-			Intent intent = new Intent(mActivity, EditActivity.class);
-			mActivity.startActivity(intent);
+			Intent message = new Intent(mActivity, MessageAcitivity.class);
+			mActivity.startActivity(message);
 			mActivity.overridePendingTransition(R.anim.tran_in, R.anim.tran_out);
 			break;
 		default:
 			break;
 		}
+	}
+	
+	class HeartRateThread extends Thread{
+		@Override
+		public void run() {
+			while(mIsRunHeart){
+				Attributes.heartRate = (int) Math.floor(Math.random()*30 + 50);
+				mHeartRateHandler.sendEmptyMessage(0);
+				try {
+					sleep(60000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
+	public void refreshView(){
+		mTvHeartRate.setText(Attributes.heartRate+"");
 	}
 }
 

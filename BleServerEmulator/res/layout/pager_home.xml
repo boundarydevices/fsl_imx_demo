@@ -100,7 +100,7 @@
             <TextView
                 style="@style/TextContentHome"
                 android:layout_toRightOf="@id/iv_home_message"
-                android:text="@string/edit" />
+                android:text="@string/check_message" />
         </RelativeLayout>
     </LinearLayout>
 
@@ -143,13 +143,13 @@
             android:background="#44000000" />
 
         <RelativeLayout
-            android:id="@+id/rl_cpu_setting"
+            android:id="@+id/rl_cpu_guide"
             style="@style/RelativeHomeContent" >
 
             <ImageView
                 android:id="@+id/iv_setting"
                 style="@style/ImageViewHome"
-                android:src="@drawable/found_setting" />
+                android:src="@drawable/guide" />
 
             <TextView
                 style="@style/TextTitelHome"

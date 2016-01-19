@@ -45,7 +45,7 @@ public class ImmediateAlertService extends BluetoothGattServerCallback {
 			throw new IllegalArgumentException("gattServer is null");
 		}
 		mGattServer = gattServer;
-
+		
 		// setup services
 		{ 
 			//immediate alert
@@ -58,7 +58,8 @@ public class ImmediateAlertService extends BluetoothGattServerCallback {
 					BluetoothGattCharacteristic.PERMISSION_READ |BluetoothGattCharacteristic.PERMISSION_WRITE);
 			alc.setValue("");
 			ias.addCharacteristic(alc);
-			mGattServer.addService(ias);
+			if(mGattServer!=null && ias!=null)
+				mGattServer.addService(ias);
 		}
 
 		{ 
@@ -87,7 +88,8 @@ public class ImmediateAlertService extends BluetoothGattServerCallback {
 			dis.addCharacteristic(mansc);
 			dis.addCharacteristic(monsc);
 			dis.addCharacteristic(snsc);
-			mGattServer.addService(dis);
+			if(mGattServer!=null && dis!=null)
+				mGattServer.addService(dis);
 		}
 
 		{
@@ -102,7 +104,8 @@ public class ImmediateAlertService extends BluetoothGattServerCallback {
 					BluetoothGattCharacteristic.PERMISSION_READ);
 			blChar.setValue(Attributes.battery+"");
 			bis.addCharacteristic(blChar);
-			mGattServer.addService(bis);
+			if(mGattServer!=null && bis!=null)
+				mGattServer.addService(bis);
 		}
 
 		{
@@ -117,7 +120,8 @@ public class ImmediateAlertService extends BluetoothGattServerCallback {
 					BluetoothGattCharacteristic.PERMISSION_READ);
 			batc.setValue(Attributes.heartRate+"");
 			hris.addCharacteristic(batc);
-			mGattServer.addService(hris);
+			if(mGattServer!=null && hris!=null)
+				mGattServer.addService(hris);
 		}
 
 		{
@@ -131,7 +135,8 @@ public class ImmediateAlertService extends BluetoothGattServerCallback {
 					BluetoothGattCharacteristic.PERMISSION_READ);
 			TemperatureChar.setValue(Attributes.cpuTemp+"");
 			cts.addCharacteristic(TemperatureChar);
-			mGattServer.addService(cts);
+			if(mGattServer!=null && cts!=null)
+				mGattServer.addService(cts);
 		}
 
 		{
@@ -148,7 +153,8 @@ public class ImmediateAlertService extends BluetoothGattServerCallback {
 				dateChar.setValue(Attributes.Date);
 			}
 			dates.addCharacteristic(dateChar);
-			mGattServer.addService(dates);
+			if(mGattServer!=null && dates!=null)
+				mGattServer.addService(dates);
 		}
 
 		{
@@ -165,7 +171,8 @@ public class ImmediateAlertService extends BluetoothGattServerCallback {
 				messageChar.setValue(Attributes.Message);
 			}
 			mis.addCharacteristic(messageChar);
-			mGattServer.addService(mis);
+			if(mGattServer!=null && mis!=null)
+				mGattServer.addService(mis);
 		}
 	}
 
@@ -227,23 +234,16 @@ public class ImmediateAlertService extends BluetoothGattServerCallback {
 	public void onCharacteristicWriteRequest(android.bluetooth.BluetoothDevice device,
 			int requestId, BluetoothGattCharacteristic characteristic, boolean preparedWrite,
 			boolean responseNeeded, int offset, byte[] value) {
-		Log.d(TAG, "onCharacteristicWriteRequest requestId=" + requestId + " preparedWrite="+ Boolean.toString(preparedWrite) + " responseNeeded="+ Boolean.toString(responseNeeded) + " offset=" + offset);
 		if (characteristic.getUuid().equals(UUID.fromString(IMXUuid.CHAR_ALERT_LEVEL))) {
-			Log.d(TAG, "CHAR_ALERT_LEVEL");
 			if (value != null && value.length > 0) {
-				Log.d(TAG, "value.length=" + value.length);
 				mAlertLevel[0] = value[0];
 			} else {
-				Log.d(TAG, "invalid value written");
 			}
 			mGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, null);
 		}if(characteristic.getUuid().equals(UUID.fromString(IMXUuid.CHAR_MESSAGE))){
-			Log.e(TAG, "alarm it:" + value);
-			if(value.equals("alarm")){
-				characteristic.setValue("stop alarm");
-				Toast.makeText(mActivity, "Alarm time is on", Toast.LENGTH_SHORT).show();
-			}
-			
+			String messageValue = new String(value);
+			Attributes.Message = messageValue;
+			MessageAcitivity.mMessageHandler.sendEmptyMessage(0);
 		}
 	}
 }
