@@ -15,6 +15,7 @@
  */
 package com.freescale.bleserver;
 import java.util.ArrayList;
+
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothGattServer;
 import android.bluetooth.BluetoothManager;
@@ -32,6 +33,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TextView;
@@ -76,18 +78,26 @@ public class HomeActivity extends FragmentActivity{
 		initData();
 
 	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		mHomePager.refreshView();
+	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		mHomePager.stopThread();
 		unregisterReceiver(mBatReceiver);
+		stopAdvertise();
 		PrefUtils.setBoolean(this, PrefUtils.BLE_STATE, false);
 	}
 
 	private void initView() {
 		//find view
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		setContentView(R.layout.activity_home);
 		mRgHome = (RadioGroup) findViewById(R.id.rg_group);
 		mTitle = (TextView)findViewById(R.id.tv_home_title);
@@ -158,8 +168,8 @@ public class HomeActivity extends FragmentActivity{
 	private class BatteryReceiver extends BroadcastReceiver{
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			int rawlevel = intent.getIntExtra("level", -1);//获得当前电量  
-			int scale = intent.getIntExtra("scale", -1);  //获得总电量  
+			int rawlevel = intent.getIntExtra("level", -1);
+			int scale = intent.getIntExtra("scale", -1); 
 			int level = -1;  
 			if (rawlevel >= 0 && scale > 0) {  
 				level = (rawlevel * 100) / scale;  
@@ -206,6 +216,9 @@ public class HomeActivity extends FragmentActivity{
 		if (mBTAdvertiser != null) {
 			ImmediateAlertService ias = new ImmediateAlertService(this);
 			mGattServer = BleUtil.getManager(this).openGattServer(this, ias);
+			if(mGattServer == null){
+				Log.e("aa" , "gatt is null");
+			}
 			ias.setupServices(mGattServer);
 			mBTAdvertiser.startAdvertising(BleUtil.createAdvSettings(true, 0),BleUtil.createFMPAdvertiseData(),mAdvCallback);
 		}

@@ -21,5 +21,5 @@ public class Attributes {
 	public static int battery;
 	public static int heartRate;
 	public static String Date;
-	public static String Message;
+	public static String Message = "No Message";
 }
