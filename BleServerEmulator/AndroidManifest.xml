@@ -5,19 +5,20 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="22"
-        android:targetSdkVersion="22" />
+        android:minSdkVersion="23"
+         />
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ble"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-        <activity
-            android:name="com.freescale.bleserver.HomeActivity"
-            android:label="@string/app_name"
+         <activity
+            android:name="com.freescale.bleserver.PermissionActivity"
             android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,7 +27,24 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.freescale.bleserver.EditActivity"
+            android:name="com.freescale.bleserver.HomeActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.freescale.bleserver.CpuInfoActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+	    android:name="com.freescale.bleserver.GuideAcitivity"
+            android:screenOrientation="portrait" >
+	</activity>
+        <activity
+	    android:name="com.freescale.bleserver.HeartRateAcitivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+	    android:name="com.freescale.bleserver.MessageAcitivity"
             android:screenOrientation="portrait" >
         </activity>
     </application>
