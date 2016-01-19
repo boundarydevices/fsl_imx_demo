@@ -17,13 +17,17 @@ package com.freescale.bleclient.service;
 
 import java.util.List;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 
 public interface BluetoothLeInterface {
 	boolean connect(String deviceAddress);
-	boolean initialize();
+	boolean initialize(Activity activity);
 	List<BluetoothGattService> getSupportedGattServices();
 	void disconnect(String mDeviceAddress);
 	BluetoothGatt getGatt();
+	boolean setCharacteristicNotification(BluetoothGattCharacteristic characteristic, boolean enabled);
+	boolean writeCharacteristic(BluetoothGattCharacteristic characteristic, String value);
 }

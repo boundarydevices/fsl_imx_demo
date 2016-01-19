@@ -15,15 +15,14 @@
  */
 package com.freescale.bleserver;
 
+import com.freescale.bleserver.global.Attributes;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
-
-import com.freescale.bleserver.R;
-import com.freescale.bleserver.global.Attributes;
 
 public class CpuInfoActivity extends Activity{
 
