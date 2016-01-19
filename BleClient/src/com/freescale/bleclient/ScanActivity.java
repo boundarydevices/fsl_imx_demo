@@ -18,13 +18,13 @@ package com.freescale.bleclient;
 
 import java.util.ArrayList;
 
+import com.freescale.bleclient.ble.BleManager;
+import com.freescale.bleclient.ble.BleManager.OnScanListener;
+import com.freescale.bleclient.global.GlobalContacts;
+
 import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothManager;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -38,15 +38,11 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
+import android.util.Log;
 
-import com.freescale.bleclient.global.GlobalContacts;
-import com.freescale.bleclient.R;
+public class ScanActivity extends Activity implements OnClickListener, OnScanListener{
 
-public class ScanActivity extends Activity implements OnClickListener{
-
-	private static final String TAG = "BLE";
-	private static final int REQUEST_ENABLE_BT = 1;
+	private static final String TAG = "BleClient";
 
 	private ProgressBar mPbScan;
 	private TextView mTvScan;
@@ -54,10 +50,11 @@ public class ScanActivity extends Activity implements OnClickListener{
 	private ListView mLvScan;
 	private ArrayList<BluetoothDevice> mLeDevices;
 
-	private BluetoothAdapter mBluetoothAdapter;
 	private boolean mIsScanning;
 	private Handler mHandler;
 	private static final long SCAN_PERIOD = 10000;
+
+	private BleManager mBleManager;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -82,13 +79,7 @@ public class ScanActivity extends Activity implements OnClickListener{
 	}
 
 	private void ensureBleDevice(){
-		// Ensure that the bluetooth device can be used
-		if (!mBluetoothAdapter.isEnabled()) {
-			if (!mBluetoothAdapter.isEnabled()) {
-				Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-				startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-			}
-		}
+		mBleManager.enSureBleOpen();
 		mScanAdapter = new ScanAdapter();
 		mLvScan.setAdapter(mScanAdapter);
 		scanLeDevice(true);
@@ -102,40 +93,27 @@ public class ScanActivity extends Activity implements OnClickListener{
 				@Override
 				public void run() {
 					mIsScanning = false;
-					mBluetoothAdapter.stopLeScan(mLeScanCallback);
+					mBleManager.startScan();
 					mPbScan.setVisibility(View.INVISIBLE);
 					mTvScan.setText("SCAN");
 				}
 			}, SCAN_PERIOD);
 			mIsScanning = true;
-			mBluetoothAdapter.startLeScan(mLeScanCallback);
+			mBleManager.startScan();
 		} else {
 			mIsScanning = false;
-			mBluetoothAdapter.stopLeScan(mLeScanCallback);
+			mBleManager.stopScan();
 		}
 		mPbScan.setVisibility(View.VISIBLE);
 		mTvScan.setText("STOP");
 	}
 
 	private void initBle() {
-		//1.check whether the system support the ble
-		if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-			Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
-			finish();
-		}
-		//2.initial the bluetooth adapter, get a bluetooth adapter from bluetooth management
-		final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-		mBluetoothAdapter = bluetoothManager.getAdapter();
-
-		//3.check the device if can support the bluetooth
-		if (mBluetoothAdapter == null) {
-			Toast.makeText(this, R.string.error_bluetooth_not_supported, Toast.LENGTH_SHORT).show();
-			finish();
-			return;
-		}
+		mBleManager = BleManager.getInstance(this);
+		mBleManager.setOnScanListener(this);
 		mHandler = new Handler();
 		mLeDevices = new ArrayList<BluetoothDevice>();
-	}
+	}	
 
 	private void initView() {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -149,24 +127,6 @@ public class ScanActivity extends Activity implements OnClickListener{
 		mLvScan.setOnItemClickListener(new ScanListItemClick());
 	}
 
-	// Device scan callback.
-	private BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
-		@Override
-		public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
-			runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					if(!mLeDevices.contains(device)){
-						mLeDevices.add(device);
-					}
-					mScanAdapter.notifyDataSetChanged();
-				}
-			});
-		}
-	};
-
-	//ListView Adapter
-	
 	class ScanAdapter extends BaseAdapter{
 
 		@Override
@@ -225,28 +185,39 @@ public class ScanActivity extends Activity implements OnClickListener{
 			break;
 		}
 	}
-	
+
 	class ScanListItemClick implements OnItemClickListener{
-		
+
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position,
 				long id) {
-			//get the device from listview
-	        final BluetoothDevice device = mLeDevices.get(position);
-	        if (device == null)
-	        	return;
-	        //start deviceControlActivity
-	        final Intent intent = new Intent(ScanActivity.this, DeviceControlActivity.class);
-	        intent.putExtra(GlobalContacts.EXTRAS_DEVICE_NAME, device.getName());
-	        intent.putExtra(GlobalContacts.EXTRAS_DEVICE_ADDRESS, device.getAddress());
-	        if (mIsScanning) {
-	            mBluetoothAdapter.stopLeScan(mLeScanCallback);
-	            mIsScanning = false;
-	        }
-	        startActivity(intent);
+			final BluetoothDevice device = mLeDevices.get(position);
+			if (device == null)
+				return;
+			Log.d(TAG, "device name is " + device.getName() + ", device address is " + device.getAddress() );
+			final Intent intent = new Intent(ScanActivity.this, DeviceControlActivity.class);
+			intent.putExtra(GlobalContacts.EXTRAS_DEVICE_NAME, device.getName());
+			intent.putExtra(GlobalContacts.EXTRAS_DEVICE_ADDRESS, device.getAddress());
+			if (mIsScanning) {
+				mBleManager.stopScan();
+				mIsScanning = false;
+			}
+			startActivity(intent);
 		}
 	}
 
-		
-	
+	@Override
+	public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {	
+		Log.d(TAG, "onLeScane in ScanActivity");
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				if(!mLeDevices.contains(device)){
+					mLeDevices.add(device);
+				}
+				mScanAdapter.notifyDataSetChanged();
+			}
+		});		
+	}
+
 }

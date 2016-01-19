@@ -20,7 +20,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-import android.Manifest;
+import com.freescale.bleclient.global.GlobalContacts;
+import com.freescale.bleclient.global.IMXUuid;
+import com.freescale.bleclient.global.SampleGattAttributes;
+import com.freescale.bleclient.service.BluetoothLeInterface;
+import com.freescale.bleclient.service.BluetoothLeService;
+import com.freescale.bleclient.utils.ListViewUtil;
+
 import android.app.Activity;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
@@ -48,21 +54,12 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.freescale.bleclient.global.GlobalContacts;
-import com.freescale.bleclient.global.IMXUuid;
-import com.freescale.bleclient.global.SampleGattAttributes;
-import com.freescale.bleclient.service.BluetoothLeInterface;
-import com.freescale.bleclient.service.BluetoothLeService;
-import com.freescale.bleclient.utils.ListViewUtil;
-import com.freescale.bleclient.R;
-
 public class DeviceControlActivity extends Activity implements OnClickListener{
 
-	private static final String TAG = "BLE";
+	private static final String TAG = "BleClient";
 	private final String LIST_NAME = "NAME";
 	private final String LIST_UUID = "UUID";
 	private final String LIST_VALUE = "VALUE";
-
 	private String mDeviceName;
 	private String mDeviceAddress;
 
@@ -71,19 +68,23 @@ public class DeviceControlActivity extends Activity implements OnClickListener{
 	private TextView mTvState;
 	private ExpandableListView mLvService;
 	private TextView mTvConnect;
+	private EditText mEtMessage;
+	private Button mBtnSend;
+	private ScrollView mSvController;
 
 	private DeviceInfoAdapter mDevAdapter;   
 
-	//Reference related to BluetoothLeService
-	private BluetoothLeInterface mBluetoothLeInterface;
+	private BluetoothLeInterface mBleController;
 	private BleServiceConn mConn;
-
-	//Reference related to updateReceiver
+		
 	private boolean mIsConnected = false;
 
 	private ArrayList<ArrayList<BluetoothGattCharacteristic>> mGattCharacteristics =
 			new ArrayList<ArrayList<BluetoothGattCharacteristic>>();
-
+	private ArrayList<HashMap<String, String>> mGattServiceData;
+	private ArrayList<ArrayList<HashMap<String, String>>> mGattCharacteristicData;
+	private HashMap<String, BluetoothGattCharacteristic> mCharToRead;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -100,51 +101,34 @@ public class DeviceControlActivity extends Activity implements OnClickListener{
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		mBleController.disconnect(mDeviceAddress);
 		if(mConn != null){
 			unbindService(mConn);
 		}
-		mBluetoothLeInterface = null;
-		stopThread();
-	}
-
-	private void stopThread() {
-		mIsRead = false;
-		mIsBatteryRead = false;
-		mIsHeartRead = false;
-		mIsTempRead = false;
-		mIsDateRead = false;
-	}
-	
-	private void startThread() {
-		mIsRead = true;
-		mIsBatteryRead = true;
-		mIsHeartRead = true;
-		mIsTempRead = true;
-		mIsDateRead = true;
+		mBleController = null;
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
 		registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
-		if (mBluetoothLeInterface != null) {
-			final boolean result = mBluetoothLeInterface.connect(mDeviceAddress);
+		if (mBleController != null) {
+			final boolean result = mBleController.connect(mDeviceAddress);
 			Log.d(TAG, "Connect request result=" + result);
 		}
 	}
 
-	//Initial the UI Compoments
 	private void initViews() {
 
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		setContentView(R.layout.activity_controller);
-		//Get the device name and address
+		
 		final Intent intent = getIntent();
 
 		mDeviceName = intent.getStringExtra(GlobalContacts.EXTRAS_DEVICE_NAME);
 		mDeviceAddress = intent.getStringExtra(GlobalContacts.EXTRAS_DEVICE_ADDRESS);
-		//Initial the UI compoments
+
 		mTvDevName = (TextView) findViewById(R.id.tv_device_name);
 		mTvAddress = (TextView) findViewById(R.id.tv_device_address);
 		mTvState = (TextView) findViewById(R.id.tv_connection_state);
@@ -170,33 +154,30 @@ public class DeviceControlActivity extends Activity implements OnClickListener{
 		
 		if(mDeviceName.equals("i.MX Device")){
 			mTvConnect.setOnClickListener(this);
-			//bind service
 			mConn = new BleServiceConn();
 			Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
 			startService(gattServiceIntent);
-			boolean isSuccess = bindService(gattServiceIntent, mConn, BIND_AUTO_CREATE);
+			bindService(gattServiceIntent, mConn, BIND_AUTO_CREATE);
 		}
 	}
 
-	//This class is implemented to get service IBinder
 	class BleServiceConn implements ServiceConnection{
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
-			Log.e(TAG, "connect it");
-			mBluetoothLeInterface = (BluetoothLeInterface) service;
+			Log.d(TAG, "DeviceControlActivity onServiceConnected");
 			
-			if (!mBluetoothLeInterface.initialize()) {
-				Log.e(TAG, "Unable to initialize Bluetooth");
+			mBleController = (BluetoothLeInterface) service;
+			if (!mBleController.initialize(DeviceControlActivity.this)) {
+				Log.d(TAG, "Unable to initialize Bluetooth");
 				finish();
 			}
-			// Automatically connects to the device upon successful start-up initialization.
-			mBluetoothLeInterface.connect(mDeviceAddress);
-			mGatt = mBluetoothLeInterface.getGatt();
 			
+			mBleController.connect(mDeviceAddress);
 		}
+		
 		@Override
 		public void onServiceDisconnected(ComponentName name) {
-
+			Log.d(TAG, "DeviceControlActivity onServiceDisconnected");
 		}
 	}
 
@@ -221,20 +202,20 @@ public class DeviceControlActivity extends Activity implements OnClickListener{
 		public void onReceive(Context context, Intent intent) {
 			final String action = intent.getAction();
 			if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
-				Log.e(TAG, "BluetoothLeService connect");
+				Log.d(TAG, "BluetoothLeService connect");
 				mIsConnected = true;
 				updateConnectionState(R.string.connected);
 				mTvConnect.setText(R.string.disconnected);
 			} else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
-				Log.e(TAG, "BluetoothLeService disconnected");
+				Log.d(TAG, "BluetoothLeService disconnected");
 				mIsConnected = false;
 				updateConnectionState(R.string.disconnected);
 				mTvConnect.setText(R.string.connected);
 				clearUI();
 			} else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
 				// Show all the supported services and characteristics on the user interface.
-				Log.e(TAG, "BluetoothLeService discovered");
-				displayGattServices(mBluetoothLeInterface.getSupportedGattServices());
+				Log.d(TAG, "BluetoothLeService discovered");
+				displayGattServices(mBleController.getSupportedGattServices());
 			} else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
 				String value = intent.getStringExtra(BluetoothLeService.EXTRA_DATA);
 				String charName = intent.getStringExtra(BluetoothLeService.EXTRA_NAME);
@@ -257,16 +238,13 @@ public class DeviceControlActivity extends Activity implements OnClickListener{
 			}
 		}
 	};
-	private ArrayList<HashMap<String, String>> mGattServiceData;
-	private ArrayList<ArrayList<HashMap<String, String>>> mGattCharacteristicData;
-	private HashMap<String, BluetoothGattCharacteristic> mCharToRead;
+	
 
 	// Demonstrates how to iterate through the supported GATT Services/Characteristics.
 	// In this sample, we populate the data structure that is bound to the ExpandableListView
 	// on the UI.
 	protected static final UUID CHARACTERISTIC_UPDATE_NOTIFICATION_DESCRIPTOR_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
 	private void displayGattServices(List<BluetoothGattService> gattServices) {
-		mGatt = mBluetoothLeInterface.getGatt();
 		if (gattServices == null) return;
 		String uuid = null;
 		String unknownServiceString = getResources().getString(R.string.unknown_service);
@@ -277,7 +255,6 @@ public class DeviceControlActivity extends Activity implements OnClickListener{
 		mGattCharacteristics = new ArrayList<ArrayList<BluetoothGattCharacteristic>>();
 		mCharToRead = new HashMap<String, BluetoothGattCharacteristic>();
 
-		// Loops through available GATT Services.
 		for (BluetoothGattService gattService : gattServices) {
 			//Get GattService
 			HashMap<String, String> currentServiceData = new HashMap<String, String>();
@@ -293,22 +270,31 @@ public class DeviceControlActivity extends Activity implements OnClickListener{
 
 			// Loops through available Characteristics.
 			for (BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
+				Log.e(TAG, gattCharacteristic.getUuid().toString());
 				if(gattCharacteristic.getUuid().toString().equals(IMXUuid.CHAR_MANUFACTURER_NAME_STRING)){
 					mCharToRead.put(GlobalContacts.MANFACTURER_NAME, gattCharacteristic);
+					mBleController.setCharacteristicNotification(gattCharacteristic, true);
 				}else if(gattCharacteristic.getUuid().toString().equals(IMXUuid.CHAR_MODEL_NUMBER_STRING)){
 					mCharToRead.put(GlobalContacts.MODEL_NAME, gattCharacteristic);
+					mBleController.setCharacteristicNotification(gattCharacteristic, true);
 				}else if(gattCharacteristic.getUuid().toString().equals(IMXUuid.CHAR_SERIAL_NUMBER_STRING)){
 					mCharToRead.put(GlobalContacts.SERIAL_NUMBER, gattCharacteristic);
+					mBleController.setCharacteristicNotification(gattCharacteristic, true);
 				}else if(gattCharacteristic.getUuid().toString().equals(IMXUuid.CHAR_ALERT_LEVEL)){
 					mCharToRead.put(GlobalContacts.ALERT_LEVEL, gattCharacteristic);
+					mBleController.setCharacteristicNotification(gattCharacteristic, true);
 				}else if(gattCharacteristic.getUuid().toString().equals(IMXUuid.CHAR_BATTERY_LEVEL)){
 					mCharToRead.put(GlobalContacts.BATTERY_LEVEL, gattCharacteristic);
+					mBleController.setCharacteristicNotification(gattCharacteristic, true);
 				}else if(gattCharacteristic.getUuid().toString().equals(IMXUuid.CHAR_BATTER)){
 					mCharToRead.put(GlobalContacts.HEART_RATE, gattCharacteristic);
+					mBleController.setCharacteristicNotification(gattCharacteristic, true);
 				}else if(gattCharacteristic.getUuid().toString().equals(IMXUuid.CHAR_CPU_TEMP)){
 					mCharToRead.put(GlobalContacts.CPU_TEMPERATURE, gattCharacteristic);
+					mBleController.setCharacteristicNotification(gattCharacteristic, true);
 				}else if(gattCharacteristic.getUuid().toString().equals(IMXUuid.CHAR_DATE)){
 					mCharToRead.put(GlobalContacts.REMOTE_DATE, gattCharacteristic);
+					mBleController.setCharacteristicNotification(gattCharacteristic, true);
 				}else if(gattCharacteristic.getUuid().toString().equals(IMXUuid.CHAR_MESSAGE)){
 					mCharToRead.put(GlobalContacts.CUSTOM_MESSAGE, gattCharacteristic);
 				}else{
@@ -325,7 +311,6 @@ public class DeviceControlActivity extends Activity implements OnClickListener{
 				}else{
 					currentCharaData.put(LIST_VALUE, "");
 				}
-
 				gattCharacteristicGroupData.add(currentCharaData);
 			}
 			mGattCharacteristics.add(charas);
@@ -334,12 +319,8 @@ public class DeviceControlActivity extends Activity implements OnClickListener{
 		mDevAdapter = new DeviceInfoAdapter();
 		mLvService.setAdapter(mDevAdapter);
 		ListViewUtil.setListViewHeight(mLvService);
-		//After update the UI, start the read thread
 		mEtMessage.setVisibility(View.VISIBLE);
 		mBtnSend.setVisibility(View.VISIBLE);
-		if(mCharToRead.size() > 0){
-			new ReadThread().start();
-		}
 	}
 
 	private void updateConnectionState(final int resourceId) {
@@ -349,11 +330,6 @@ public class DeviceControlActivity extends Activity implements OnClickListener{
 				mTvState.setText(resourceId);
 			}
 		});
-	}
-
-	private void displayData(String data) {
-		if (data != null) {
-		}
 	}
 
 	private void clearUI() {
@@ -368,7 +344,6 @@ public class DeviceControlActivity extends Activity implements OnClickListener{
 		}
 	}
 
-	//ExpandedListViewAdapter
 	class DeviceInfoAdapter extends BaseExpandableListAdapter{
 
 		@Override
@@ -441,10 +416,6 @@ public class DeviceControlActivity extends Activity implements OnClickListener{
 			ArrayList<HashMap<String, String>> gattCharGroup = new ArrayList<HashMap<String,String>>();
 			gattCharGroup = mGattCharacteristicData.get(groupPosition);
 			HashMap<String, String> gattChar = gattCharGroup.get(childPosition);
-			//			private ArrayList<ArrayList<BluetoothGattCharacteristic>> mGattCharacteristics =
-			//			new ArrayList<ArrayList<BluetoothGattCharacteristic>>();
-			//			BluetoothGattCharacteristic characteristic = mGattCharacteristics.get(groupPosition).get(childPosition);
-			//			mGatt.readCharacteristic(characteristic);
 			String charName = gattChar.get(LIST_NAME);
 			String uuid = gattChar.get(LIST_UUID);
 			String value = gattChar.get(LIST_VALUE);
@@ -469,113 +440,14 @@ public class DeviceControlActivity extends Activity implements OnClickListener{
 		switch (v.getId()) {
 		case R.id.tv_connect_state:
 			if(!mIsConnected){
-				mBluetoothLeInterface.connect(mDeviceAddress);
-				startThread();
+				mBleController.connect(mDeviceAddress);
 			}else{
-				mBluetoothLeInterface.disconnect(mDeviceAddress);
-				stopThread();
+				mBleController.disconnect(mDeviceAddress);
 				clearUI();
 			}
 			break;
 		default:
 			break;
-		}
-	}
-
-	private BluetoothGatt mGatt;
-	private boolean mIsRead = true;
-	private boolean mIsBatteryRead = true;
-	private boolean mIsHeartRead = true;
-	private boolean mIsTempRead = true;
-	private boolean mIsDateRead = true;
-	private EditText mEtMessage;
-	private Button mBtnSend;
-	private ScrollView mSvController;
-
-	class ReadThread extends Thread{
-		@Override
-		public void run() {
-			try {
-				if(mCharToRead.get(GlobalContacts.MANFACTURER_NAME) != null)
-					while((!mGatt.readCharacteristic(mCharToRead.get(GlobalContacts.MANFACTURER_NAME))) && mIsRead);
-				if(mCharToRead.get(GlobalContacts.MODEL_NAME) != null)
-					while((!mGatt.readCharacteristic(mCharToRead.get(GlobalContacts.MODEL_NAME))) && mIsRead);
-				if(mCharToRead.get(GlobalContacts.SERIAL_NUMBER) != null)
-					while((!mGatt.readCharacteristic(mCharToRead.get(GlobalContacts.SERIAL_NUMBER))) && mIsRead);
-				if(mCharToRead.get(GlobalContacts.BATTERY_LEVEL) != null)
-					new BatteryReadThread().start();
-				sleep(2000);
-				if(mCharToRead.get(GlobalContacts.HEART_RATE) != null)
-					new HeartRateThread().start();
-				sleep(2000);
-				if(mCharToRead.get(GlobalContacts.CPU_TEMPERATURE) != null)
-					new TemperatureThread().start();
-				sleep(2000);
-				if(mCharToRead.get(GlobalContacts.REMOTE_DATE) != null)
-					new DateThread().start();
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
-			}
-		}
-	}
-
-	class BatteryReadThread extends Thread{
-		@Override
-		public void run() {
-			while(mIsBatteryRead){
-				try {
-					sleep(30000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-
-	class HeartRateThread extends Thread{
-		@Override
-		public void run() {
-			while(mIsHeartRead){
-				try {
-					while(!mGatt.readCharacteristic(mCharToRead.get(GlobalContacts.HEART_RATE)));
-					sleep(10000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-
-	class TemperatureThread extends Thread{
-		@Override
-		public void run() {
-			while(mIsTempRead){
-				try {
-					while(!mGatt.readCharacteristic(mCharToRead.get(GlobalContacts.CPU_TEMPERATURE)));
-					sleep(5000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-
-	class DateThread extends Thread{
-		@Override
-		public void run() {
-			while(mIsDateRead){
-				try {
-					boolean isSuccess = false;
-					do{
-						isSuccess = mGatt.readCharacteristic(mCharToRead.get(GlobalContacts.REMOTE_DATE));
-						Log.e(TAG,"dateRead:" + isSuccess);
-					}
-					while(!isSuccess);
-					sleep(1000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
 		}
 	}
 	
@@ -588,13 +460,10 @@ public class DeviceControlActivity extends Activity implements OnClickListener{
 		if(message.length() > 20){
 			Toast.makeText(this, "no more than 20 letters", Toast.LENGTH_SHORT).show();
 		}else{
-			charMessage.setValue( message);
-			boolean isSuccess = false;
-			isSuccess = mGatt.writeCharacteristic(charMessage);
-			if(isSuccess){
-				Toast.makeText(this, "Send Successfully", Toast.LENGTH_SHORT).show();
+			if(mBleController.writeCharacteristic(charMessage, message) == true){
+				Toast.makeText(this, "Send Message Successfully", Toast.LENGTH_SHORT).show();
 			}else{
-				Toast.makeText(this, "Send Unsuccessfully", Toast.LENGTH_SHORT).show();	
+				Toast.makeText(this, "Send Message Unsuccessfully", Toast.LENGTH_SHORT).show();
 			}
 		}
 	}

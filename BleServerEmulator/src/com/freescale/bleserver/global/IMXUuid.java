@@ -17,6 +17,7 @@ package com.freescale.bleserver.global;
 
 /** BLE UUID Strings */
 public class IMXUuid {
+	public static String CLIENT_CHARACTERISTIC_CONFIG = "00002902-0000-1000-8000-00805f9b34fb";
 	// 180A Device Information
 	public static final String SERVICE_DEVICE_INFORMATION = "aaaabbbb-0000-1000-8000-cccccccccccc";
 	public static final String CHAR_MANUFACTURER_NAME_STRING = "00002a29-0000-1000-8000-00805f9b34fb";

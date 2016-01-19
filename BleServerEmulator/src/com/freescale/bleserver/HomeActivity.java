@@ -16,6 +16,7 @@
 package com.freescale.bleserver;
 import java.util.ArrayList;
 
+import android.R.interpolator;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothGattServer;
 import android.bluetooth.BluetoothManager;
@@ -40,35 +41,31 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.freescale.bleserver.R;
+import com.freescale.bleserver.ble.BleServerManager;
 import com.freescale.bleserver.global.Attributes;
 import com.freescale.bleserver.pager.BasePager;
 import com.freescale.bleserver.pager.HomePager;
 import com.freescale.bleserver.pager.SettingPager;
-import com.freescale.bleserver.utils.BleUtil;
 import com.freescale.bleserver.utils.PrefUtils;
 
 public class HomeActivity extends FragmentActivity{
 
-	//Fragment Tag
 	private static final String FRAG_HOME = "homeFragment";
 	private static final String FRAG_EDIT = "editFragment";
-	private static final String TAG = "BLE";
-	//UI Compoments
+	private static final String TAG = "BleServer";
+	
 	private RadioGroup mRgHome;
 	private BatteryReceiver mBatReceiver = null;
 	private TextView mTitle;
 	public ViewPager mVpHome;
 	private HomePagerAdapter mHomePagerAdapter;
 	public ArrayList<BasePager> mPagerList;
-	//2 child pager of ViewPager
-	private HomePager mHomePager;
+	
+	public HomePager mHomePager;
 	private SettingPager mSettingPager;
 
-	private static final int REQUEST_ENABLE_BT = 1;
-	// BT
-	private BluetoothAdapter mBTAdapter;
-	private BluetoothLeAdvertiser mBTAdvertiser;
 	public BluetoothGattServer mGattServer;
+	public BleServerManager mBleServerManager;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +73,6 @@ public class HomeActivity extends FragmentActivity{
 		initView();
 		initBle();
 		initData();
-
 	}
 	
 	@Override
@@ -90,47 +86,36 @@ public class HomeActivity extends FragmentActivity{
 		super.onDestroy();
 		mHomePager.stopThread();
 		unregisterReceiver(mBatReceiver);
-		stopAdvertise();
+		mBleServerManager.stopAdvertise();
 		PrefUtils.setBoolean(this, PrefUtils.BLE_STATE, false);
 	}
 
 	private void initView() {
-		//find view
+		
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		setContentView(R.layout.activity_home);
+		
 		mRgHome = (RadioGroup) findViewById(R.id.rg_group);
 		mTitle = (TextView)findViewById(R.id.tv_home_title);
 		mVpHome = (ViewPager) findViewById(R.id.vp_home);
-		//set listener
+
 		mRgHome.setOnCheckedChangeListener(new MyRgCheckListener());
 	}
 
 	private void initBle() {
-		//1.BLE check
-		if (!BleUtil.isBLESupported(this)) {
+		
+		mBleServerManager = BleServerManager.getBleServerManager(this);
+		if (!mBleServerManager.isBLESupported(this)) {
 			Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
 			finish();
 			return;
 		}
-		//2. BT check, get BTAdapter
-		BluetoothManager manager = BleUtil.getManager(this);
-		if (manager != null) {
-			mBTAdapter = manager.getAdapter();
-		}
-		//3.if the bluetooth has not been enabled, enable it!
-		if ((mBTAdapter == null) || (!mBTAdapter.isEnabled())) {
-			Toast.makeText(this, R.string.bt_unavailable, Toast.LENGTH_SHORT).show();
-			Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-			startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-		}
-		//4.set device name
-		mBTAdapter.setName("i.MX Device");
-		//5.set the related UI listener, set it in the HomePager
+		mBleServerManager.setName("i.MX Device");
 	}
 
 	private void initData() {
-		//view pager
+		
 		mPagerList = new ArrayList<BasePager>();
 		mHomePager = new HomePager(this);
 		mSettingPager = new SettingPager(this);
@@ -139,7 +124,6 @@ public class HomeActivity extends FragmentActivity{
 		mHomePagerAdapter = new HomePagerAdapter();
 		mVpHome.setAdapter(mHomePagerAdapter);	
 
-		//batteryInfo Receiver
 		mBatReceiver = new BatteryReceiver();
 		IntentFilter filter=new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
 		registerReceiver(mBatReceiver, filter);
@@ -168,14 +152,26 @@ public class HomeActivity extends FragmentActivity{
 	private class BatteryReceiver extends BroadcastReceiver{
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			int rawlevel = intent.getIntExtra("level", -1);
-			int scale = intent.getIntExtra("scale", -1); 
+			int rawlevel = intent.getIntExtra("level", -1); 
+			int scale = intent.getIntExtra("scale", -1);  
 			int level = -1;  
 			if (rawlevel >= 0 && scale > 0) {  
 				level = (rawlevel * 100) / scale;  
 			}  
 			Attributes.battery = level;
+			if(listener != null)
+				listener.onBatteryChanged();
 		}
+	}
+	
+	private onBatteryChangedListener listener;
+	
+	public void setonBatteryChangedListener(onBatteryChangedListener listener){
+		this.listener = listener;
+	}
+	
+	public interface onBatteryChangedListener{
+		public void onBatteryChanged();
 	}
 
 	//ViewPagerAdapter
@@ -205,52 +201,4 @@ public class HomeActivity extends FragmentActivity{
 		}
 	}
 
-	//start and stop Advertise as Immediate Alert Service
-	public void startIASAdvertise() {
-		if (mBTAdapter == null) {
-			return;
-		}
-		if (mBTAdvertiser == null) {
-			mBTAdvertiser = mBTAdapter.getBluetoothLeAdvertiser();
-		}
-		if (mBTAdvertiser != null) {
-			ImmediateAlertService ias = new ImmediateAlertService(this);
-			mGattServer = BleUtil.getManager(this).openGattServer(this, ias);
-			if(mGattServer == null){
-				Log.e("aa" , "gatt is null");
-			}
-			ias.setupServices(mGattServer);
-			mBTAdvertiser.startAdvertising(BleUtil.createAdvSettings(true, 0),BleUtil.createFMPAdvertiseData(),mAdvCallback);
-		}
-	}
-
-	public void stopAdvertise() {
-		//close the gatt server
-		if (mGattServer != null) {
-			mGattServer.clearServices();
-			mGattServer.close();
-			mGattServer = null;
-		}
-		//close the btadvertiser
-		if (mBTAdvertiser != null) {
-			mBTAdvertiser.stopAdvertising(mAdvCallback);
-			mBTAdvertiser = null;
-		}
-	}
-
-	private AdvertiseCallback mAdvCallback = new AdvertiseCallback() {
-		public void onStartSuccess(android.bluetooth.le.AdvertiseSettings settingsInEffect) {
-			Log.i(TAG, "callback 0");
-			if (settingsInEffect != null) {
-				Log.d(TAG, "onStartSuccess TxPowerLv="+ settingsInEffect.getTxPowerLevel()+ " mode=" + settingsInEffect.getMode()+ " timeout=" + settingsInEffect.getTimeout());
-			} else {
-				Log.d(TAG, "onStartSuccess, settingInEffect is null");
-			}
-		}
-
-		public void onStartFailure(int errorCode) {
-			Log.d(TAG, "onStartFailure errorCode=" + errorCode);
-		};
-	};
-	
 }

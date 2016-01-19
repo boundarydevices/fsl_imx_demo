@@ -63,7 +63,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:background="@android:color/transparent"
-            android:button="@drawable/ios7_btn"
+            android:button="@drawable/btn_switch"
             android:checked="false"
             android:scaleX="0.7"
             android:scaleY="0.7"

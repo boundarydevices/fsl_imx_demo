@@ -22,9 +22,8 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.widget.Toast;
 import android.content.Intent;
-import android.content.DialogInterface;
-import com.freescale.bleclient.R;
 import android.util.Log;
+import com.freescale.bleclient.R;
 
 public class PermissionActivity extends Activity {
 

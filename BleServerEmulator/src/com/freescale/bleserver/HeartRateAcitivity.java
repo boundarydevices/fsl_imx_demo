@@ -15,6 +15,8 @@
  */
 package com.freescale.bleserver;
 
+import com.freescale.bleserver.global.Attributes;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,9 +27,6 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-
-import com.freescale.bleserver.R;
-import com.freescale.bleserver.global.Attributes;
 
 public class HeartRateAcitivity extends Activity implements OnClickListener{
 

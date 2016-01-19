@@ -15,8 +15,6 @@
  */
 package com.freescale.bleserver;
 
-import com.freescale.bleserver.R;
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Window;

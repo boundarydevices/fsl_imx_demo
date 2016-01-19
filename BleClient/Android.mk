@@ -13,8 +13,6 @@ LOCAL_PACKAGE_NAME := BleClient
 LOCAL_CERTIFICATE := platform
 LOCAL_PRIVILEGED_MODULE := true
 
-#LOCAL_PROGUARD_FLAG_FILES := proguard.flags
-#include frameworks/opt/setupwizard/navigationbar/common.mk
 
 include $(BUILD_PACKAGE)
 

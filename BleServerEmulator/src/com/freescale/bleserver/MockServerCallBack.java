@@ -17,35 +17,106 @@ package com.freescale.bleserver;
 
 import java.util.UUID;
 
+import com.freescale.bleserver.HomeActivity.onBatteryChangedListener;
+import com.freescale.bleserver.global.Attributes;
+import com.freescale.bleserver.global.IMXUuid;
+import com.freescale.bleserver.pager.HomePager;
+import com.freescale.bleserver.pager.HomePager.onDataChangedListener;
+
 import android.app.Activity;
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattServer;
 import android.bluetooth.BluetoothGattServerCallback;
 import android.bluetooth.BluetoothGattService;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.freescale.bleserver.global.Attributes;
-import com.freescale.bleserver.global.IMXUuid;
-
-public class ImmediateAlertService extends BluetoothGattServerCallback {
-	private static final String TAG = "BLE";
+public class MockServerCallBack extends BluetoothGattServerCallback {
+	private static final String TAG = "BleServer";
 	private byte[] mAlertLevel = new byte[] {(byte) 0x00};
 	private Activity mActivity;
-	
-	public ImmediateAlertService(Activity activity) {
+	private HomePager mHomepager;
+	private boolean mIsPushStatic = false;
+
+	public MockServerCallBack(Activity activity) {
 		this.mActivity = activity;
+		this.mHomepager = ((HomeActivity)mActivity).mHomePager;
+		mHomepager.setOnDataChangedListener(new onDataChangedListener() {
+
+			@Override
+			public void onDateChanged() {
+				if(mDateChar !=null && btClient != null){
+					mDateChar.setValue(Attributes.Date+"");
+					if(btClient != null){
+						mGattServer.notifyCharacteristicChanged(btClient, mDateChar, false);
+					}
+					if(!mIsPushStatic){
+						try {
+							mGattServer.notifyCharacteristicChanged(btClient, mManufacturerNameChar, false);
+							Thread.sleep(10);
+							mGattServer.notifyCharacteristicChanged(btClient, mModuleNumberChar, false);
+							Thread.sleep(10);
+							mGattServer.notifyCharacteristicChanged(btClient, mSerialNumberChar, false);
+							Thread.sleep(10);
+							mGattServer.notifyCharacteristicChanged(btClient, mBatteryChar, false);
+							mIsPushStatic = true;
+						} catch (InterruptedException e) {
+						}
+					}
+				}
+			}
+
+			@Override
+			public void onTemperatureChanged() {
+				if(mTemperatureChar !=null && btClient != null){
+					mTemperatureChar.setValue(Attributes.cpuTemp+"");
+					if(btClient != null)
+						mGattServer.notifyCharacteristicChanged(btClient, mTemperatureChar, false);
+				}
+			}
+
+			@Override
+			public void onHeartRateChanged() {
+				if(mHeartRateChar !=null && btClient != null){
+					mHeartRateChar.setValue(Attributes.heartRate+"");
+					if(btClient != null)
+						mGattServer.notifyCharacteristicChanged(btClient, mHeartRateChar, false);
+				}
+			}
+
+		});
+
+		HomeActivity homeUI = (HomeActivity) mActivity;
+		homeUI.setonBatteryChangedListener(new onBatteryChangedListener() {
+
+			@Override
+			public void onBatteryChanged() {
+				if(mBatteryChar !=null && btClient != null){
+					mBatteryChar.setValue(Attributes.battery+"");
+					if(btClient != null)
+						mGattServer.notifyCharacteristicChanged(btClient, mBatteryChar, false);
+				}
+			}
+		});
 	}
-	
+
 	private BluetoothGattServer mGattServer;
-	
+	private BluetoothGattCharacteristic mDateChar;
+	private BluetoothDevice btClient;
+	private BluetoothGattCharacteristic mHeartRateChar;
+	private BluetoothGattCharacteristic mTemperatureChar;
+	private BluetoothGattCharacteristic mBatteryChar;
+	private BluetoothGattCharacteristic mManufacturerNameChar;
+	private BluetoothGattCharacteristic mModuleNumberChar;
+	private BluetoothGattCharacteristic mSerialNumberChar;
+
 	public void setupServices(BluetoothGattServer gattServer) {
 		if (gattServer == null) {
 			throw new IllegalArgumentException("gattServer is null");
 		}
 		mGattServer = gattServer;
-		
 		// setup services
 		{ 
 			//immediate alert
@@ -63,31 +134,35 @@ public class ImmediateAlertService extends BluetoothGattServerCallback {
 		}
 
 		{ 
+			BluetoothGattDescriptor descriptor = new BluetoothGattDescriptor(
+					UUID.fromString(IMXUuid.CLIENT_CHARACTERISTIC_CONFIG), 
+					BluetoothGattDescriptor.PERMISSION_WRITE | BluetoothGattDescriptor.PERMISSION_READ);
 			//device information
 			BluetoothGattService dis = new BluetoothGattService(
 					UUID.fromString(IMXUuid.SERVICE_DEVICE_INFORMATION),
 					BluetoothGattService.SERVICE_TYPE_PRIMARY);
-			//manufacturer name string char.
-			BluetoothGattCharacteristic mansc = new BluetoothGattCharacteristic(
+			mManufacturerNameChar = new BluetoothGattCharacteristic(
 					UUID.fromString(IMXUuid.CHAR_MANUFACTURER_NAME_STRING),
 					BluetoothGattCharacteristic.PROPERTY_READ | BluetoothGattCharacteristic.PROPERTY_NOTIFY,
 					BluetoothGattCharacteristic.PERMISSION_READ);
-			mansc.setValue("Freescale");
-			//model number string char.
-			BluetoothGattCharacteristic monsc = new BluetoothGattCharacteristic(
+			mManufacturerNameChar.addDescriptor(descriptor);
+			mManufacturerNameChar.setValue("Freescale");
+			mModuleNumberChar = new BluetoothGattCharacteristic(
 					UUID.fromString(IMXUuid.CHAR_MODEL_NUMBER_STRING),
 					BluetoothGattCharacteristic.PROPERTY_READ | BluetoothGattCharacteristic.PROPERTY_NOTIFY,
 					BluetoothGattCharacteristic.PERMISSION_READ);
-			monsc.setValue("i.MX");
-			//serial number string char.
-			BluetoothGattCharacteristic snsc = new BluetoothGattCharacteristic(
+			mModuleNumberChar.addDescriptor(descriptor);
+			mModuleNumberChar.setValue("i.MX");
+			mSerialNumberChar = new BluetoothGattCharacteristic(
 					UUID.fromString(IMXUuid.CHAR_SERIAL_NUMBER_STRING),
 					BluetoothGattCharacteristic.PROPERTY_READ | BluetoothGattCharacteristic.PROPERTY_NOTIFY,
 					BluetoothGattCharacteristic.PERMISSION_READ);
-			snsc.setValue("000-000-000");
-			dis.addCharacteristic(mansc);
-			dis.addCharacteristic(monsc);
-			dis.addCharacteristic(snsc);
+			mSerialNumberChar.addDescriptor(descriptor);
+			mSerialNumberChar.setValue("000-000-000");
+
+			dis.addCharacteristic(mManufacturerNameChar);
+			dis.addCharacteristic(mModuleNumberChar);
+			dis.addCharacteristic(mSerialNumberChar);
 			if(mGattServer!=null && dis!=null)
 				mGattServer.addService(dis);
 		}
@@ -97,13 +172,18 @@ public class ImmediateAlertService extends BluetoothGattServerCallback {
 			BluetoothGattService bis = new BluetoothGattService(
 					UUID.fromString(IMXUuid.SERVICE_BATTERY_SERVICE),
 					BluetoothGattService.SERVICE_TYPE_PRIMARY);
-			//batery level
-			BluetoothGattCharacteristic blChar = new BluetoothGattCharacteristic(
+			mBatteryChar = new BluetoothGattCharacteristic(
 					UUID.fromString(IMXUuid.CHAR_BATTERY_LEVEL),
 					BluetoothGattCharacteristic.PROPERTY_READ | BluetoothGattCharacteristic.PROPERTY_NOTIFY,
 					BluetoothGattCharacteristic.PERMISSION_READ);
-			blChar.setValue(Attributes.battery+"");
-			bis.addCharacteristic(blChar);
+
+			BluetoothGattDescriptor descriptor = new BluetoothGattDescriptor(
+					UUID.fromString(IMXUuid.CLIENT_CHARACTERISTIC_CONFIG), 
+					BluetoothGattDescriptor.PERMISSION_WRITE | BluetoothGattDescriptor.PERMISSION_READ);
+			mBatteryChar.addDescriptor(descriptor);
+
+			mBatteryChar.setValue(Attributes.battery+"");
+			bis.addCharacteristic(mBatteryChar);
 			if(mGattServer!=null && bis!=null)
 				mGattServer.addService(bis);
 		}
@@ -113,13 +193,18 @@ public class ImmediateAlertService extends BluetoothGattServerCallback {
 			BluetoothGattService hris = new BluetoothGattService(
 					UUID.fromString(IMXUuid.SERVICE_HEART_RATE),
 					BluetoothGattService.SERVICE_TYPE_PRIMARY);
-			//heart rate level
-			BluetoothGattCharacteristic batc = new BluetoothGattCharacteristic(
+			mHeartRateChar = new BluetoothGattCharacteristic(
 					UUID.fromString(IMXUuid.CHAR_BATTER),
 					BluetoothGattCharacteristic.PROPERTY_READ | BluetoothGattCharacteristic.PROPERTY_NOTIFY,
 					BluetoothGattCharacteristic.PERMISSION_READ);
-			batc.setValue(Attributes.heartRate+"");
-			hris.addCharacteristic(batc);
+
+			BluetoothGattDescriptor descriptor = new BluetoothGattDescriptor(
+					UUID.fromString(IMXUuid.CLIENT_CHARACTERISTIC_CONFIG), 
+					BluetoothGattDescriptor.PERMISSION_WRITE | BluetoothGattDescriptor.PERMISSION_READ);
+			mHeartRateChar.addDescriptor(descriptor);
+
+			mHeartRateChar.setValue(Attributes.heartRate+"");
+			hris.addCharacteristic(mHeartRateChar);
 			if(mGattServer!=null && hris!=null)
 				mGattServer.addService(hris);
 		}
@@ -129,12 +214,18 @@ public class ImmediateAlertService extends BluetoothGattServerCallback {
 			BluetoothGattService cts = new BluetoothGattService(
 					UUID.fromString(IMXUuid.SERVICE_CPU_TEMP),
 					BluetoothGattService.SERVICE_TYPE_PRIMARY);
-			BluetoothGattCharacteristic TemperatureChar = new BluetoothGattCharacteristic(
+			mTemperatureChar = new BluetoothGattCharacteristic(
 					UUID.fromString(IMXUuid.CHAR_CPU_TEMP),
 					BluetoothGattCharacteristic.PROPERTY_READ | BluetoothGattCharacteristic.PROPERTY_NOTIFY ,
 					BluetoothGattCharacteristic.PERMISSION_READ);
-			TemperatureChar.setValue(Attributes.cpuTemp+"");
-			cts.addCharacteristic(TemperatureChar);
+
+			BluetoothGattDescriptor descriptor = new BluetoothGattDescriptor(
+					UUID.fromString(IMXUuid.CLIENT_CHARACTERISTIC_CONFIG), 
+					BluetoothGattDescriptor.PERMISSION_WRITE | BluetoothGattDescriptor.PERMISSION_READ);
+			mTemperatureChar.addDescriptor(descriptor);
+
+			mTemperatureChar.setValue(Attributes.cpuTemp+"");
+			cts.addCharacteristic(mTemperatureChar);
 			if(mGattServer!=null && cts!=null)
 				mGattServer.addService(cts);
 		}
@@ -144,15 +235,19 @@ public class ImmediateAlertService extends BluetoothGattServerCallback {
 			BluetoothGattService dates = new BluetoothGattService(
 					UUID.fromString(IMXUuid.SERVICE_DATE),
 					BluetoothGattService.SERVICE_TYPE_PRIMARY);
-			//Date char
-			BluetoothGattCharacteristic dateChar = new BluetoothGattCharacteristic(
+			mDateChar = new BluetoothGattCharacteristic(
 					UUID.fromString(IMXUuid.CHAR_DATE),
-					BluetoothGattCharacteristic.PROPERTY_READ,
+					BluetoothGattCharacteristic.PROPERTY_NOTIFY,
 					BluetoothGattCharacteristic.PERMISSION_READ);
+			BluetoothGattDescriptor descriptor = new BluetoothGattDescriptor(
+					UUID.fromString(IMXUuid.CLIENT_CHARACTERISTIC_CONFIG), 
+					BluetoothGattDescriptor.PERMISSION_WRITE | BluetoothGattDescriptor.PERMISSION_READ);
+			mDateChar.addDescriptor(descriptor);
+
 			if(Attributes.Date != null){
-				dateChar.setValue(Attributes.Date);
+				mDateChar.setValue(Attributes.Date);
 			}
-			dates.addCharacteristic(dateChar);
+			dates.addCharacteristic(mDateChar);
 			if(mGattServer!=null && dates!=null)
 				mGattServer.addService(dates);
 		}
@@ -186,46 +281,41 @@ public class ImmediateAlertService extends BluetoothGattServerCallback {
 
 	public void onConnectionStateChange(android.bluetooth.BluetoothDevice device, int status,
 			int newState) {
-		 Log.d(TAG, "onConnectionStateChange status=" + status + "->" + newState);
+		Log.d(TAG, "onConnectionStateChange status=" + status + "->" + newState);
+		if(status ==0 && newState == 0){
+			btClient = null;
+		}
+
 	}
 
 	public void onCharacteristicReadRequest(android.bluetooth.BluetoothDevice device,
 			int requestId, int offset, BluetoothGattCharacteristic characteristic) {
 		Log.d(TAG, "onCharacteristicReadRequest requestId=" + requestId + " offset=" + offset);
 		if (characteristic.getUuid().equals(UUID.fromString(IMXUuid.CHAR_MANUFACTURER_NAME_STRING))) {
-			Log.d(TAG, "CHAR_MANUFACTURER_NAME_STRING");
 			characteristic.setValue("Freescale");
 			mGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset,characteristic.getValue());
 		} else if (characteristic.getUuid().equals(UUID.fromString(IMXUuid.CHAR_MODEL_NUMBER_STRING))) {
-			Log.d(TAG, "CHAR_MODEL_NUMBER_STRING");
 			characteristic.setValue("i.Mx");
 			mGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset,characteristic.getValue());
 		} else if (characteristic.getUuid().equals(UUID.fromString(IMXUuid.CHAR_SERIAL_NUMBER_STRING))) {
-			Log.d(TAG, "CHAR_SERIAL_NUMBER_STRING");
 			characteristic.setValue("000-000-000");
 			mGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset,characteristic.getValue());
 		} else if (characteristic.getUuid().equals(UUID.fromString(IMXUuid.CHAR_ALERT_LEVEL))) {
-			Log.d(TAG, "CHAR_ALERT_LEVEL");
 			characteristic.setValue(mAlertLevel);
 			mGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset,characteristic.getValue());
 		} else if (characteristic.getUuid().equals(UUID.fromString(IMXUuid.CHAR_BATTERY_LEVEL))) {
-			Log.d(TAG, "CHAR_BATTERY_LEVEL");
 			characteristic.setValue(Attributes.battery+"");
 			mGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset,characteristic.getValue());
 		} else if (characteristic.getUuid().equals(UUID.fromString(IMXUuid.CHAR_BATTER))){
-			Log.d(TAG, "CHAR_BATTER");
 			characteristic.setValue(Attributes.heartRate+"");
 			mGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset,characteristic.getValue());
 		} else if (characteristic.getUuid().equals(UUID.fromString(IMXUuid.CHAR_CPU_TEMP))){
-			Log.d(TAG, "CHAR_CPU_TEMP");
 			characteristic.setValue(Attributes.cpuTemp+"");
 			mGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset,characteristic.getValue());
 		} else if (characteristic.getUuid().equals(UUID.fromString(IMXUuid.CHAR_DATE))){
-			Log.d(TAG, "CHAR_DATE");
 			characteristic.setValue(Attributes.Date+"");
 			mGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset,characteristic.getValue());
 		} else if (characteristic.getUuid().equals(UUID.fromString(IMXUuid.CHAR_MESSAGE))){
-			Log.d(TAG, "CHAR_MESSAGE");
 			characteristic.setValue(Attributes.Message+"");
 			mGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset,characteristic.getValue());
 		}
@@ -243,7 +333,17 @@ public class ImmediateAlertService extends BluetoothGattServerCallback {
 		}if(characteristic.getUuid().equals(UUID.fromString(IMXUuid.CHAR_MESSAGE))){
 			String messageValue = new String(value);
 			Attributes.Message = messageValue;
-			MessageAcitivity.mMessageHandler.sendEmptyMessage(0);
+			if(MessageAcitivity.mMessageHandler != null)
+				MessageAcitivity.mMessageHandler.sendEmptyMessage(0);
 		}
+	}
+
+	@Override
+	public void onDescriptorWriteRequest (BluetoothDevice device, int requestId, BluetoothGattDescriptor descriptor, boolean preparedWrite, boolean responseNeeded, int offset, byte[] value) {
+
+		btClient = device;
+		Log.d(TAG, "onDescriptorWriteRequest");
+		// now tell the connected device that this was all successfull
+		mGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, value);
 	}
 }

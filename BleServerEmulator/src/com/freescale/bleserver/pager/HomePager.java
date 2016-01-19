@@ -28,25 +28,24 @@ import android.view.View.OnClickListener;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.freescale.bleserver.R;
 import com.freescale.bleserver.CpuInfoActivity;
 import com.freescale.bleserver.GuideAcitivity;
 import com.freescale.bleserver.HeartRateAcitivity;
 import com.freescale.bleserver.HomeActivity;
 import com.freescale.bleserver.MessageAcitivity;
+import com.freescale.bleserver.R;
+import com.freescale.bleserver.ble.BleServerManager;
 import com.freescale.bleserver.global.Attributes;
 import com.freescale.bleserver.utils.PrefUtils;
 import com.freescale.bleserver.utils.StreamUtil;
 
 public class HomePager extends BasePager implements OnClickListener{ 
 
-	//Varialbe related to some thread
 	private boolean mIsRunTemp = true;
 	private boolean mIsRunHeart = true;
 	private boolean mIsRunDate = true;
 	private boolean mIsBleOn;
 
-	//UI Compoments
 	private TextView mTvTemp;
 	private TextView mTvBleState;
 	private RelativeLayout mRlCpuTempl;
@@ -55,8 +54,6 @@ public class HomePager extends BasePager implements OnClickListener{
 	private RelativeLayout mRlSetting;
 	private TextView mTvHeartRate;
 
-
-	//handler of refreshing the temperature
 	private Handler mTempHandler = new Handler(){
 		public void handleMessage(android.os.Message msg) {
 			mTvTemp.setText(Attributes.cpuTemp+"");
@@ -88,7 +85,6 @@ public class HomePager extends BasePager implements OnClickListener{
 		mRlHeart = (RelativeLayout) mRootView.findViewById(R.id.rl_cpu_heart);
 		mRlSetting = (RelativeLayout) mRootView.findViewById(R.id.rl_cpu_guide);
 
-		//setListener
 		mTvBleState.setOnClickListener(this);
 		mRlCpuTempl.setOnClickListener(this);
 		mRlMessage.setOnClickListener(this);
@@ -103,7 +99,6 @@ public class HomePager extends BasePager implements OnClickListener{
 		new ScanTempThread().start();
 		new HeartRateThread().start();
 		new DateThread().start();
-
 	}
 
 	public void setEnable(){
@@ -132,7 +127,9 @@ public class HomePager extends BasePager implements OnClickListener{
 					String cpuTemp = StreamUtil.getStreamString(is);
 					Attributes.cpuTemp = Integer.parseInt(cpuTemp)/1000;
 					mTempHandler.sendEmptyMessage(0);
-					sleep(5000);
+					if(listener != null)
+						listener.onTemperatureChanged();
+					sleep(4010);
 				} catch (IOException e) {
 					e.printStackTrace();
 				} catch (InterruptedException e) {
@@ -142,14 +139,14 @@ public class HomePager extends BasePager implements OnClickListener{
 		}
 	}
 
-	
-
 	class DateThread extends Thread{
 		@Override
 		public void run() {
 			while(mIsRunDate){
 				SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 				Attributes.Date = df.format(new Date());
+				if(listener != null)
+					listener.onDateChanged();
 				try {
 					sleep(1000);
 				} catch (InterruptedException e) {
@@ -159,12 +156,41 @@ public class HomePager extends BasePager implements OnClickListener{
 		}
 	}
 	
+	class HeartRateThread extends Thread{
+		@Override
+		public void run() {
+			while(mIsRunHeart){
+				Attributes.heartRate = (int) Math.floor(Math.random()*30 + 50);
+				mHeartRateHandler.sendEmptyMessage(0);
+				if(listener != null)
+					listener.onHeartRateChanged();
+				try {
+					sleep(3013);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
+	public void setOnDataChangedListener(onDataChangedListener listener){
+		this.listener = listener;
+	}
+	
+	private onDataChangedListener listener;
+	
+	public interface onDataChangedListener{
+		void onDateChanged();
+		void onTemperatureChanged();
+		void onHeartRateChanged();
+	}
+	
+	
 	public void stopThread(){
 		mIsRunTemp = false;
 		mIsRunHeart = false;
 		mIsRunDate = false;
 	}
-
 
 	@Override
 	public void onClick(View v) {
@@ -172,10 +198,10 @@ public class HomePager extends BasePager implements OnClickListener{
 		case R.id.btn_on_off:
 			if(mIsBleOn){
 				mIsBleOn = false;
-				homeUI.stopAdvertise();
+				homeUI.mBleServerManager.stopAdvertise();
 			}else{
 				mIsBleOn = true;
-				homeUI.startIASAdvertise();
+				homeUI.mBleServerManager.startIASAdvertise();
 			}
 			refreshState(mIsBleOn);
 			PrefUtils.setBoolean(mActivity, PrefUtils.BLE_STATE, mIsBleOn);
@@ -202,21 +228,6 @@ public class HomePager extends BasePager implements OnClickListener{
 			break;
 		default:
 			break;
-		}
-	}
-	
-	class HeartRateThread extends Thread{
-		@Override
-		public void run() {
-			while(mIsRunHeart){
-				Attributes.heartRate = (int) Math.floor(Math.random()*30 + 50);
-				mHeartRateHandler.sendEmptyMessage(0);
-				try {
-					sleep(60000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
 		}
 	}
 	
