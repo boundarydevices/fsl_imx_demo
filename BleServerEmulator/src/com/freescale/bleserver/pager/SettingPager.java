@@ -15,14 +15,14 @@
  */
 package com.freescale.bleserver.pager;
 
+import com.freescale.bleserver.R;
+import com.freescale.bleserver.utils.PrefUtils;
+
 import android.app.Activity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.TextView;
 import android.widget.ToggleButton;
-
-import com.freescale.bleserver.R;
-import com.freescale.bleserver.utils.PrefUtils;
 
 public class SettingPager extends BasePager implements OnClickListener{
 
