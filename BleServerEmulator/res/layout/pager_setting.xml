@@ -33,6 +33,18 @@
 
     <View style="@style/HorLine" />
 
+    <TextView
+        style="@style/EditDataText"
+        android:text="@string/manufacturer" />
+
+    <View style="@style/HorLine" />
+
+    <TextView
+        style="@style/EditDataText"
+        android:text="@string/serial_number" />
+
+    <View style="@style/HorLine" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

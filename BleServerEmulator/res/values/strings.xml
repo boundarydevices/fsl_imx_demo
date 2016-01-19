@@ -6,10 +6,10 @@
     <string name="action_settings">Settings</string>
     <string name="home">Home</string>
     <string name="setting">Setting</string>
-    <string name="temperature">CPU Temperature</string>
+    <string name="temperature">Device Info</string>
     <string name="default_string">Default Value</string>
-    <string name="Message">Message</string>
-    <string name="edit">Edit Message Here</string>
+    <string name="Message">Message Box</string>
+    <string name="check_message">Check Message Here</string>
     <string name="heart">Heart Rate</string>
     <string name="ble_off">BLE OFF</string>
     <string name="ble_on">BLE ON</string>
@@ -17,7 +17,7 @@
     <string name="editData">Edit Simulation Data</string>
     <string name="Date">Date</string>
     <string name="your_messager">Message:</string>
-    <string name="default_message">no more than 20 letters(include space)</string>
+    <string name="default_message">your custom message</string>
     <string name="send">Send</string>
     <string name="config">Config Device</string>
     <string name="device">Device Name: i.MX Device</string>
@@ -26,5 +26,16 @@
     <string name="label_ibeacon_button">Advertise as iBeacon</string>
     <string name="label_ias_button">Adv. as Immediate Alert Service</string>
     <string name="label_stop_button">Stop Advertising</string>
-    <string name="space"> </string>   
+    <string name="how_to_use_it">How To Use It</string>
+    <string name="guide_text">      This apk is to simulate the ble peripheral device, it can read the battery info, cpu temperature, device information 
+        system time, and simulate the heart rate and notify the centeral device to read it. You can set the info by every child view.</string>
+    <string name="copyright"> Copyright (C) 2015 Freescale Semiconductor, Inc.</string>
+    <string name="change_heart">you can simulate the heart rate manually here</string>
+    <string name="change">Simulate</string>
+    <string name="device_info">Device Info</string>
+    <string name="heart_title">Heart Rate Simulater</string>
+    <string name="Custom_Message">Custom Message</string>
+    <string name="manufacturer">Manufacturer:Freescale</string>
+    <string name="serial_number">Serial Number:000-000-000</string>
+    <string name="space"> </string>
 </resources>
