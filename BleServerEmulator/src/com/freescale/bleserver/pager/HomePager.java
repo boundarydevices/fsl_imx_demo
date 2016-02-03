@@ -198,12 +198,13 @@ public class HomePager extends BasePager implements OnClickListener{
 		case R.id.btn_on_off:
 			if(mIsBleOn){
 				mIsBleOn = false;
+				refreshState(mIsBleOn);
 				homeUI.mBleServerManager.stopAdvertise();
 			}else{
 				mIsBleOn = true;
+				refreshState(mIsBleOn);
 				homeUI.mBleServerManager.startIASAdvertise();
 			}
-			refreshState(mIsBleOn);
 			PrefUtils.setBoolean(mActivity, PrefUtils.BLE_STATE, mIsBleOn);
 			break;
 		case R.id.rl_cpu_temp:
