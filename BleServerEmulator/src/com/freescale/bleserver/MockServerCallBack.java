@@ -112,7 +112,7 @@ public class MockServerCallBack extends BluetoothGattServerCallback {
 	private BluetoothGattCharacteristic mModuleNumberChar;
 	private BluetoothGattCharacteristic mSerialNumberChar;
 
-	public void setupServices(BluetoothGattServer gattServer) {
+	public void setupServices(BluetoothGattServer gattServer) throws InterruptedException{
 		if (gattServer == null) {
 			throw new IllegalArgumentException("gattServer is null");
 		}
@@ -132,7 +132,7 @@ public class MockServerCallBack extends BluetoothGattServerCallback {
 			if(mGattServer!=null && ias!=null)
 				mGattServer.addService(ias);
 		}
-
+		Thread.sleep(100);
 		{ 
 			BluetoothGattDescriptor descriptor = new BluetoothGattDescriptor(
 					UUID.fromString(IMXUuid.CLIENT_CHARACTERISTIC_CONFIG), 
@@ -166,7 +166,7 @@ public class MockServerCallBack extends BluetoothGattServerCallback {
 			if(mGattServer!=null && dis!=null)
 				mGattServer.addService(dis);
 		}
-
+		Thread.sleep(100);
 		{
 			//batery information
 			BluetoothGattService bis = new BluetoothGattService(
@@ -187,7 +187,7 @@ public class MockServerCallBack extends BluetoothGattServerCallback {
 			if(mGattServer!=null && bis!=null)
 				mGattServer.addService(bis);
 		}
-
+		Thread.sleep(100);
 		{
 			//heart rate information
 			BluetoothGattService hris = new BluetoothGattService(
@@ -208,7 +208,7 @@ public class MockServerCallBack extends BluetoothGattServerCallback {
 			if(mGattServer!=null && hris!=null)
 				mGattServer.addService(hris);
 		}
-
+		Thread.sleep(100);
 		{
 			//cpu temperature
 			BluetoothGattService cts = new BluetoothGattService(
@@ -229,7 +229,7 @@ public class MockServerCallBack extends BluetoothGattServerCallback {
 			if(mGattServer!=null && cts!=null)
 				mGattServer.addService(cts);
 		}
-
+		Thread.sleep(100);
 		{
 			//Date Information
 			BluetoothGattService dates = new BluetoothGattService(
@@ -251,7 +251,7 @@ public class MockServerCallBack extends BluetoothGattServerCallback {
 			if(mGattServer!=null && dates!=null)
 				mGattServer.addService(dates);
 		}
-
+		Thread.sleep(100);
 		{
 			//Message Information
 			BluetoothGattService mis = new BluetoothGattService(

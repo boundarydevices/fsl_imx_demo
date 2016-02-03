@@ -107,7 +107,7 @@ public class BleServerManager {
 	}
 
 	//start and stop Advertise as Immediate Alert Service
-	public void startIASAdvertise() {
+	public void startIASAdvertise(){
 		
 		initBle();
 		if (mBluetoothAdapter == null) {
@@ -122,8 +122,12 @@ public class BleServerManager {
 			if(mGattServer == null){
 				Log.d(TAG , "BleServerManger:gatt is null");
 			}
-			mMockServerCallBack.setupServices(mGattServer);
-			mBluetoothAdvertiser.startAdvertising(createAdvSettings(true, 0), createFMPAdvertiseData(),mAdvCallback);
+			try{
+				mMockServerCallBack.setupServices(mGattServer);
+				mBluetoothAdvertiser.startAdvertising(createAdvSettings(true, 0), createFMPAdvertiseData(),mAdvCallback);
+			}catch(InterruptedException e){
+				Log.v(TAG, "Fail to setup BleService");
+			}
 		}
 	}
 
