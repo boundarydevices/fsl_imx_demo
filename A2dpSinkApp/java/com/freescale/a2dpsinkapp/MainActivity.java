@@ -1,8 +1,11 @@
 /*
- * Copyright (C) 2015 Freescale Semiconductor, Inc.
+ * Copyright (C) 2016 Freescale Semiconductor, Inc.
  */
 package com.freescale.a2dpsinkapp;
 
+import android.content.pm.PackageManager;
+import android.widget.Toast;
+import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothA2dpSink;
 import android.bluetooth.BluetoothAdapter;
@@ -67,6 +70,12 @@ public class MainActivity extends Activity {
     static int AVRCP_CMD_PAUSE = 0x46;
     static int AVRCP_BTN_PRESS = 0;
     static int AVRCP_BTN_RELEASE = 1;
+
+    //Permission Related
+    private int mNumPermissionsToRequest = 0;
+    private boolean mShouldRequestSoundPermission = false;
+    private int mIndexPermissionRequestSound = 0;
+    private static final int PERMISSION_REQUEST_CODE = 0;
 
     private void requestAudio() {
         AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
@@ -253,6 +262,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+	checkPermission();
         setContentView(R.layout.activity_main);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -334,7 +344,6 @@ public class MainActivity extends Activity {
         mBroadcastReceiverA2dpSink = new BroadcastReceiverA2dpSink();
         registerReceiver(mBroadcastReceiverA2dpSink,a2dpSinkIntentFilter);
 
-
     }
 
     @Override
@@ -370,6 +379,46 @@ public class MainActivity extends Activity {
         }
         mTrack = null;
         mRecord = null;
+    }
+
+    private void checkPermission(){
+
+	if(checkSelfPermission(Manifest.permission.RECORD_AUDIO)
+			!= PackageManager.PERMISSION_GRANTED){
+		mNumPermissionsToRequest++;
+		mShouldRequestSoundPermission = true;
+	}
+
+	String[] permissionToRequest = new String[mNumPermissionsToRequest];
+		int permissionRequestIndex = 0;
+	if(mShouldRequestSoundPermission){
+		permissionToRequest[permissionRequestIndex] = Manifest.permission.RECORD_AUDIO;
+		mIndexPermissionRequestSound = permissionRequestIndex;
+		permissionRequestIndex++;
+	}
+
+	if(permissionToRequest.length > 0){
+		requestPermissions(permissionToRequest, PERMISSION_REQUEST_CODE);
+	}
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+		String permissions[], int[] grantResults) {
+	switch (requestCode) {
+	case PERMISSION_REQUEST_CODE:
+		if (grantResults.length > 0
+				&& grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+			Log.v(TAG, "Grant permission successfully");
+			Toast.makeText(this, "Grant Mic Permission successfully", Toast.LENGTH_SHORT).show();
+		} else {
+			Log.v(TAG, "Grant permission unsuccessfully");
+			Toast.makeText(this, "Fail to grant Mic Permission", Toast.LENGTH_SHORT).show();
+		}
+		break;
+	default:
+		break;
+	}
     }
 
     class AvrcpHandler implements Runnable {
