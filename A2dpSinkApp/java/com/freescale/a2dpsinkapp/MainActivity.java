@@ -21,6 +21,7 @@ import android.media.AudioTrack;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -70,6 +71,23 @@ public class MainActivity extends Activity {
     static int AVRCP_CMD_PAUSE = 0x46;
     static int AVRCP_BTN_PRESS = 0;
     static int AVRCP_BTN_RELEASE = 1;
+    public static final int UNINIT_AUDIO_RECORDER = 1;
+
+    private Handler playbackNotifyHandler = new Handler() {
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case UNINIT_AUDIO_RECORDER:
+                    Log.w(TAG, "uninit audio recoder in bluedroid.");
+                    ShowToast("Source Audio is not ready, please confirm audio is playing in source end and try again.");
+                    uiSetA2dpConnectState(a2dpState == BluetoothA2dpSink.STATE_CONNECTED, connectDeviceInfo);
+                    btn_enable.setBackgroundResource(R.drawable.power_off);
+                    break;
+                default:
+                    ShowToast("Unknown error");
+
+            }
+        }
+    };
 
     //Permission Related
     private int mNumPermissionsToRequest = 0;
@@ -475,9 +493,17 @@ public class MainActivity extends Activity {
             if (DBG) Log.d(TAG, "background play 4");
             int ReadSize = minRecBufSize;
             byte[] recData = new byte[ReadSize];
-            mTrack.play();
-            mRecord.startRecording();
-            isPlaying = true;
+            try {
+                mTrack.play();
+                mRecord.startRecording();
+                isPlaying = true;
+            } catch (IllegalStateException err) {
+                Log.e(TAG, err.toString());
+                Message message = new Message();
+                message.what = UNINIT_AUDIO_RECORDER;
+                playbackNotifyHandler.sendMessage(message);
+                isPlaying = false;
+            }
             while(isPlaying) {
                 mRecord.read(recData, 0, ReadSize);
                 mTrack.write(recData, 0, ReadSize);
@@ -604,5 +630,6 @@ public class MainActivity extends Activity {
 
             }
         }
+
     }
 }
