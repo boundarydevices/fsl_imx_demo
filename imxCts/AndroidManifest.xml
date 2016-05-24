@@ -13,6 +13,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="com.imx.AllocBufTestActivity"></activity>
+        <activity android:name="com.imx.AllocBufTestLaunchActivity"></activity>
     </application>
     <!--  self-instrumenting test package. -->
     <instrumentation
@@ -24,4 +26,3 @@
             android:value="com.android.cts.runner.CtsTestRunListener" />
     </instrumentation>
 </manifest>
-
