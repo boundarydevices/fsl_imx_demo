@@ -298,14 +298,6 @@ public class EthernetManager {
         String mInterfaceName ;
         EthernetDevInfo info = getSavedConfig();
         if (info != null && isConfigured()) {
-            synchronized (this) {
-                mInterfaceName = info.getIfName();
-                Log.d(TAG, "reset device " + mInterfaceName);
-                NetworkUtils.resetConnections(mInterfaceName, NetworkUtils.RESET_ALL_ADDRESSES);
-            }
-            if (!NetworkUtils.stopDhcp(mInterfaceName)) {
-                Log.d(TAG, "Could not stop DHCP");
-            }
             configureInterface(info);
         } else {
             //First boot using AOSP dhcp
