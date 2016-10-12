@@ -125,11 +125,27 @@ public class MainActivity extends Activity {
                 text.setMovementMethod(ScrollingMovementMethod.getInstance());
                 mSaveConfig = mEthEnabler.getManager().getSavedConfig();
                 if (mSaveConfig != null) {
-                    final String config_detail = "IP Mode       : " + mEthEnabler.getManager().getSharedPreMode() + "\n"
-                            + "IP Address    : " +  mEthEnabler.getManager().getSharedPreIpAddress() + "\n"
+                    String IPAddresses = mEthEnabler.getManager().getSharedPreIpAddress();
+                    final String config_detail;
+		    if(IPAddresses == null || IPAddresses.equals("")) {
+                        IPAddresses = " ";
+		    }
+                    String[] IPAddress = IPAddresses.split(", /");
+
+                    if(IPAddress.length ==1) {
+                            config_detail = "IP Mode       : " + mEthEnabler.getManager().getSharedPreMode() + "\n"
+                            + "IPv4 Address  : " + mEthEnabler.getManager().getSharedPreIpAddress() + "\n"
                             + "DNS Address   : " + mEthEnabler.getManager().getSharedPreDnsAddress() + "\n"
                             + "Proxy Address : " + mEthEnabler.getManager().getSharedPreProxyAddress() + "\n"
                             + "Proxy Port    : " + mEthEnabler.getManager().getSharedPreProxyPort() + "\n";
+		    } else {
+                            config_detail = "IP Mode       : " + mEthEnabler.getManager().getSharedPreMode() + "\n"
+                            + "IPv4 Address  : " +  IPAddress[1] + "\n"
+                            + "IPv6 Address  : " +  IPAddress[0] + "\n"
+                            + "DNS Address   : " + mEthEnabler.getManager().getSharedPreDnsAddress() + "\n"
+                            + "Proxy Address : " + mEthEnabler.getManager().getSharedPreProxyAddress() + "\n"
+                            + "Proxy Port    : " + mEthEnabler.getManager().getSharedPreProxyPort() + "\n";
+                    }
                     text.setText(config_detail);
                 }
             }
