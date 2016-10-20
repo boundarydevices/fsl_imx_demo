@@ -22,6 +22,8 @@ import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemProperties;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -55,6 +57,7 @@ public class MainActivity extends Activity {
     Button btn_start;
     Button btn_stop;
     ImageButton btn_enable;
+    ImageButton btn_enter;
     BluetoothA2dpSink mA2dpSinkService;
     BluetoothAvrcpController mAvrcpControllerService;
     BroadcastReceiverA2dpSink mBroadcastReceiverA2dpSink;
@@ -72,6 +75,8 @@ public class MainActivity extends Activity {
     static int AVRCP_BTN_PRESS = 0;
     static int AVRCP_BTN_RELEASE = 1;
     public static final int UNINIT_AUDIO_RECORDER = 1;
+
+    BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
     private Handler playbackNotifyHandler = new Handler() {
         public void handleMessage(Message msg) {
@@ -92,6 +97,7 @@ public class MainActivity extends Activity {
     //Permission Related
     private int mNumPermissionsToRequest = 0;
     private boolean mShouldRequestSoundPermission = false;
+    private boolean mShouldRequestWritePermission = false;
     private int mIndexPermissionRequestSound = 0;
     private static final int PERMISSION_REQUEST_CODE = 0;
 
@@ -226,13 +232,41 @@ public class MainActivity extends Activity {
         button_avrcp_cmd.put(R.id.btn_playi, MainActivity.AVRCP_CMD_PLAY);
         button_avrcp_cmd.put(R.id.btn_pausei, MainActivity.AVRCP_CMD_PAUSE);
 
-        initPowerButton();
+        btn_enable = (ImageButton)findViewById(R.id.btn_enable);
+        btn_enable.setVisibility(View.INVISIBLE);
+        btn_enable.setEnabled(false);
+        initEnterButton();
+    }
 
+    private void initEnterButton() {
+        btn_enter = (ImageButton)findViewById(R.id.btn_enter);
+
+        btn_enter.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SystemProperties.set("persist.bluetooth.a2dpsink", "1");
+
+                if (mBluetoothAdapter != null) {
+                    if (mBluetoothAdapter.isEnabled()) {
+                        mBluetoothAdapter.disable();
+                    }
+                }
+
+                Intent intent =new Intent(Settings.ACTION_BLUETOOTH_SETTINGS);
+                startActivity(intent);
+
+                btn_enter.setVisibility(View.INVISIBLE);
+                btn_enter.setEnabled(false);
+                btn_enable.setVisibility(View.VISIBLE);
+                btn_enable.setEnabled(true);
+
+                initPowerButton();
+            }
+        });
 
     }
 
     private void initPowerButton() {
-        btn_enable = (ImageButton)findViewById(R.id.btn_enable);
         EnableButtonlistener listener = new EnableButtonlistener();
         btn_enable.setOnTouchListener(listener);
 
@@ -274,19 +308,24 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (mBluetoothAdapter != null) {
+            if (mBluetoothAdapter.isEnabled()) {
+                mBluetoothAdapter.disable();
+            }
+        }
+        SystemProperties.set("persist.bluetooth.a2dpsink", "0");
         unregisterReceiver(mBroadcastReceiverA2dpSink);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-	checkPermission();
+        checkPermission();
         setContentView(R.layout.activity_main);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         btn_start = (Button)findViewById(R.id.btn_start);
         btn_stop = (Button)findViewById(R.id.btn_stop);
-        final BluetoothAdapter mBluetoothAdapter;
         initButtonDictionary();
 
         Log.i(TAG, "onCreate");
@@ -321,13 +360,8 @@ public class MainActivity extends Activity {
                         connectDeviceInfo);
             }
         });
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (mBluetoothAdapter != null) {
-            if (!mBluetoothAdapter.isEnabled()) {
-                Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                startActivity(intent);
-            }
 
+        if (mBluetoothAdapter != null) {
             if (mBluetoothAdapter.getProfileConnectionState(BluetoothProfile.A2DP_SINK) !=
                     BluetoothProfile.STATE_CONNECTED) {
                 Log.i(TAG, "no a2dp");
@@ -400,24 +434,33 @@ public class MainActivity extends Activity {
     }
 
     private void checkPermission(){
+        if(checkSelfPermission(Manifest.permission.RECORD_AUDIO)
+                != PackageManager.PERMISSION_GRANTED){
+            mNumPermissionsToRequest++;
+            mShouldRequestSoundPermission = true;
+        }
 
-	if(checkSelfPermission(Manifest.permission.RECORD_AUDIO)
-			!= PackageManager.PERMISSION_GRANTED){
-		mNumPermissionsToRequest++;
-		mShouldRequestSoundPermission = true;
-	}
+        if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED){
+            mNumPermissionsToRequest++;
+            mShouldRequestWritePermission = true;
+        }
 
-	String[] permissionToRequest = new String[mNumPermissionsToRequest];
-		int permissionRequestIndex = 0;
-	if(mShouldRequestSoundPermission){
-		permissionToRequest[permissionRequestIndex] = Manifest.permission.RECORD_AUDIO;
-		mIndexPermissionRequestSound = permissionRequestIndex;
-		permissionRequestIndex++;
-	}
+        String[] permissionToRequest = new String[mNumPermissionsToRequest];
+        int permissionRequestIndex = 0;
+        if(mShouldRequestSoundPermission ){
+            permissionToRequest[permissionRequestIndex] = Manifest.permission.RECORD_AUDIO;
+            permissionRequestIndex++;
+        }
 
-	if(permissionToRequest.length > 0){
-		requestPermissions(permissionToRequest, PERMISSION_REQUEST_CODE);
-	}
+        if(mShouldRequestWritePermission ){
+            permissionToRequest[permissionRequestIndex] = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+            permissionRequestIndex++;
+        }
+
+        if(permissionToRequest.length > 0){
+            requestPermissions(permissionToRequest, PERMISSION_REQUEST_CODE);
+        }
     }
 
     @Override
