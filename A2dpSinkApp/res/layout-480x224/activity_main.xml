@@ -91,12 +91,25 @@
                 android:id="@+id/btn_start"
                 android:visibility="invisible"
                 />
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center">
             <ImageButton
                 android:layout_marginLeft="15dp"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:id="@+id/btn_enable"
                 android:background="@drawable/power_off"/>
+            <ImageButton
+                android:layout_marginLeft="15dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignTop="@id/btn_enable"
+                android:id="@+id/btn_enter"
+                android:background="@drawable/power_off"/>
+        </RelativeLayout>
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
