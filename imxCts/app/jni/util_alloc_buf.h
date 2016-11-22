@@ -46,7 +46,7 @@ typedef struct ANativeWindow aWindow;
 
 #define QCT_WORKAROUND 1
 
-static unsigned  int  hal_format[]= {
+static int  hal_format[]= {
     HAL_PIXEL_FORMAT_RGBA_8888 ,
     HAL_PIXEL_FORMAT_RGBX_8888,
     HAL_PIXEL_FORMAT_RGB_565,
@@ -57,7 +57,7 @@ static unsigned  int  hal_format[]= {
     HAL_PIXEL_FORMAT_YCbCr_420_SP
 };
 
-static unsigned  int  usage_list[]= {
+static int  usage_list[]= {
     GRALLOC_USAGE_SW_READ_NEVER,
     GRALLOC_USAGE_SW_READ_RARELY,
     GRALLOC_USAGE_SW_READ_OFTEN,

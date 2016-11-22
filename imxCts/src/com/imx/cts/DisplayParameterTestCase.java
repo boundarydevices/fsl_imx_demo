@@ -49,6 +49,11 @@ public class DisplayParameterTestCase extends IMxCtsAssetsTestCase {
 
         String actual = actualResult.successMsg;
         expected = mActivity.getFb0Mode(mBoard);
+        /* String "actual": U:1024x768p-60 or S:1024x768p-60
+           String "expected": 1024x768p-60 or   1024x768p-60,
+           we don't care the first char(U/S), so cut the string
+           from third character*/
+        actual = actual.substring(2, actual.length());
         assertEquals("Fb0 Mode is wrong", expected, actual);
     }
 
@@ -60,7 +65,7 @@ public class DisplayParameterTestCase extends IMxCtsAssetsTestCase {
         CmdUtil.CmdResult actualResult = CmdUtil.execCommand(cmd);
 
         if (actualResult.errorMsg.contains("No such file or directory")) {
-            fail("Does not support Fb2");
+            return;
         }
 
         String actual = actualResult.successMsg;
@@ -75,11 +80,16 @@ public class DisplayParameterTestCase extends IMxCtsAssetsTestCase {
         CmdUtil.CmdResult actualResult = CmdUtil.execCommand(cmd);
 
         if (actualResult.errorMsg.contains("No such file or directory")) {
-            fail("Does not support Fb2");
+            return;
         }
 
         String actual = actualResult.successMsg;
         expected = mActivity.getFb2Mode(mBoard);
+        /* String "actual": U:1024x768p-60 or S:1024x768p-60
+           String "expected": 1024x768p-60 or   1024x768p-60,
+           we don't care the first char(U/S), so cut the string
+           from third character*/
+        actual = actual.substring(2, actual.length());
         assertEquals("Fb2 Mode is wrong", expected, actual);
     }
 

@@ -37,6 +37,7 @@ public class AllocBufTestActivity extends Activity {
     private Intent intent;
     private ExecutorService mThreadPool;
     private boolean isAppRun;
+    private boolean hasAllocBuff;
     private UiDevice mDevice;
     private boolean isStartActivitySuccess;
     private static final String TAG = "TestActivity";
@@ -50,6 +51,7 @@ public class AllocBufTestActivity extends Activity {
         super.onCreate(savedInstanceState);
         mThreadPool = Executors.newFixedThreadPool(5);
         isAppRun = true;
+        hasAllocBuff = false;
     }
 
     public void click(View view){
@@ -61,11 +63,15 @@ public class AllocBufTestActivity extends Activity {
         intent = new Intent();
         intent.setAction("com.imx.app.allocbuffer");
         intent.setPackage("com.imx.app");
+        hasAllocBuff = true;
         startService(intent);
     }
 
     public void stopAllocRandomBuffer(){
-        stopService(intent);
+        if (hasAllocBuff) {
+            hasAllocBuff = false;
+            stopService(intent);
+        }
     }
 
     public void startGalleryRun(){

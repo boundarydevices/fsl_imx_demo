@@ -22,6 +22,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.KeyEvent;
 
@@ -41,9 +43,9 @@ public class CameraRun extends AppRun {
         StringBuilder path = new StringBuilder();
         path.append(Environment.getExternalStorageDirectory().getPath()).append("/123.jpg");
         File file=new File(path.toString());
-        Uri uri=Uri.fromFile(file);
-        Intent itent=new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-        itent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, uri);
+        Uri uri=FileProvider.getUriForFile(this.mContext, "com.imx.cts.fileprovider", file);
+        Intent itent=new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        itent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
         ((Activity)mContext).startActivityForResult(itent, 1);
     }
 

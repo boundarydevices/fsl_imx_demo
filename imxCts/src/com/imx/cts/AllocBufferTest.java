@@ -254,7 +254,7 @@ public class AllocBufferTest extends InstrumentationTestCase {
         testCameraOpen();
     }
 
-    private void testCameraOpen() {
+    public void testCameraOpen() {
         try {
             mActivity.startCameraRun();
             sleep(MID_WAIT);

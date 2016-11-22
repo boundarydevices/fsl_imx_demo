@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<configuration description="Config for imx Cts test cases">
+    <target_preparer class="com.android.compatibility.common.tradefed.targetprep.ApkInstaller">
+        <option name="cleanup-apks" value="true" />
+        <option name="test-file-name" value="CtsImxTestCases.apk" />
+    </target_preparer>
+    <test class="com.android.tradefed.testtype.AndroidJUnitTest" >
+        <option name="package" value="com.imx.cts" />
+        <option name="test-timeout" value="600000" />
+    </test>
+</configuration>
