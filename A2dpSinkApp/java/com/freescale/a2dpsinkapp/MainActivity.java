@@ -244,8 +244,7 @@ public class MainActivity extends Activity {
         btn_enter.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                SystemProperties.set("persist.bluetooth.a2dpsink", "1");
-
+                SystemProperties.set("persist.sys.a2dpsink", "1");
                 if (mBluetoothAdapter != null) {
                     if (mBluetoothAdapter.isEnabled()) {
                         mBluetoothAdapter.disable();
@@ -313,7 +312,7 @@ public class MainActivity extends Activity {
                 mBluetoothAdapter.disable();
             }
         }
-        SystemProperties.set("persist.bluetooth.a2dpsink", "0");
+        SystemProperties.set("persist.sys.a2dpsink", "0");
         unregisterReceiver(mBroadcastReceiverA2dpSink);
     }
 
