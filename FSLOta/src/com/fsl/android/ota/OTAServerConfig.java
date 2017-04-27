@@ -75,24 +75,18 @@ public class OTAServerConfig {
                         String boottype = SystemProperties.get("ro.boot.storage_type");
 			if (machineString.indexOf("i.MX6") != -1) {
 			if (machineString.indexOf("DualLite") != -1) {
-                               if (boottype.equals("sd"))
-                                  {fileaddr = fileaddr + ".imx6dl_sd";}
-                              else if (boottype.equals("nand"))
+                              if (boottype.equals("nand"))
                                   {fileaddr = fileaddr + ".imx6dl_nand";}
                               else
                               fileaddr = fileaddr + ".imx6dl";
 			} else if (machineString.indexOf("Quad") != -1) {
 				if(machineString.indexOf("Plus") != -1){
-                               		if (boottype.equals("sd"))
-                                  		{fileaddr = fileaddr + ".imx6qp_sd";}
-                              		else if (boottype.equals("nand"))
+                              		if (boottype.equals("nand"))
                                   		{fileaddr = fileaddr + ".imx6qp_nand";}
                               		else
                               	  		fileaddr = fileaddr + ".imx6qp";
 				} else {
-					if (boottype.equals("sd"))
-                                  		{fileaddr = fileaddr + ".imx6q_sd";}
-                                	else if (boottype.equals("nand"))
+                                	if (boottype.equals("nand"))
                                   		{fileaddr = fileaddr + ".imx6q_nand";}
                                 	else
                                   		fileaddr = fileaddr + ".imx6q";
