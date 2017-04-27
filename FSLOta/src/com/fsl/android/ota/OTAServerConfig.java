@@ -100,8 +100,10 @@ public class OTAServerConfig {
                               else
 			      fileaddr = fileaddr + ".imx6sx";
 			}
-			} else if (machineString.indexOf("i.MX7") != -1) {
-			      fileaddr = fileaddr + ".imx7d";	
+			} else if (machineString.indexOf("i.MX7ULP") != -1) {
+			      fileaddr = fileaddr + ".imx7ulp";
+			} else if (machineString.indexOf("i.MX7D") != -1) {
+			      fileaddr = fileaddr + ".imx7d";
 			}
 			updatePackageURL = new URL(default_protocol, server, port, fileaddr);
 			buildpropURL = new URL(default_protocol, server, port, buildconfigAddr);
