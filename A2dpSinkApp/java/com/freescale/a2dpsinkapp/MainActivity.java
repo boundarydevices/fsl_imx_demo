@@ -53,6 +53,7 @@ public class MainActivity extends Activity {
     AudioRecord mRecord = null;
     AudioTrack mTrack = null;
     boolean isPlaying = false;
+    int initiated = 0;
     A2dpSinkWorkTask mPlayTask;
     Button btn_start;
     Button btn_stop;
@@ -75,6 +76,7 @@ public class MainActivity extends Activity {
     static int AVRCP_BTN_PRESS = 0;
     static int AVRCP_BTN_RELEASE = 1;
     public static final int UNINIT_AUDIO_RECORDER = 1;
+    public static final int AUDIO_PLAY_EXCEPTION = 2;
 
     BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -84,6 +86,11 @@ public class MainActivity extends Activity {
                 case UNINIT_AUDIO_RECORDER:
                     Log.w(TAG, "uninit audio recoder in bluedroid.");
                     ShowToast("Source Audio is not ready, please confirm audio is playing in source end and try again.");
+                    uiSetA2dpConnectState(a2dpState == BluetoothA2dpSink.STATE_CONNECTED, connectDeviceInfo);
+                    btn_enable.setBackgroundResource(R.drawable.power_off);
+                    break;
+                case AUDIO_PLAY_EXCEPTION:
+                    Log.w(TAG, "play error in bluedroid.");
                     uiSetA2dpConnectState(a2dpState == BluetoothA2dpSink.STATE_CONNECTED, connectDeviceInfo);
                     btn_enable.setBackgroundResource(R.drawable.power_off);
                     break;
@@ -244,13 +251,13 @@ public class MainActivity extends Activity {
         btn_enter.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                SystemProperties.set("persist.sys.a2dpsink", "1");
                 if (mBluetoothAdapter != null) {
                     if (mBluetoothAdapter.isEnabled()) {
                         mBluetoothAdapter.disable();
                     }
                 }
 
+                SystemProperties.set("persist.sys.a2dpsink", "1");
                 Intent intent =new Intent(Settings.ACTION_BLUETOOTH_SETTINGS);
                 startActivity(intent);
 
@@ -392,6 +399,7 @@ public class MainActivity extends Activity {
         a2dpSinkIntentFilter.addAction(BluetoothA2dpSink.ACTION_CONNECTION_STATE_CHANGED);
         a2dpSinkIntentFilter.addAction(BluetoothA2dpSink.ACTION_PLAYING_STATE_CHANGED);
         a2dpSinkIntentFilter.addAction(BluetoothA2dpSink.ACTION_AUDIO_CONFIG_CHANGED);
+        a2dpSinkIntentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         mBroadcastReceiverA2dpSink = new BroadcastReceiverA2dpSink();
         registerReceiver(mBroadcastReceiverA2dpSink,a2dpSinkIntentFilter);
 
@@ -410,6 +418,10 @@ public class MainActivity extends Activity {
                 mTrack.stop();
             } catch (IllegalStateException err) {
                 Log.e(TAG, err.toString());
+                Message message = new Message();
+                message.what = AUDIO_PLAY_EXCEPTION;
+                playbackNotifyHandler.sendMessage(message);
+                isPlaying = false;
             }
             mTrack.release();
         }
@@ -418,6 +430,10 @@ public class MainActivity extends Activity {
                 mRecord.stop();
             } catch (IllegalStateException err) {
                 Log.e(TAG, err.toString());
+                Message message = new Message();
+                message.what = AUDIO_PLAY_EXCEPTION;
+                playbackNotifyHandler.sendMessage(message);
+                isPlaying = false;
             }
             mRecord.release();
         }
@@ -426,6 +442,10 @@ public class MainActivity extends Activity {
                 mPlayTask.cancel(true);
             } catch (Exception err) {
                 Log.e(TAG, "onStop cannot cancel task because" + err);
+                Message message = new Message();
+                message.what = AUDIO_PLAY_EXCEPTION;
+                playbackNotifyHandler.sendMessage(message);
+                isPlaying = false;
             }
         }
         mTrack = null;
@@ -547,8 +567,16 @@ public class MainActivity extends Activity {
                 isPlaying = false;
             }
             while(isPlaying) {
-                mRecord.read(recData, 0, ReadSize);
-                mTrack.write(recData, 0, ReadSize);
+                try {
+                    mRecord.read(recData, 0, ReadSize);
+                    mTrack.write(recData, 0, ReadSize);
+                } catch (IllegalStateException err) {
+                    Log.e(TAG, "playback task " + err.toString());
+                    Message message = new Message();
+                    message.what = AUDIO_PLAY_EXCEPTION;
+                    playbackNotifyHandler.sendMessage(message);
+                    isPlaying = false;
+                }
 
             }
             if (mTrack != null) {
@@ -556,6 +584,10 @@ public class MainActivity extends Activity {
                     mTrack.stop();
                 } catch (IllegalStateException err) {
                     Log.e(TAG, "playback task " + err.toString());
+                    Message message = new Message();
+                    message.what = AUDIO_PLAY_EXCEPTION;
+                    playbackNotifyHandler.sendMessage(message);
+                    isPlaying = false;
                 }
                 mTrack.release();
             }
@@ -564,6 +596,10 @@ public class MainActivity extends Activity {
                     mRecord.stop();
                 } catch (IllegalStateException err) {
                     Log.e(TAG, "playback task " + err.toString());
+                    Message message = new Message();
+                    message.what = AUDIO_PLAY_EXCEPTION;
+                    playbackNotifyHandler.sendMessage(message);
+                    isPlaying = false;
                 }
                 mRecord.release();
             }
@@ -668,6 +704,23 @@ public class MainActivity extends Activity {
                     ShowToast(getResources().getString(R.string.A2dp_is_playing));
                 } else {
                     ShowToast(getResources().getString(R.string.A2dp_source_pause));
+                }
+
+            }
+
+          if(action == (BluetoothAdapter.ACTION_STATE_CHANGED))  {
+                int newState = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1);
+
+                initiated++;
+
+                if ((BluetoothAdapter.STATE_OFF == newState) && (initiated != 2) ){
+                    Log.d(TAG, "ACTION_STATE_CHANGED Bluetooth Closed!");
+                    Toast.makeText(MainActivity.this, "Bluetooth Closed", Toast.LENGTH_LONG).show();
+                    uiSetA2dpConnectState(false,null);
+
+                    btn_enable.setVisibility(View.GONE);
+                    btn_enter.setVisibility(View.VISIBLE);
+                    btn_enter.setEnabled(true);
                 }
 
             }
