@@ -101,7 +101,11 @@ public class DeviceControlActivity extends Activity implements OnClickListener{
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		mBleController.disconnect(mDeviceAddress);
+		try {
+			mBleController.disconnect(mDeviceAddress);
+		} catch (Exception e) {
+			Log.e(TAG,"Device disconnect on destroy exception" , e);
+		}
 		if(mConn != null){
 			unbindService(mConn);
 		}
@@ -113,8 +117,12 @@ public class DeviceControlActivity extends Activity implements OnClickListener{
 		super.onResume();
 		registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
 		if (mBleController != null) {
-			final boolean result = mBleController.connect(mDeviceAddress);
-			Log.d(TAG, "Connect request result=" + result);
+			try {
+				final boolean result = mBleController.connect(mDeviceAddress);
+				Log.d(TAG, "Connect request result=" + result);
+			} catch (Exception e) {
+				Log.e(TAG,"No device to connect on resume", e);
+			}
 		}
 	}
 
@@ -152,12 +160,14 @@ public class DeviceControlActivity extends Activity implements OnClickListener{
 		});
 		
 		
-		if(mDeviceName.equals("i.MX Device")){
+		if("i.MX Device" .equals(mDeviceName)){
 			mTvConnect.setOnClickListener(this);
 			mConn = new BleServiceConn();
 			Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
 			startService(gattServiceIntent);
 			bindService(gattServiceIntent, mConn, BIND_AUTO_CREATE);
+		} else {
+			Log.d(TAG, "It will only connect to i.MX Device");
 		}
 	}
 
@@ -171,8 +181,11 @@ public class DeviceControlActivity extends Activity implements OnClickListener{
 				Log.d(TAG, "Unable to initialize Bluetooth");
 				finish();
 			}
-			
-			mBleController.connect(mDeviceAddress);
+			if((mDeviceAddress == null || mDeviceAddress.equals(""))) {
+				Log.d(TAG,"No device availale to connect ");
+			} else {
+				mBleController.connect(mDeviceAddress);
+			}
 		}
 		
 		@Override
@@ -440,9 +453,17 @@ public class DeviceControlActivity extends Activity implements OnClickListener{
 		switch (v.getId()) {
 		case R.id.tv_connect_state:
 			if(!mIsConnected){
-				mBleController.connect(mDeviceAddress);
+				if((mDeviceAddress == null || mDeviceAddress.equals(""))) {
+					Log.d(TAG,"No device availale to connect ");
+				} else {
+					mBleController.connect(mDeviceAddress);
+				}
 			}else{
-				mBleController.disconnect(mDeviceAddress);
+				if((mDeviceAddress == null || mDeviceAddress.equals(""))) {
+					Log.d(TAG,"No device availale to connect ");
+				} else {
+					mBleController.disconnect(mDeviceAddress);
+				}
 				clearUI();
 			}
 			break;
