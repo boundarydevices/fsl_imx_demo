@@ -260,13 +260,6 @@ public class MainActivity extends Activity {
                 SystemProperties.set("persist.sys.a2dpsink", "1");
                 Intent intent =new Intent(Settings.ACTION_BLUETOOTH_SETTINGS);
                 startActivity(intent);
-
-                btn_enter.setVisibility(View.INVISIBLE);
-                btn_enter.setEnabled(false);
-                btn_enable.setVisibility(View.VISIBLE);
-                btn_enable.setEnabled(true);
-
-                initPowerButton();
             }
         });
 
@@ -679,6 +672,13 @@ public class MainActivity extends Activity {
                 if (state == BluetoothA2dpSink.STATE_CONNECTED) {
                     ShowToast(getResources().getString(R.string.A2dp_source_connected));
                     connected = true;
+
+                    btn_enter.setVisibility(View.INVISIBLE);
+                    btn_enter.setEnabled(false);
+                    btn_enable.setVisibility(View.VISIBLE);
+                    btn_enable.setEnabled(true);
+                    initPowerButton();
+
                     info = device.getAliasName() + " " + device.getAddress();
                     a2dpRemoteDevice = device;
                 } else {
@@ -708,7 +708,7 @@ public class MainActivity extends Activity {
 
             }
 
-          if(action == (BluetoothAdapter.ACTION_STATE_CHANGED))  {
+            if(action == (BluetoothAdapter.ACTION_STATE_CHANGED))  {
                 int newState = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1);
 
                 initiated++;
