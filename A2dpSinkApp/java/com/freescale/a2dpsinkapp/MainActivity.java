@@ -691,6 +691,8 @@ public class MainActivity extends Activity {
                     a2dpRemoteDevice = null;
                 }
 
+                AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                am.setBluetoothA2dpDeviceConnectionState(device, state, BluetoothProfile.A2DP_SINK);
                 uiSetA2dpConnectState(connected,info);
 
             }
