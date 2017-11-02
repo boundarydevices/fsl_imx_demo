@@ -18,6 +18,7 @@ package com.fsl.android.ota;
 
 import android.content.*;
 import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
@@ -127,9 +128,11 @@ public class OTAServerManager {
     public boolean checkNetworkOnline() {
         ConnectivityManager conMgr =
                 (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo ethInfo = conMgr.getNetworkInfo(ConnectivityManager.TYPE_ETHERNET);
+        NetworkInfo wlanInfo = conMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
-        if (conMgr.getNetworkInfo(ConnectivityManager.TYPE_ETHERNET).isConnectedOrConnecting()
-                || conMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnectedOrConnecting()) {
+        if (((ethInfo != null) && ethInfo.isConnectedOrConnecting())
+                || ((wlanInfo != null) && (wlanInfo.isConnectedOrConnecting()))) {
             return true;
         } else {
             return false;
