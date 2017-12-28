@@ -63,6 +63,26 @@
             android:layout_rowSpan="2"
             android:text="@string/upgrade" />
 
+        <Button
+            android:id="@+id/diff_upgrade_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="3"
+            android:layout_columnSpan="3"
+            android:layout_row="5"
+            android:layout_rowSpan="2"
+            android:text="@string/diff_upgrade" />
+
+        <Button
+            android:id="@+id/reboot_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="4"
+            android:layout_columnSpan="3"
+            android:layout_row="5"
+            android:layout_rowSpan="2"
+            android:text="@string/reboot" />
+
         <Space
             android:layout_width="1dp"
             android:layout_height="23dp"

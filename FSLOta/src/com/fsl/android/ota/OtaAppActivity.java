@@ -19,6 +19,7 @@ import java.net.MalformedURLException;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -38,7 +39,10 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
 	private final int WIFI_NOT_AVALIBLE = 4;
 	private final int CANNOT_FIND_SERVER = 5;
 	private final int WRITE_FILE_ERROR = 6;
+	private final int WAIT_REBOOT = 7;
 	Button mUpgradeButton;
+	Button mDiffUpgradeButton;
+	Button mRebootButton;
 	TextView mMessageTextView;
 	TextView mVersionTextView;
 	ProgressBar mSpinner;
@@ -62,6 +66,8 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
                     	mVersionTextView.setVisibility(View.INVISIBLE);
                     	mDownloadProgress.setVisibility(View.INVISIBLE);
                     	mUpgradeButton.setVisibility(View.INVISIBLE); 
+                    	mDiffUpgradeButton.setVisibility(View.INVISIBLE);
+                    	mRebootButton.setVisibility(View.INVISIBLE);
                     	break;
                 case CHECKED:
                     	mVersionTextView.setVisibility(View.VISIBLE);
@@ -70,6 +76,8 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
                 case DOWNLOADING:
                       	mVersionTextView.setVisibility(View.INVISIBLE);
                     	mUpgradeButton.setVisibility(View.INVISIBLE);
+                    	mDiffUpgradeButton.setVisibility(View.INVISIBLE);
+                    	mRebootButton.setVisibility(View.INVISIBLE);
                     	mSpinner.setVisibility(View.INVISIBLE);
                     	mDownloadProgress.setVisibility(View.VISIBLE);
                     	break;
@@ -82,6 +90,11 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
                 case WRITE_FILE_ERROR:
                 	mMessageTextView.setText(getText(R.string.error_write_file));
 			break;
+                case WAIT_REBOOT:
+                	mDownloadProgress.setVisibility(View.INVISIBLE);
+                	mMessageTextView.setText(getText(R.string.wait_for_reboot));
+                	mRebootButton.setVisibility(View.VISIBLE);
+                    break;
                 default:
                 break;
             }
@@ -97,6 +110,11 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
         setContentView(R.layout.main);
         (mUpgradeButton = (Button) findViewById(R.id.upgrade_button)) 
         		.setOnClickListener(mUpgradeListener);
+        (mDiffUpgradeButton = (Button) findViewById(R.id.diff_upgrade_button))
+        		.setOnClickListener(mDiffUpgradeListener);
+        (mRebootButton = (Button) findViewById(R.id.reboot_button))
+        		.setOnClickListener(mRebootListener);
+        mRebootButton.setVisibility(View.INVISIBLE);
         mMessageTextView = (TextView) findViewById(R.id.message_text_view);
         mVersionTextView = ((TextView) findViewById(R.id.version_text_view)); 
         mSpinner = (ProgressBar) findViewById(R.id.spinner);
@@ -162,7 +180,34 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
 		}
 		
 	};
-	
+
+    OnClickListener mDiffUpgradeListener = new OnClickListener() {
+		public void onClick(View v) {
+			Log.v(TAG, "diff upgrade button clicked.");
+			new Thread(new Runnable() {
+				public void run() {
+					mOTAManager.setDiffUpgrade();
+					mOTAManager.startDownloadUpgradePackage();
+				}
+			}).start();
+			onStateChangeUI(STATE_IN_DOWNLOADING);
+		}
+	};
+
+    OnClickListener mRebootListener = new OnClickListener() {
+		public void onClick(View v) {
+			Log.v(TAG, "reboot button clicked.");
+			try {
+				Intent intent = new Intent(Intent.ACTION_REBOOT);
+				intent.putExtra("nowait", 1);
+				intent.putExtra("interval", 1);
+				intent.putExtra("window", 0);
+				sendBroadcast(intent);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	};
 	
 	public void onStateOrProgress(int message, int error, Object info)
 	{
@@ -186,6 +231,9 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
 		case MESSAGE_DOWNLOAD_PROGRESS:
 		case MESSAGE_VERIFY_PROGRESS:
 			onProgress(message, error, info);
+			break;
+		case MESSAGE_WAIT_REBOOT:
+			mHandler.sendEmptyMessageDelayed(WAIT_REBOOT,0);
 			break;
 		}
 	}
@@ -320,12 +368,17 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
 						
 						if (bytes > 0)
 							length = byteCountToDisplaySize(bytes, false);
-						mVersionTextView.setText(getText(R.string.version) +  ":" +
-								parser.getProp("ro.build.id") + "\n" +
-								getText(R.string.full_version) + ":" +
-								parser.getProp("ro.build.description") + "\n" +
-								getText(R.string.size) + " " + length);
+							if (parser != null) {
+								mVersionTextView.setText(getText(R.string.version) +  ":" +
+										parser.getProp("ro.build.id") + "\n" +
+										getText(R.string.full_version) + ":" +
+										parser.getProp("ro.build.description") + "\n" +
+										getText(R.string.size) + " " + length);
+							}
 						mUpgradeButton.setVisibility(View.VISIBLE);
+						if (mOTAManager.ab_slot()) {
+							mDiffUpgradeButton.setVisibility(View.VISIBLE);
+						}
 					}
 				});
 			}

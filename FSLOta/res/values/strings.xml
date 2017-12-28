@@ -1,6 +1,8 @@
 
     <resources>
         <string name="upgrade">Upgrade</string>
+        <string name="diff_upgrade">Diff Upgrade</string>
+        <string name="reboot">Reboot</string>
         <string name="version">Version</string>
         <string name="check_for_upgrade">Checking Upgrade</string>
         <string name="app_name">Freescale OTA System Update</string>
@@ -17,4 +19,5 @@
         <string name="length_unknown">Unknown</string>
         <string name="verify_package">Verifying package</string>
         <string name="full_version">Description</string>
+        <string name="wait_for_reboot">Waiting for Reboot</string>
     </resources>

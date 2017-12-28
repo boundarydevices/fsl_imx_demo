@@ -34,6 +34,12 @@ public class OTAServerConfig {
 	final int default_port = 10888;
 	URL updatePackageURL;
 	URL buildpropURL;
+	URL payloadPropertiesURL;
+	URL payloadURL;
+	URL diffPayloadPropertiesURL;
+	URL diffPayloadURL;
+	boolean ab_slot = false;
+	boolean is_diff_upgrade = false;
 	String product;
 	final String TAG = "OTA";
 	final String configFile = "/system/etc/ota.conf";
@@ -67,12 +73,20 @@ public class OTAServerConfig {
 			int port = new Long(port_str).intValue();
 			String fileaddr;
 			String buildconfigAddr;
+			String payloadPropertiesAddr;
+			String payloadAddr;
+			String diffPayloadPropertiesAddr;
+			String diffPayloadAddr;
 
 			readMachine();
 			String version = SystemProperties.get("ro.build.version.release");
 			fileaddr = new String(product + "_" + android_name + "_" + version + "/" + product + ".ota.zip");
 			buildconfigAddr = new String(product + "_" + android_name + "_" + version + "/" + "build.prop");
-                        String boottype = SystemProperties.get("ro.boot.storage_type");
+			payloadPropertiesAddr = new String(product + "_" + android_name + "_" + version + "/payload_properties-");
+			payloadAddr = new String(product + "_" + android_name + "_" + version + "/payload-");
+			diffPayloadPropertiesAddr = payloadPropertiesAddr;
+			diffPayloadAddr = payloadAddr;
+			String boottype = SystemProperties.get("ro.boot.storage_type");
 			if (machineString.indexOf("i.MX6") != -1) {
 			if (machineString.indexOf("DualLite") != -1) {
                               if (boottype.equals("nand"))
@@ -104,9 +118,34 @@ public class OTAServerConfig {
 			      fileaddr = fileaddr + ".imx7ulp";
 			} else if (machineString.indexOf("i.MX7D") != -1) {
 			      fileaddr = fileaddr + ".imx7d";
+			} else if (machineString.indexOf("i.MX8MQ") != -1) {
+			      ab_slot = true;
+			      payloadPropertiesAddr = payloadPropertiesAddr + "imx8mq.txt";
+			      payloadAddr = payloadAddr + "imx8mq.bin";
+			      diffPayloadPropertiesAddr = diffPayloadPropertiesAddr + "imx8mq_diff.txt";
+			      diffPayloadAddr = diffPayloadAddr + "imx8mq_diff.bin";
+			} else if (machineString.indexOf("i.MX8QXP") != -1) {
+			      ab_slot = true;
+			      payloadPropertiesAddr = payloadPropertiesAddr + "imx8qxp.txt";
+			      payloadAddr = payloadAddr + "imx8qxp.bin";
+			      diffPayloadPropertiesAddr = diffPayloadPropertiesAddr + "imx8qxp_diff.txt";
+			      diffPayloadAddr = diffPayloadAddr + "imx8qxp_diff.bin";
+			} else if (machineString.indexOf("i.MX8QM") != -1) {
+			      ab_slot = true;
+			      payloadPropertiesAddr = payloadPropertiesAddr + "imx8qm.txt";
+			      payloadAddr = payloadAddr + "imx8qm.bin";
+			      diffPayloadPropertiesAddr = diffPayloadPropertiesAddr + "imx8qm_diff.txt";
+			      diffPayloadAddr = diffPayloadAddr + "imx8qm_diff.bin";
 			}
-			updatePackageURL = new URL(default_protocol, server, port, fileaddr);
 			buildpropURL = new URL(default_protocol, server, port, buildconfigAddr);
+			if (!ab_slot) {
+				updatePackageURL = new URL(default_protocol, server, port, fileaddr);
+			} else {
+				payloadPropertiesURL = new URL(default_protocol, server, port, payloadPropertiesAddr);
+				payloadURL = new URL(default_protocol, server, port, payloadAddr);
+				diffPayloadPropertiesURL = new URL(default_protocol, server, port, diffPayloadPropertiesAddr);
+				diffPayloadURL = new URL(default_protocol, server, port, diffPayloadAddr);
+			}
 		} catch (Exception e) {
 			Log.e(TAG, "wrong format/error of OTA configure file.");
 			e.printStackTrace();
@@ -127,7 +166,41 @@ public class OTAServerConfig {
 		Log.d(TAG, "build.prop URL:" + buildpropURL.toString());
 	}
 	
-	public URL getPackageURL () { return updatePackageURL; }
+	public boolean ab_slot()
+	{
+		return ab_slot;
+	}
+
+	public boolean getDiffUpgrade()
+	{
+		return is_diff_upgrade;
+	}
+
+	public void setDiffUpgrade()
+	{
+		is_diff_upgrade = true;
+	}
+
+	public URL getPackageURL ()
+	{
+		if (ab_slot) {
+			if (getDiffUpgrade())
+				return diffPayloadURL;
+			else
+				return payloadURL;
+		}
+		else
+			return updatePackageURL;
+	}
+
+	public URL getPayloadPropertiesURL ()
+	{
+		if (getDiffUpgrade())
+			return diffPayloadPropertiesURL;
+		else
+			return payloadPropertiesURL;
+	}
+
 	public URL getBuildPropURL() { return buildpropURL; }
-	
+
 }

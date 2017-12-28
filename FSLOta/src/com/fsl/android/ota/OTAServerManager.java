@@ -19,6 +19,8 @@ package com.fsl.android.ota;
 import java.net.*;
 import java.security.GeneralSecurityException;
 import java.io.*;
+import java.util.List;
+import java.util.ArrayList;
 
 import android.os.SystemProperties;
 import android.content.*;
@@ -29,9 +31,11 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.os.RecoverySystem;
+import android.os.UpdateEngine;
+import android.os.UpdateEngineCallback;
 import android.util.Log;
 
-public class OTAServerManager  {
+public class OTAServerManager {
 	public interface OTAStateChangeListener {
 		
 		final int STATE_IN_IDLE = 0;
@@ -43,6 +47,7 @@ public class OTAServerManager  {
 		final int MESSAGE_VERIFY_PROGRESS = 5;
 		final int MESSAGE_STATE_CHANGE = 6;
 		final int MESSAGE_ERROR = 7;
+		final int MESSAGE_WAIT_REBOOT = 8;
 		
 		// should be raise exception ? but how to do exception in async mode ?
 		final int NO_ERROR = 0;
@@ -61,6 +66,28 @@ public class OTAServerManager  {
 		
 	}
 
+	public class OTAUpdateEngineCallback extends UpdateEngineCallback {
+		private OTAStateChangeListener mListener;
+
+		public OTAUpdateEngineCallback(OTAStateChangeListener listener){
+			mListener = listener;
+		}
+
+		public void onStatusUpdate(int status, float percent) {
+			if (status == UpdateEngine.UpdateStatusConstants.DOWNLOADING) {
+				publishDownloadProgress(100, (long)(percent*100));
+			}
+		}
+
+		public void onPayloadApplicationComplete(int errorCode) {
+			Log.d(TAG, "onPayloadApplicationComplete: errorCode: " + errorCode);
+			if (errorCode == UpdateEngine.ErrorCodeConstants.SUCCESS) {
+				if (this.mListener != null && !mStop)
+					this.mListener.onStateOrProgress(OTAStateChangeListener.MESSAGE_WAIT_REBOOT, 0, null);
+			}
+		}
+	}
+
 	private OTAStateChangeListener mListener;	
 	private OTAServerConfig mConfig;
 	private BuildPropParser parser = null;
@@ -71,12 +98,15 @@ public class OTAServerManager  {
 	String TAG = "OTA";
 	Handler mSelfHandler;
 	WakeLock mWakelock;
+	UpdateEngine mUpdateEngine;
+	String[] mUpdateHeader;
 	
 	public OTAServerManager(Context context) throws MalformedURLException {
 		mConfig = new OTAServerConfig(Build.PRODUCT);
 		PowerManager pm = (PowerManager)context.getSystemService(Context.POWER_SERVICE);
 		mWakelock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "OTA Wakelock");
 		mContext = context;
+		mUpdateEngine = new UpdateEngine();
 	}
 
 	public OTAStateChangeListener getmListener() {
@@ -126,7 +156,34 @@ public class OTAServerManager  {
 			reportCheckingError(OTAStateChangeListener.ERROR_WRITE_FILE_ERROR);
 		}
 	}
-	
+
+	public boolean getUpdateHeader(URL propertiesURL)
+	{
+		try {
+			URL url = propertiesURL;
+			url.openConnection();
+			InputStream is = url.openStream();
+			BufferedReader br = new BufferedReader(new InputStreamReader(is));
+			List<String> lines = new ArrayList<String>();
+			String line = null;
+			while ((line = br.readLine()) != null) {
+				lines.add(line);
+			}
+			br.close();
+			is.close();
+			mUpdateHeader = lines.toArray(new String[lines.size()]);
+			mUpdateEngine.bind(new OTAUpdateEngineCallback(this.mListener));
+
+			return true;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
 	// return true if needs to upgrade
 	public boolean compareLocalVersionToServer() {
 		if (parser == null) {
@@ -206,6 +263,18 @@ public class OTAServerManager  {
 			return;
 		}
 
+		if (ab_slot()) {
+			if (getUpdateHeader(mConfig.getPayloadPropertiesURL()) == false) {
+				reportCheckingError(OTAStateChangeListener.ERROR_CANNOT_FIND_SERVER);
+									Log.v(TAG, "error cannot find server!");
+				return;
+			}
+
+			mWakelock.acquire();
+			mUpdateEngine.applyPayload(mConfig.getPackageURL().toString(), 0l, 0l, mUpdateHeader);
+			mWakelock.release();
+			return;
+		}
 
 		File targetFile = new File(mUpdatePackageLocation);
 		try {
@@ -266,6 +335,13 @@ public class OTAServerManager  {
 	};
 	
 	public void startInstallUpgradePackage() {
+		if (ab_slot()) {
+			if (mListener != null) {
+				mListener.onStateOrProgress(OTAStateChangeListener.MESSAGE_WAIT_REBOOT, 0, null);
+			}
+			return;
+		}
+
 		File recoveryFile = new File(mUpdatePackageLocation);
 		
 		// first verify package
@@ -336,21 +412,20 @@ public class OTAServerManager  {
 			int bytesRead;
 			
 			Log.d(TAG, "start download: " + url.toString() + "to buffer");
-		
+
 			while ((bytesRead = reader.read(buffer)) > 0) {
 				writer.write(buffer, 0, bytesRead);
 				buffer = new byte[153600];
 				totalBufRead += bytesRead;
 			}
-			
-		
-		Log.d(TAG, "download finish:" + (new Integer(totalBufRead).toString()) + "bytes download");
-		reader.close();
-		
-		BuildPropParser parser = new BuildPropParser(writer, mContext);
-		
-		return parser;
-		
+
+			Log.d(TAG, "download finish:" + (new Integer(totalBufRead).toString()) + "bytes download");
+			reader.close();
+
+			BuildPropParser parser = new BuildPropParser(writer, mContext);
+
+			return parser;
+
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
@@ -365,4 +440,11 @@ public class OTAServerManager  {
 		return false;
 	}
 
+	public boolean ab_slot() {
+		return mConfig.ab_slot();
+	}
+
+	public void setDiffUpgrade() {
+		mConfig.setDiffUpgrade();
+	}
 }
