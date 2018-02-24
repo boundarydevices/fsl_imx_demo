@@ -7,6 +7,7 @@ LOCAL_SRC_FILES := $(call all-java-files-under, com)
 
 LOCAL_PACKAGE_NAME := ethernet
 LOCAL_CERTIFICATE := platform
+LOCAL_VENDOR_MODULE := true
 
 include $(BUILD_PACKAGE)
 
