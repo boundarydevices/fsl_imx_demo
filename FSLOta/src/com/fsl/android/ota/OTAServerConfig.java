@@ -42,7 +42,7 @@ public class OTAServerConfig {
 	boolean is_diff_upgrade = false;
 	String product;
 	final String TAG = "OTA";
-	final String configFile = "/system/etc/ota.conf";
+	final String configFile = "/vendor/etc/ota.conf";
 	final String machineFile = "/sys/devices/soc0/machine";
 	final String server_ip_config = "server";
 	final String port_config_str = "port";
