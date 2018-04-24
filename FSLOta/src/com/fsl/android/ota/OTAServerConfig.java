@@ -35,6 +35,7 @@ public class OTAServerConfig {
 	final int default_port = 10888;
 	URL updatePackageURL;
 	URL buildpropURL;
+	URL diffbuildpropURL;
 	URL payloadPropertiesURL;
 	URL payloadURL;
 	URL diffPayloadPropertiesURL;
@@ -75,6 +76,7 @@ public class OTAServerConfig {
 			int port = new Long(port_str).intValue();
 			String fileaddr;
 			String buildconfigAddr;
+			String diffbuildconfigAddr;
 			String payloadPropertiesAddr;
 			String payloadAddr;
 			String diffPayloadPropertiesAddr;
@@ -84,6 +86,7 @@ public class OTAServerConfig {
 			String version = SystemProperties.get("ro.build.version.release");
 			fileaddr = new String(product + "_" + android_name + "_" + version + "/" + product + "-ota-" + version_incremental);
 			buildconfigAddr = new String(product + "_" + android_name + "_" + version + "/" + "build.prop");
+			diffbuildconfigAddr = new String(product + "_" + android_name + "_" + version + "/" + "build_diff.prop");
 			payloadPropertiesAddr = new String(product + "_" + android_name + "_" + version + "/payload_properties-");
 			payloadAddr = new String(product + "_" + android_name + "_" + version + "/payload-");
 			diffPayloadPropertiesAddr = payloadPropertiesAddr;
@@ -151,6 +154,7 @@ public class OTAServerConfig {
 			} else {
 				payloadPropertiesURL = new URL(default_protocol, server, port, payloadPropertiesAddr);
 				payloadURL = new URL(default_protocol, server, port, payloadAddr);
+				diffbuildpropURL = new URL(default_protocol, server, port, diffbuildconfigAddr);
 				diffPayloadPropertiesURL = new URL(default_protocol, server, port, diffPayloadPropertiesAddr);
 				diffPayloadURL = new URL(default_protocol, server, port, diffPayloadAddr);
 			}
@@ -210,5 +214,7 @@ public class OTAServerConfig {
 	}
 
 	public URL getBuildPropURL() { return buildpropURL; }
+
+	public URL getBuildPropDiffURL() { return diffbuildpropURL; }
 
 }

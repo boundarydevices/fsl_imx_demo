@@ -347,7 +347,7 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
 		if (error == 0) {
 			// return no error, usually means have a version info from remote server, release name is in @info
 			// needs check here whether the local version is newer then remote version
-			if (mOTAManager.compareLocalVersionToServer() == false) {
+			if (mOTAManager.compareLocalVersionToServer() == OTAServerManager.OtaTypeSelect.NONE) {
 				// we are already latest...				
 				mMessageTextView.post(new Runnable() {
 					public void run() {
@@ -356,7 +356,7 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
 					}
 				});
 				
-			} else if (mOTAManager.compareLocalVersionToServer() == true ) {
+			} else {
 				final BuildPropParser parser = (BuildPropParser) info;
 				final long bytes = mOTAManager.getUpgradePackageSize();
 				mMessageTextView.post(new Runnable() {
@@ -364,20 +364,26 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
 						onStateChangeUI(STATE_IN_CHECKED);
 						mMessageTextView.setText(getText(R.string.have_new));
 
-						String length = (String) getText(R.string.length_unknown);
-						
 						if (bytes > 0)
-							length = byteCountToDisplaySize(bytes, false);
 							if (parser != null) {
 								mVersionTextView.setText(getText(R.string.version) +  ":" +
 										parser.getProp("ro.build.id") + "\n" +
 										getText(R.string.full_version) + ":" +
-										parser.getProp("ro.build.description") + "\n" +
-										getText(R.string.size) + " " + length);
+										parser.getProp("ro.build.description") + "\n");
 							}
 						mUpgradeButton.setVisibility(View.VISIBLE);
 						if (mOTAManager.ab_slot()) {
 							mDiffUpgradeButton.setVisibility(View.VISIBLE);
+						}
+						if (mOTAManager.compareLocalVersionToServer() == OTAServerManager.OtaTypeSelect.BOTH_OTA) {
+							mUpgradeButton.setEnabled(true);
+							mDiffUpgradeButton.setEnabled(true);
+						} else if (mOTAManager.compareLocalVersionToServer() == OTAServerManager.OtaTypeSelect.FULL_OTA) {
+							mUpgradeButton.setEnabled(true);
+							mDiffUpgradeButton.setEnabled(false);
+						} else if (mOTAManager.compareLocalVersionToServer() == OTAServerManager.OtaTypeSelect.DIFF_OTA) {
+							mUpgradeButton.setEnabled(false);
+							mDiffUpgradeButton.setEnabled(true);
 						}
 					}
 				});

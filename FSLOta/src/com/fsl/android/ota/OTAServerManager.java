@@ -66,6 +66,10 @@ public class OTAServerManager {
 		
 	}
 
+	public enum OtaTypeSelect {
+		NONE, FULL_OTA, DIFF_OTA, BOTH_OTA;
+	}
+
 	public class OTAUpdateEngineCallback extends UpdateEngineCallback {
 		private OTAStateChangeListener mListener;
 
@@ -91,6 +95,7 @@ public class OTAServerManager {
 	private OTAStateChangeListener mListener;	
 	private OTAServerConfig mConfig;
 	private BuildPropParser parser = null;
+	private BuildPropParser parser_diff = null;
 	long mCacheProgress = -1;
 	boolean mStop = false;
 	Context mContext;
@@ -147,6 +152,7 @@ public class OTAServerManager {
 		}
 		
 		parser = getTargetPackagePropertyList(mConfig.getBuildPropURL());
+		parser_diff = getTargetPackagePropertyList(mConfig.getBuildPropDiffURL());
 		
 		if (parser != null) {
 			if (this.mListener != null)
@@ -185,21 +191,34 @@ public class OTAServerManager {
 	}
 
 	// return true if needs to upgrade
-	public boolean compareLocalVersionToServer() {
+	public OtaTypeSelect compareLocalVersionToServer() {
+	    boolean diff_ota = false;
+	    boolean full_ota = false;
 		if (parser == null) {
 			Log.d(TAG, "compareLocalVersion Without fetch remote prop list.");
-			return false;
+			return OtaTypeSelect.NONE;
 		}
 		String localNumVersion = Build.VERSION.INCREMENTAL;
 		Long buildutc = Build.TIME;
 		Long remoteBuildUTC = (Long.parseLong(parser.getProp("ro.build.date.utc"))) * 1000;
+		Long remoteDiffBuildUTC = (Long.parseLong(parser_diff.getProp("ro.build.date.utc"))) * 1000;
+		Long remoteDiffBuildBaseUTC = (Long.parseLong(parser_diff.getProp("base.ro.build.date.utc"))) * 1000;
 		// *1000 because Build.java also *1000, align with it.
-		Log.d(TAG, "Local Version:" + Build.VERSION.INCREMENTAL + "server Version:" + parser.getNumRelease());
-                 Log.d(TAG, "BOARD BOOTTYPE:" + SystemProperties.get("ro.boot.storage_type"));
-		boolean upgrade = false;
-		upgrade = remoteBuildUTC > buildutc;
+		Log.d(TAG, "Local Version:" + Build.VERSION.INCREMENTAL + "; full image version:" + parser.getNumRelease() + "; diff image version" + parser_diff.getNumRelease());
+		Log.d(TAG, "BOARD BOOTTYPE:" + SystemProperties.get("ro.boot.storage_type"));
+		OtaTypeSelect upgrade = OtaTypeSelect.NONE;
+		if (buildutc < remoteBuildUTC)
+			full_ota = true;
+		if (buildutc < remoteDiffBuildUTC && buildutc.equals(remoteDiffBuildBaseUTC))
+			diff_ota = true;
+		if (full_ota && diff_ota)
+			upgrade = OtaTypeSelect.BOTH_OTA;
+		else if (full_ota)
+			upgrade = OtaTypeSelect.FULL_OTA;
+		else if (diff_ota)
+			upgrade = OtaTypeSelect.DIFF_OTA;
 		// here only check build time, in your case, you may also check build id, etc.
-		Log.d(TAG, "remote BUILD TIME: " + remoteBuildUTC + " local build rtc:" + buildutc);
+		Log.d(TAG, "remote BUILD TIME: " + remoteBuildUTC + "remote DIFF BUILD TIME: " + remoteDiffBuildUTC + "remote DIFF BUILD BASE TIME: " + remoteDiffBuildBaseUTC + " local build rtc:" + buildutc);
 		return upgrade;
 	}
 	
