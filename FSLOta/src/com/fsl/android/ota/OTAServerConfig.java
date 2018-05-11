@@ -25,6 +25,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import android.util.Log;
+import android.os.Build;
 
 // TODO: get the configure from a configure file.
 public class OTAServerConfig {
@@ -70,6 +71,7 @@ public class OTAServerConfig {
 			String server = parser.getProp(server_ip_config);
 			String port_str = parser.getProp(port_config_str);
 			String android_name = parser.getProp(android_nickname);
+			String version_incremental = Build.VERSION.INCREMENTAL;
 			int port = new Long(port_str).intValue();
 			String fileaddr;
 			String buildconfigAddr;
@@ -80,7 +82,7 @@ public class OTAServerConfig {
 
 			readMachine();
 			String version = SystemProperties.get("ro.build.version.release");
-			fileaddr = new String(product + "_" + android_name + "_" + version + "/" + product + ".ota.zip");
+			fileaddr = new String(product + "_" + android_name + "_" + version + "/" + product + "-ota-" + version_incremental);
 			buildconfigAddr = new String(product + "_" + android_name + "_" + version + "/" + "build.prop");
 			payloadPropertiesAddr = new String(product + "_" + android_name + "_" + version + "/payload_properties-");
 			payloadAddr = new String(product + "_" + android_name + "_" + version + "/payload-");
@@ -90,34 +92,34 @@ public class OTAServerConfig {
 			if (machineString.indexOf("i.MX6") != -1) {
 			if (machineString.indexOf("DualLite") != -1) {
                               if (boottype.equals("nand"))
-                                  {fileaddr = fileaddr + ".imx6dl_nand";}
+                                  {fileaddr = fileaddr + "-imx6dl_nand.zip";}
                               else
-                              fileaddr = fileaddr + ".imx6dl";
+                              fileaddr = fileaddr + "-imx6dl.zip";
 			} else if (machineString.indexOf("Quad") != -1) {
 				if(machineString.indexOf("Plus") != -1){
                               		if (boottype.equals("nand"))
-                                  		{fileaddr = fileaddr + ".imx6qp_nand";}
+                                  		{fileaddr = fileaddr + "-imx6qp_nand.zip";}
                               		else
-                              	  		fileaddr = fileaddr + ".imx6qp";
+                              	  		fileaddr = fileaddr + "-imx6qp.zip";
 				} else {
                                 	if (boottype.equals("nand"))
-                                  		{fileaddr = fileaddr + ".imx6q_nand";}
+                                  		{fileaddr = fileaddr + "-imx6q_nand.zip";}
                                 	else
-                                  		fileaddr = fileaddr + ".imx6q";
+                                  		fileaddr = fileaddr + "-imx6q.zip";
 				}
 			} else if (machineString.indexOf("SoloLite") != -1) {
-				fileaddr = fileaddr + ".imx6sl";
+				fileaddr = fileaddr + "-imx6sl.zip";
 			} else if (machineString.indexOf("SoloX") != -1) {
                                if (boottype.equals("nand"))
-                                  {fileaddr = fileaddr + ".imx6sx_nand";
+                                  {fileaddr = fileaddr + "-imx6sx_nand.zip";
                         }
                               else
-			      fileaddr = fileaddr + ".imx6sx";
+			      fileaddr = fileaddr + "-imx6sx.zip";
 			}
 			} else if (machineString.indexOf("i.MX7ULP") != -1) {
-			      fileaddr = fileaddr + ".imx7ulp";
+			      fileaddr = fileaddr + "-imx7ulp.zip";
 			} else if (machineString.indexOf("i.MX7D") != -1) {
-			      fileaddr = fileaddr + ".imx7d";
+			      fileaddr = fileaddr + "-imx7d.zip";
 			} else if (machineString.indexOf("i.MX8MQ") != -1) {
 			      ab_slot = true;
 			      payloadPropertiesAddr = payloadPropertiesAddr + "imx8mq.txt";
