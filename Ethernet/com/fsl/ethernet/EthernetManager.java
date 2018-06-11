@@ -210,12 +210,12 @@ public class EthernetManager {
         if (info.getConnectMode().equals(EthernetDevInfo.ETHERNET_CONN_MODE_DHCP)) {
             IpConfiguration ipcfg = new IpConfiguration();
             ipcfg.ipAssignment = IpAssignment.DHCP;
-            ethernetService.setConfiguration(ipcfg);
+            ethernetService.setConfiguration(DevName[0], ipcfg);
         } else {
             InterfaceConfiguration ifcg = null;
             Log.d(TAG, "Static IP =" + info.getIpAddress());
             try {
-                IpConfiguration ipcfg = ethernetService.getConfiguration();
+                IpConfiguration ipcfg = ethernetService.getConfiguration(DevName[0]);
                 ipcfg.ipAssignment = IpAssignment.STATIC;
 
                 Inet4Address iNetmask = (Inet4Address)InetAddress.getByName(info.getNetMask());
@@ -229,7 +229,7 @@ public class EthernetManager {
                 if (info.getDnsAddr() != null)
                     config.dnsServers.add(InetAddress.getByName(info.getDnsAddr()));
                    ipcfg.staticIpConfiguration = config;
-                  ethernetService.setConfiguration(ipcfg);
+                  ethernetService.setConfiguration(DevName[0] ,ipcfg);
 
                 Log.d(TAG,"Static IP configuration succeeded");
             } catch (UnknownHostException e){

@@ -5,12 +5,14 @@ LOCAL_MODULE_TAGS := optional
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
-LOCAL_SDK_VERSION := current
+LOCAL_PRIVATE_PLATFORM_APIS := current
+
 LOCAL_PACKAGE_NAME := FSLOta
+
 LOCAL_CERTIFICATE := platform
+
 LOCAL_VENDOR_MODULE := true
 
-#LOCAL_PROGUARD_FLAG_FILES := proguard.flags
 
 include $(BUILD_PACKAGE)
 
