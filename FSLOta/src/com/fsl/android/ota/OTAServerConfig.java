@@ -138,6 +138,12 @@ public class OTAServerConfig {
 			      payloadAddr = payloadAddr + "imx8qm.bin";
 			      diffPayloadPropertiesAddr = diffPayloadPropertiesAddr + "imx8qm_diff.txt";
 			      diffPayloadAddr = diffPayloadAddr + "imx8qm_diff.bin";
+			} else if (machineString.indexOf("i.MX8MM") != -1) {
+			      ab_slot = true;
+			      payloadPropertiesAddr = payloadPropertiesAddr + "imx8mm.txt";
+			      payloadAddr = payloadAddr + "imx8mm.bin";
+			      diffPayloadPropertiesAddr = diffPayloadPropertiesAddr + "imx8mm_diff.txt";
+			      diffPayloadAddr = diffPayloadAddr + "imx8mm_diff.bin";
 			}
 			buildpropURL = new URL(default_protocol, server, port, buildconfigAddr);
 			if (!ab_slot) {
