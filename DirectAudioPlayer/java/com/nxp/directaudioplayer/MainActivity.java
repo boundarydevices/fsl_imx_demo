@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2018 NXP Semiconductor, Inc.
  */
-package com.nxp.audio;
+package com.nxp.directaudioplayer;
 
 import android.app.Activity;
 import android.media.AudioAttributes;
@@ -48,6 +48,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         permission();
+
     }
 
     @Override
@@ -88,7 +89,7 @@ public class MainActivity extends Activity {
             if(playstate== AudioTrack.PLAYSTATE_PAUSED){
                 threadPlay.mTrack.play();
             }
-         mHandle.postDelayed(mAutoTimerRunnable,AUTO_UPDATE_TIMER);
+            mHandle.postDelayed(mAutoTimerRunnable,AUTO_UPDATE_TIMER);
         }
     };
 
@@ -117,7 +118,6 @@ public class MainActivity extends Activity {
             mTime.setText("Have played "+new String(String.valueOf(msg.arg1))+" seconds");
         }
     };
-
     View.OnClickListener pauselick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
