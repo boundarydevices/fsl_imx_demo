@@ -30,7 +30,7 @@ import android.os.Build;
 // TODO: get the configure from a configure file.
 public class OTAServerConfig {
 	
-	final String default_serveraddr = "10.192.224.88";
+	final String default_serveraddr = "10.193.108.180";
 	final String default_protocol = "http";
 	final int default_port = 10888;
 	URL updatePackageURL;
@@ -45,25 +45,12 @@ public class OTAServerConfig {
 	String product;
 	final String TAG = "OTA";
 	final String configFile = "/vendor/etc/ota.conf";
-	final String machineFile = "/sys/devices/soc0/machine";
 	final String server_ip_config = "server";
 	final String port_config_str = "port";
 	final String android_nickname = "ota_folder_suffix";
-	String machineString = null;
 	public OTAServerConfig (String productname) throws MalformedURLException {
 		if (loadConfigureFromFile(configFile, productname) == false)
 			defaultConfigure(productname);
-	}
-	void readMachine() {
-		File file = new File(machineFile);
-		BufferedReader reader = null;
-		try {
-			reader = new BufferedReader(new FileReader(file));
-			machineString = reader.readLine();
-			reader.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	boolean loadConfigureFromFile (String configFile, String product) {
@@ -74,6 +61,7 @@ public class OTAServerConfig {
 			String android_name = parser.getProp(android_nickname);
 			String version_incremental = Build.VERSION.INCREMENTAL;
 			int port = new Long(port_str).intValue();
+			String ota_folder;
 			String fileaddr;
 			String buildconfigAddr;
 			String diffbuildconfigAddr;
@@ -82,81 +70,33 @@ public class OTAServerConfig {
 			String diffPayloadPropertiesAddr;
 			String diffPayloadAddr;
 
-			readMachine();
 			String version = SystemProperties.get("ro.build.version.release");
-			fileaddr = new String(product + "_" + android_name + "_" + version + "/" + product + "-ota-" + version_incremental);
-			buildconfigAddr = new String(product + "_" + android_name + "_" + version + "/" + "build.prop");
-			diffbuildconfigAddr = new String(product + "_" + android_name + "_" + version + "/" + "build_diff.prop");
-			payloadPropertiesAddr = new String(product + "_" + android_name + "_" + version + "/payload_properties-");
-			payloadAddr = new String(product + "_" + android_name + "_" + version + "/payload-");
-			diffPayloadPropertiesAddr = payloadPropertiesAddr;
-			diffPayloadAddr = payloadAddr;
-			String boottype = SystemProperties.get("ro.boot.storage_type");
-			if (machineString.indexOf("i.MX6") != -1) {
-			if (machineString.indexOf("DualLite") != -1) {
-                              if (boottype.equals("nand"))
-                                  {fileaddr = fileaddr + "-imx6dl_nand.zip";}
-                              else
-                              fileaddr = fileaddr + "-imx6dl.zip";
-			} else if (machineString.indexOf("Quad") != -1) {
-				if(machineString.indexOf("Plus") != -1){
-                              		if (boottype.equals("nand"))
-                                  		{fileaddr = fileaddr + "-imx6qp_nand.zip";}
-                              		else
-                              	  		fileaddr = fileaddr + "-imx6qp.zip";
-				} else {
-                                	if (boottype.equals("nand"))
-                                  		{fileaddr = fileaddr + "-imx6q_nand.zip";}
-                                	else
-                                  		fileaddr = fileaddr + "-imx6q.zip";
-				}
-			} else if (machineString.indexOf("SoloLite") != -1) {
-				fileaddr = fileaddr + "-imx6sl.zip";
-			} else if (machineString.indexOf("SoloX") != -1) {
-                               if (boottype.equals("nand"))
-                                  {fileaddr = fileaddr + "-imx6sx_nand.zip";
-                        }
-                              else
-			      fileaddr = fileaddr + "-imx6sx.zip";
+			String platform = SystemProperties.get("ro.board.platform");
+			ota_folder = new String(product + "_" + android_name + "_" + version + "/");
+			fileaddr = new String(ota_folder + product + "-ota-" + version_incremental + ".zip");
+			buildconfigAddr = new String(ota_folder + "build.prop");
+			diffbuildconfigAddr = new String(ota_folder + "build_diff.prop");
+			payloadPropertiesAddr = new String(ota_folder + "payload_properties.txt");
+			diffPayloadPropertiesAddr = new String(ota_folder + "payload_properties_diff.txt");
+			payloadAddr = new String(ota_folder + "payload.bin");
+			diffPayloadAddr = new String(ota_folder + "payload_diff.bin");
+			if (platform.indexOf("imx8") != -1) {
+				ab_slot = true;
 			}
-			} else if (machineString.indexOf("i.MX7ULP") != -1) {
-			      fileaddr = fileaddr + "-imx7ulp.zip";
-			} else if (machineString.indexOf("i.MX7D") != -1) {
-			      fileaddr = fileaddr + "-imx7d.zip";
-			} else if (machineString.indexOf("i.MX8MQ") != -1) {
-			      ab_slot = true;
-			      payloadPropertiesAddr = payloadPropertiesAddr + "imx8mq.txt";
-			      payloadAddr = payloadAddr + "imx8mq.bin";
-			      diffPayloadPropertiesAddr = diffPayloadPropertiesAddr + "imx8mq_diff.txt";
-			      diffPayloadAddr = diffPayloadAddr + "imx8mq_diff.bin";
-			} else if (machineString.indexOf("i.MX8QXP") != -1) {
-			      ab_slot = true;
-			      payloadPropertiesAddr = payloadPropertiesAddr + "imx8qxp.txt";
-			      payloadAddr = payloadAddr + "imx8qxp.bin";
-			      diffPayloadPropertiesAddr = diffPayloadPropertiesAddr + "imx8qxp_diff.txt";
-			      diffPayloadAddr = diffPayloadAddr + "imx8qxp_diff.bin";
-			} else if (machineString.indexOf("i.MX8QM") != -1) {
-			      ab_slot = true;
-			      payloadPropertiesAddr = payloadPropertiesAddr + "imx8qm.txt";
-			      payloadAddr = payloadAddr + "imx8qm.bin";
-			      diffPayloadPropertiesAddr = diffPayloadPropertiesAddr + "imx8qm_diff.txt";
-			      diffPayloadAddr = diffPayloadAddr + "imx8qm_diff.bin";
-			} else if (machineString.indexOf("i.MX8MM") != -1) {
-			      ab_slot = true;
-			      payloadPropertiesAddr = payloadPropertiesAddr + "imx8mm.txt";
-			      payloadAddr = payloadAddr + "imx8mm.bin";
-			      diffPayloadPropertiesAddr = diffPayloadPropertiesAddr + "imx8mm_diff.txt";
-			      diffPayloadAddr = diffPayloadAddr + "imx8mm_diff.bin";
-			}
+
 			buildpropURL = new URL(default_protocol, server, port, buildconfigAddr);
 			if (!ab_slot) {
 				updatePackageURL = new URL(default_protocol, server, port, fileaddr);
+				Log.d(TAG, "ota package: " + updatePackageURL.toString());
 			} else {
 				payloadPropertiesURL = new URL(default_protocol, server, port, payloadPropertiesAddr);
 				payloadURL = new URL(default_protocol, server, port, payloadAddr);
 				diffbuildpropURL = new URL(default_protocol, server, port, diffbuildconfigAddr);
 				diffPayloadPropertiesURL = new URL(default_protocol, server, port, diffPayloadPropertiesAddr);
 				diffPayloadURL = new URL(default_protocol, server, port, diffPayloadAddr);
+				Log.d(TAG, "build.prop: " + buildpropURL.toString());
+				Log.d(TAG, "payload.bin: " + payloadURL.toString());
+				Log.d(TAG, "payload_properties.txt" + payloadPropertiesURL.toString());
 			}
 		} catch (Exception e) {
 			Log.e(TAG, "wrong format/error of OTA configure file.");
