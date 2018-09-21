@@ -40,6 +40,8 @@ public class MainActivity extends Activity {
     private static String TAG = "AudioTrack";
     public final static int PERMISSION_REQUESTCODE = 1;
     private static final int AUTO_UPDATE_TIMER = 1000;
+    // For 48KHz audio, this buffer can hold 30s data
+    private static final int BUFFER_SIZE = 5760000;
     List<String> permissionLists = new ArrayList<>();
     int cnt = 0;
     boolean avoid_RedundantClickCrash = true;
@@ -227,8 +229,7 @@ public class MainActivity extends Activity {
                 Log.e(TAG, "unsupported bits " + bits + ", treat as 16 bits");
                 return;
             }
-            minBufSize = AudioTrack.getMinBufferSize(rate, AudioFmtChn, AudioFmtBits);
-            minBufSize*= 100;
+            minBufSize = BUFFER_SIZE;
             mediaBuffer = new byte[minBufSize];
             mTrack = new AudioTrack(
                     new AudioAttributes.Builder()
