@@ -152,7 +152,9 @@ public class OTAServerManager {
 		}
 		
 		parser = getTargetPackagePropertyList(mConfig.getBuildPropURL());
-		parser_diff = getTargetPackagePropertyList(mConfig.getBuildPropDiffURL());
+		if (ab_slot()) {
+			parser_diff = getTargetPackagePropertyList(mConfig.getBuildPropDiffURL());
+		}
 		
 		if (parser != null) {
 			if (this.mListener != null)
@@ -192,25 +194,27 @@ public class OTAServerManager {
 
 	// return true if needs to upgrade
 	public OtaTypeSelect compareLocalVersionToServer() {
-	    boolean diff_ota = false;
-	    boolean full_ota = false;
+		boolean diff_ota = false;
+		boolean full_ota = false;
+		Long remoteDiffBuildUTC = 0L;
+		Long remoteDiffBuildBaseUTC = 0L;
+
 		if (parser == null) {
 			Log.d(TAG, "compareLocalVersion Without fetch remote prop list.");
 			return OtaTypeSelect.NONE;
 		}
-		String localNumVersion = Build.VERSION.INCREMENTAL;
-		Long buildutc = Build.TIME;
-		Long remoteBuildUTC = (Long.parseLong(parser.getProp("ro.build.date.utc"))) * 1000;
-		Long remoteDiffBuildUTC = (Long.parseLong(parser_diff.getProp("ro.build.date.utc"))) * 1000;
-		Long remoteDiffBuildBaseUTC = (Long.parseLong(parser_diff.getProp("base.ro.build.date.utc"))) * 1000;
-		// *1000 because Build.java also *1000, align with it.
-		Log.d(TAG, "Local Version:" + Build.VERSION.INCREMENTAL + "; full image version:" + parser.getNumRelease() + "; diff image version" + parser_diff.getNumRelease());
-		Log.d(TAG, "BOARD BOOTTYPE:" + SystemProperties.get("ro.boot.storage_type"));
 		OtaTypeSelect upgrade = OtaTypeSelect.NONE;
+		Long buildutc = Build.TIME;
+		// *1000 because Build.java also *1000, align with it.
+		Long remoteBuildUTC = (Long.parseLong(parser.getProp("ro.build.date.utc"))) * 1000;
 		if (buildutc < remoteBuildUTC)
 			full_ota = true;
-		if (buildutc < remoteDiffBuildUTC && buildutc.equals(remoteDiffBuildBaseUTC))
-			diff_ota = true;
+		if (ab_slot()) {
+			remoteDiffBuildUTC = (Long.parseLong(parser_diff.getProp("ro.build.date.utc"))) * 1000;
+			remoteDiffBuildBaseUTC = (Long.parseLong(parser_diff.getProp("base.ro.build.date.utc"))) * 1000;
+			if (buildutc < remoteDiffBuildUTC && buildutc.equals(remoteDiffBuildBaseUTC))
+				diff_ota = true;
+		}
 		if (full_ota && diff_ota)
 			upgrade = OtaTypeSelect.BOTH_OTA;
 		else if (full_ota)
@@ -218,7 +222,7 @@ public class OTAServerManager {
 		else if (diff_ota)
 			upgrade = OtaTypeSelect.DIFF_OTA;
 		// here only check build time, in your case, you may also check build id, etc.
-		Log.d(TAG, "remote BUILD TIME: " + remoteBuildUTC + "remote DIFF BUILD TIME: " + remoteDiffBuildUTC + "remote DIFF BUILD BASE TIME: " + remoteDiffBuildBaseUTC + " local build rtc:" + buildutc);
+		Log.d(TAG, "remote BUILD TIME: " + remoteBuildUTC + " remote DIFF BUILD TIME: " + remoteDiffBuildUTC + " remote DIFF BUILD BASE TIME: " + remoteDiffBuildBaseUTC + " local BUILD TIME:" + buildutc);
 		return upgrade;
 	}
 	
