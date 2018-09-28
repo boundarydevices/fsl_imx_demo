@@ -24,6 +24,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.PowerManager;
 import com.fsl.android.ota.R;
 import android.util.Log;
 import android.view.View;
@@ -198,11 +199,8 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
 		public void onClick(View v) {
 			Log.v(TAG, "reboot button clicked.");
 			try {
-				Intent intent = new Intent(Intent.ACTION_REBOOT);
-				intent.putExtra("nowait", 1);
-				intent.putExtra("interval", 1);
-				intent.putExtra("window", 0);
-				sendBroadcast(intent);
+				PowerManager mPowerManager = (PowerManager)getSystemService(Context.POWER_SERVICE);
+				mPowerManager.reboot("reboot");
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
