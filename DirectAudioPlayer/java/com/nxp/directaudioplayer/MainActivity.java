@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 NXP Semiconductor, Inc.
+ * Copyright 2018 NXP.
  */
 package com.nxp.directaudioplayer;
 
