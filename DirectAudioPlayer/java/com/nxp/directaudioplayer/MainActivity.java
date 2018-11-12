@@ -4,6 +4,7 @@
 package com.nxp.directaudioplayer;
 
 import android.app.Activity;
+import android.content.Context;
 import android.media.AudioAttributes;
 import android.media.AudioFormat;
 import android.media.AudioManager;
@@ -20,16 +21,24 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
+
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 
 public class MainActivity extends Activity {
+    int mLPA = 0;
     int positionTime=0;
     ListView mFileList;
     TextView mSelectedFfileNameText;
@@ -39,18 +48,19 @@ public class MainActivity extends Activity {
     ThreadPlay threadPlay = new ThreadPlay();
     private static String TAG = "AudioTrack";
     public final static int PERMISSION_REQUESTCODE = 1;
+    public final static String LPA_ENABLE_PROPERTY = "vendor.audio.lpa.enable";
     private static final int AUTO_UPDATE_TIMER = 1000;
     // For 48KHz audio, this buffer can hold 30s data
     private static final int BUFFER_SIZE = 5760000;
     List<String> permissionLists = new ArrayList<>();
     int cnt = 0;
     boolean avoid_RedundantClickCrash = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         permission();
-
     }
 
     @Override
@@ -58,9 +68,27 @@ public class MainActivity extends Activity {
         super.onResume();
         try {
             initView();
+            checkLPAMode();
         }catch (Exception e){
             Log.e(TAG,e.toString());
         }
+    }
+
+    private void checkLPAMode() {
+        Process mProcess = null;
+        try {
+            mProcess = Runtime.getRuntime().exec("getprop " + LPA_ENABLE_PROPERTY);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        BufferedReader in = new BufferedReader(new InputStreamReader(mProcess.getInputStream()));
+        try {
+            mLPA = Integer.parseInt(in.readLine());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Log.d(TAG, "lpa_enable: " + mLPA);
     }
 
     private void permission() {
@@ -193,6 +221,7 @@ public class MainActivity extends Activity {
         int read = 0;
         boolean isPlaying = true;
         byte[] mediaBuffer;
+        float[] mediaBufferFloat;
         int minBufSize;
         public void setFile(String filename) {
             this.mFileName = filename;
@@ -211,12 +240,17 @@ public class MainActivity extends Activity {
             paserWAVheader();
             int AudioFmtChn;
             int AudioFmtBits;
+
             if (chans == 1)
-                AudioFmtChn = AudioFormat.CHANNEL_IN_MONO;
+                AudioFmtChn = AudioFormat.CHANNEL_OUT_MONO;
             else if (chans == 2)
-                AudioFmtChn = AudioFormat.CHANNEL_IN_STEREO;
+                AudioFmtChn = AudioFormat.CHANNEL_OUT_STEREO;
+            else if (chans == 4)
+                AudioFmtChn = AudioFormat.CHANNEL_OUT_QUAD;
             else if (chans == 6)
                 AudioFmtChn = AudioFormat.CHANNEL_OUT_5POINT1;
+            else if (chans == 8)
+                AudioFmtChn = AudioFormat.CHANNEL_OUT_7POINT1;
             else {
                 Log.e(TAG, "unsupported channel num " + chans + ", treat as stereo");
                 return;
@@ -225,37 +259,79 @@ public class MainActivity extends Activity {
                 AudioFmtBits = AudioFormat.ENCODING_PCM_8BIT;
             else if (bits == 16)
                 AudioFmtBits = AudioFormat.ENCODING_PCM_16BIT;
+            else if (bits == 24)
+                AudioFmtBits = AudioFormat.ENCODING_PCM_FLOAT;
+            else if (bits == 32)
+                AudioFmtBits = AudioFormat.ENCODING_PCM_FLOAT;
             else {
                 Log.e(TAG, "unsupported bits " + bits + ", treat as 16 bits");
                 return;
             }
-            minBufSize = BUFFER_SIZE;
+            AudioManager mAudioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+            if (bits == 16)
+                mAudioManager.setParameters("pcm_bit=16");
+            else if (bits == 24)
+                mAudioManager.setParameters("pcm_bit=24");
+            else if (bits == 32)
+                mAudioManager.setParameters("pcm_bit=32");
+
+            if (mLPA == 1)
+                minBufSize = BUFFER_SIZE;
+            else
+                minBufSize = AudioTrack.getMinBufferSize(rate, AudioFmtChn, AudioFmtBits);
+            Log.e(TAG, "Buffer size: " + minBufSize );
+
             mediaBuffer = new byte[minBufSize];
-            mTrack = new AudioTrack(
-                    new AudioAttributes.Builder()
-                            .setFlags(AudioAttributes.FLAG_HW_AV_SYNC)
-                            .setUsage(AudioAttributes.USAGE_MEDIA)
-                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build(),
-                    new AudioFormat.Builder()
-                            .setSampleRate(rate)
-                            .setEncoding(AudioFmtBits)
-                            .setChannelMask(AudioFmtChn).build(),
-                    minBufSize,
-                    AudioTrack.MODE_STREAM,
-                    AudioManager.AUDIO_SESSION_ID_GENERATE
-            );
+            // For stream rate <= 192000, channels <=2, it can obviously be attached to a mixed output,
+            // AudioPolicyManager will use mixer thread(primary thread) to play them.
+            // In App layer, we can use FLAG_HW_AV_SYNC to explicitly request AudioPolicyManager
+            // to use DirectOutput thread.
+            if (rate <= 192000 && chans <= 2 && bits <= 16) {
+                mTrack = new AudioTrack(
+                        new AudioAttributes.Builder()
+                                .setFlags(AudioAttributes.FLAG_HW_AV_SYNC)
+                                .setUsage(AudioAttributes.USAGE_MEDIA)
+                                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build(),
+                        new AudioFormat.Builder()
+                                .setSampleRate(rate)
+                                .setEncoding(AudioFmtBits)
+                                .setChannelMask(AudioFmtChn).build(),
+                        minBufSize,
+                        AudioTrack.MODE_STREAM,
+                        AudioManager.AUDIO_SESSION_ID_GENERATE
+                );
+            } else {
+                mTrack = new AudioTrack(
+                        new AudioAttributes.Builder()
+                                .setUsage(AudioAttributes.USAGE_MEDIA)
+                                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build(),
+                        new AudioFormat.Builder()
+                                .setSampleRate(rate)
+                                .setEncoding(AudioFmtBits)
+                                .setChannelMask(AudioFmtChn).build(),
+                        minBufSize,
+                        AudioTrack.MODE_STREAM,
+                        AudioManager.AUDIO_SESSION_ID_GENERATE
+                );
+            }
+
             mTrack.play();
-            while(mTrack!=null) {
-                while (isPlaying && mTrack.getPlayState() == AudioTrack.PLAYSTATE_PLAYING) {
-                    try {
-                        read = minputStream.read(mediaBuffer);
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                    mTrack.write(mediaBuffer, 0, read);
-                    if(read<0) break;
-                    if(isPlaying ==false) break;
+            while (isPlaying && mTrack.getPlayState() == AudioTrack.PLAYSTATE_PLAYING) {
+                try {
+                    read = minputStream.read(mediaBuffer);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
+
+                if (bits == 24 || bits == 32) {
+                    mediaBufferFloat = byteArrayToFloatArray(mediaBuffer);
+                    mTrack.write(mediaBufferFloat, 0, mediaBufferFloat.length, AudioTrack.WRITE_BLOCKING);
+                } else {
+                    mTrack.write(mediaBuffer, 0, read);
+                }
+
+                if(read<0) break;
+                if(isPlaying ==false) break;
             }
             Log.i(TAG, "Done playing");
             try {
@@ -269,7 +345,17 @@ public class MainActivity extends Activity {
             Log.i(TAG,"mtrack release in play thread");
         }
 
-        public void paserWAVheader() {
+        public float[] byteArrayToFloatArray(byte[] bytes) {
+            ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
+            byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
+            FloatBuffer floatBuffer = byteBuffer.asFloatBuffer();
+
+            float[] array = new float[floatBuffer.remaining()];
+            floatBuffer.get(array);
+            return array;
+        }
+
+    public void paserWAVheader() {
             byte[] head = new byte[44];
             try {
                 read = minputStream.read(head);
