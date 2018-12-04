@@ -319,7 +319,7 @@ public class EthernetManager {
 
     public SharedPreferences sharedPreferences(){
         SharedPreferences sp = this.mContext.getSharedPreferences("ethernet",
-                Context.MODE_WORLD_WRITEABLE);
+                Context.MODE_PRIVATE);
         return sp;
     }
 

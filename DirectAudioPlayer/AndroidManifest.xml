@@ -3,7 +3,7 @@
     package="com.nxp.directaudioplayer"
     android:versionCode="1"
     android:versionName="1.0" >
-    <uses-sdk android:targetSdkVersion="17" />
+    <uses-sdk android:targetSdkVersion="28" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
