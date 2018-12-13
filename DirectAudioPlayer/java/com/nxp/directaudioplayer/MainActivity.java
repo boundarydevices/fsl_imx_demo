@@ -287,7 +287,7 @@ public class MainActivity extends Activity {
             // AudioPolicyManager will use mixer thread(primary thread) to play them.
             // In App layer, we can use FLAG_HW_AV_SYNC to explicitly request AudioPolicyManager
             // to use DirectOutput thread.
-            if (rate <= 192000 && chans <= 2 && bits <= 16) {
+            if (rate <= 192000 && chans <= 2) {
                 mTrack = new AudioTrack(
                         new AudioAttributes.Builder()
                                 .setFlags(AudioAttributes.FLAG_HW_AV_SYNC)
