@@ -9,6 +9,7 @@ import android.media.AudioAttributes;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
+import android.media.AudioTimestamp;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -317,6 +318,8 @@ public class MainActivity extends Activity {
             }
 
             mTrack.play();
+            long totalFeedSize = 0;
+            Log.i(TAG, "begin feed data, buffer size " + minBufSize);
             while (isPlaying && mTrack.getPlayState() == AudioTrack.PLAYSTATE_PLAYING) {
                 try {
                     read = minputStream.read(mediaBuffer);
@@ -330,11 +333,34 @@ public class MainActivity extends Activity {
                 } else {
                     mTrack.write(mediaBuffer, 0, read);
                 }
+                totalFeedSize += read;
 
                 if(read<0) break;
                 if(isPlaying ==false) break;
             }
+
+            if(mLPA == 1) {
+                AudioTimestamp timestamp = new AudioTimestamp();
+                mTrack.getTimestamp(timestamp);
+
+                long playedFrame = timestamp.framePosition;
+                long frameSize = chans*bits/8;
+                long totalFrame = totalFeedSize/frameSize;
+                long restFrame = totalFrame - playedFrame;
+                long restTimeMs = restFrame*1000/rate;
+
+                Log.i(TAG, "Done feeding data, total frames " + totalFrame + ", played frames " + playedFrame +
+                      ", rest frames " + restFrame + ", rest ms " + restTimeMs + ", frame size " + frameSize);
+
+                try {
+                  Thread.sleep(restTimeMs);
+                } catch (InterruptedException e) {
+                  e.printStackTrace();
+                }
+            }
+
             Log.i(TAG, "Done playing");
+
             try {
                 minputStream.close();
             } catch (Exception ex) {
