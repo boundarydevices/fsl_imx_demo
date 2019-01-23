@@ -251,7 +251,7 @@ public class MainActivity extends Activity {
             else if (chans == 6)
                 AudioFmtChn = AudioFormat.CHANNEL_OUT_5POINT1;
             else if (chans == 8)
-                AudioFmtChn = AudioFormat.CHANNEL_OUT_7POINT1;
+                AudioFmtChn = AudioFormat.CHANNEL_OUT_7POINT1_SURROUND;
             else {
                 Log.e(TAG, "unsupported channel num " + chans + ", treat as stereo");
                 return;
