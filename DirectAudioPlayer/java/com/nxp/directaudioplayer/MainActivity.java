@@ -110,6 +110,7 @@ public class MainActivity extends Activity {
     View.OnClickListener playclick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            Log.i(TAG, "play click");
             int playstate =0;
             if(threadPlay.mTrack!=null){
                 playstate = threadPlay.mTrack.getPlayState();
@@ -153,6 +154,7 @@ public class MainActivity extends Activity {
     View.OnClickListener pauselick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            Log.i(TAG, "pause click");
             threadPlay.mTrack.pause();
         }
     };
@@ -195,6 +197,7 @@ public class MainActivity extends Activity {
             long selectedPosition = arg3;
             mSelectedFileName = (String) mFileList.getItemAtPosition((int) selectedPosition);
             mSelectedFfileNameText.setText("File selected:  "+mSelectedFileName);
+
             while (avoid_RedundantClickCrash){
                 if(cnt>0){
                     threadPlay.isPlaying = false;
@@ -305,6 +308,7 @@ public class MainActivity extends Activity {
             } else {
                 mTrack = new AudioTrack(
                         new AudioAttributes.Builder()
+
                                 .setUsage(AudioAttributes.USAGE_MEDIA)
                                 .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build(),
                         new AudioFormat.Builder()
@@ -320,24 +324,65 @@ public class MainActivity extends Activity {
             mTrack.play();
             long totalFeedSize = 0;
             Log.i(TAG, "begin feed data, buffer size " + minBufSize);
-            while (isPlaying && mTrack.getPlayState() == AudioTrack.PLAYSTATE_PLAYING) {
+            while (isPlaying) {
+                int state = mTrack.getPlayState();
+
+                if(state ==  AudioTrack.PLAYSTATE_STOPPED) {
+                    Log.i(TAG, "PLAYSTATE_STOPPED");
+                    break;
+                }
+
+                if(state == AudioTrack.PLAYSTATE_PAUSED) {
+                    Log.v(TAG, "PLAYSTATE_PAUSED");
+                    try {
+                      Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                      e.printStackTrace();
+                    }
+                    continue;
+                }
+
                 try {
                     read = minputStream.read(mediaBuffer);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
 
-                if (bits == 24 || bits == 32) {
-                    mediaBufferFloat = byteArrayToFloatArray(mediaBuffer);
-                    mTrack.write(mediaBufferFloat, 0, mediaBufferFloat.length, AudioTrack.WRITE_BLOCKING);
-                } else {
-                    mTrack.write(mediaBuffer, 0, read);
-                }
-                totalFeedSize += read;
+                if(read<0) { Log.i(TAG, "break since read faile " + read); break; }
 
-                if(read<0) break;
-                if(isPlaying ==false) break;
-            }
+                int ret = 0;
+                int written = 0;
+                int toWrite = read;
+
+                // In pause stae, mTrack.write may exit with written < read.
+                while(written < read) {
+                    if (bits == 24 || bits == 32) {
+                        mediaBufferFloat = byteArrayToFloatArray(mediaBuffer);
+                        ret = mTrack.write(mediaBufferFloat, written/4, toWrite/4, AudioTrack.WRITE_BLOCKING);
+                        ret = ret*4; // convert float to byte length
+                    } else {
+                        ret = mTrack.write(mediaBuffer, written, toWrite);
+                    }
+
+                    if(ret < 0) {
+                        Log.i(TAG, "write " + toWrite + " bytes failed, ret " + ret + ", break");
+                        break;
+                    }
+
+                    written += ret;
+                    if(written < read) {
+                       toWrite = read - written;
+
+                       try {
+                           Thread.sleep(10);
+                       } catch (InterruptedException e) {
+                          e.printStackTrace();
+                       }
+                    }
+                } // write cycle
+
+                totalFeedSize += written;
+            } // while (isPlaying)
 
             if(mLPA == 1) {
                 AudioTimestamp timestamp = new AudioTimestamp();
