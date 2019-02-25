@@ -118,11 +118,11 @@ public class MainActivity extends Activity {
             if(playstate==0){
                 threadPlay.start();
                 avoid_RedundantClickCrash = true;
+                mHandle.postDelayed(mAutoTimerRunnable,AUTO_UPDATE_TIMER);
             }
             if(playstate== AudioTrack.PLAYSTATE_PAUSED){
                 threadPlay.mTrack.play();
             }
-            mHandle.postDelayed(mAutoTimerRunnable,AUTO_UPDATE_TIMER);
         }
     };
 
