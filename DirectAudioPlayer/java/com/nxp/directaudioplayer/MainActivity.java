@@ -129,15 +129,6 @@ public class MainActivity extends Activity {
     private Runnable mAutoTimerRunnable = new Runnable() {
         @Override
         public void run() {
-            if(threadPlay!=null){
-                if(threadPlay.mTrack!=null){
-                    synchronized (threadPlay.mTrack){
-                        if(threadPlay.mTrack.getPlayState() == AudioTrack.PLAYSTATE_PLAYING){
-                            positionTime = threadPlay.mTrack.getPlaybackHeadPosition() / threadPlay.rate;
-                        }
-                    }
-                }
-            }
             Message msg = new Message();
             msg.arg1 = positionTime;
             mHandle.sendMessage(msg);
@@ -228,6 +219,8 @@ public class MainActivity extends Activity {
         byte[] mediaBuffer;
         float[] mediaBufferFloat;
         int minBufSize;
+        int frameSize;
+
         public void setFile(String filename) {
             this.mFileName = filename;
         }
@@ -272,6 +265,9 @@ public class MainActivity extends Activity {
                 Log.e(TAG, "unsupported bits " + bits + ", treat as 16 bits");
                 return;
             }
+
+            frameSize = chans * bits/8;
+
             AudioManager mAudioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
             if (bits == 16)
                 mAudioManager.setParameters("pcm_bit=16");
@@ -348,7 +344,7 @@ public class MainActivity extends Activity {
                     ex.printStackTrace();
                 }
 
-                if(read<0) { Log.i(TAG, "break since read faile " + read); break; }
+                if(read<0) { Log.i(TAG, "break since read meet EOF, ret " + read); break; }
 
                 int ret = 0;
                 int written = 0;
@@ -382,6 +378,7 @@ public class MainActivity extends Activity {
                 } // write cycle
 
                 totalFeedSize += written;
+                positionTime = (int)totalFeedSize / frameSize / rate;
             } // while (isPlaying)
 
             if(mLPA == 1) {
