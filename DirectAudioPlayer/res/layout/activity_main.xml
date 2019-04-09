@@ -16,9 +16,9 @@
 
     <ListView
         android:id="@+id/listSongs"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:layout_below="@id/Select_SampleFile" >
+        android:layout_width="wrap_content"
+        android:layout_height="188dp"
+        android:layout_below="@id/Select_SampleFile">
 
     </ListView>
 
@@ -31,32 +31,44 @@
         android:layout_marginBottom="130dp"
         android:text="Display_SelectedFile" />
 
-    <Button
-        android:id="@+id/Play"
-        android:layout_width="80dp"
+    <LinearLayout
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/Select_SampleFile"
-        android:layout_below="@+id/Pause"
-        android:layout_marginTop="-70dp"
-        android:text="Play" />
+        android:layout_marginTop="210dp">
 
-    <Button
-        android:id="@+id/Pause"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginBottom="22dp"
-        android:layout_marginEnd="24dp"
-        android:text="Pause" />
+        <TextView
+            android:id="@+id/tv_start"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp" />
 
-    <TextView
-        android:id="@+id/Time"
-        android:layout_width="256dp"
+        <SeekBar
+            android:id="@+id/seekbar"
+            android:layout_width="270dp"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/tv_end"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignStart="@+id/Select_SampleFile"
-        android:layout_marginBottom="101dp"
-        android:text="Time" />
+        android:layout_marginTop="245dp"
+        android:gravity="center_horizontal">
+
+        <ImageButton
+
+            android:id="@+id/bt_media"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@android:drawable/ic_media_play" />
+
+    </LinearLayout>
+
 
 </RelativeLayout>
