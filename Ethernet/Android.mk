@@ -11,7 +11,7 @@ LOCAL_PACKAGE_NAME := ethernet
 
 LOCAL_CERTIFICATE := platform
 
-LOCAL_VENDOR_MODULE := true
+LOCAL_PRODUCT_MODULE := true
 
 include $(BUILD_PACKAGE)
 

@@ -8,7 +8,7 @@ LOCAL_SRC_FILES := $(call all-java-files-under, java)
 LOCAL_SDK_VERSION := current
 LOCAL_PACKAGE_NAME := DirectAudioPlayer
 LOCAL_CERTIFICATE := platform
-LOCAL_VENDOR_MODULE := true
+LOCAL_PRODUCT_MODULE := true
 LOCAL_STATIC_JAVA_LIBRARIES := android-support-v4
 
 include $(BUILD_PACKAGE)
