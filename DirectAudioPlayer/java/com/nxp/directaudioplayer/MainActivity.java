@@ -143,6 +143,11 @@ public class MainActivity extends Activity {
             Log.i(TAG, "play click");
             initSeekbar();
             threadPlay.start();
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             avoid_RedundantClickCrash = true;
             imageButton.setImageResource(android.R.drawable.ic_media_pause);
             seekbar.setMax(threadPlay.getDuration());
