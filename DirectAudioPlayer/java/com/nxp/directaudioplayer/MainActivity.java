@@ -501,7 +501,6 @@ public class MainActivity extends Activity {
         }
 
         public int getDuration(){
-            paserWAVheader();
             return  maxSize;
         }
     }
