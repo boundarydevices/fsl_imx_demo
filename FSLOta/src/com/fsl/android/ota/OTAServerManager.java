@@ -32,340 +32,339 @@ import android.os.PowerManager.WakeLock;
 import android.os.RecoverySystem;
 import android.util.Log;
 
-public class OTAServerManager  {
-	public interface OTAStateChangeListener {
-		
-		final int STATE_IN_IDLE = 0;
-		final int STATE_IN_CHECKED = 1; // state in checking whether new available.
-		final int STATE_IN_DOWNLOADING = 2; // state in download upgrade package
-		final int STATE_IN_UPGRADING = 3;  // In upgrade state
-		
-		final int MESSAGE_DOWNLOAD_PROGRESS = 4;
-		final int MESSAGE_VERIFY_PROGRESS = 5;
-		final int MESSAGE_STATE_CHANGE = 6;
-		final int MESSAGE_ERROR = 7;
-		
-		// should be raise exception ? but how to do exception in async mode ?
-		final int NO_ERROR = 0;
-		final int ERROR_WIFI_NOT_AVALIBLE = 1;  // require wifi network, for OTA app.
-		final int ERROR_CANNOT_FIND_SERVER = 2;
-		final int ERROR_PACKAGE_VERIFY_FALIED = 3;
-		final int ERROR_WRITE_FILE_ERROR = 4;
-		final int ERROR_NETWORK_ERROR = 5;
-		final int ERROR_PACKAGE_INSTALL_FAILED = 6;
-		final int ERROR_PACKAGE_VERIFY_FAILED = 7;
-		
-		// results
-		final int RESULTS_ALREADY_LATEST = 1;
+public class OTAServerManager {
+    public interface OTAStateChangeListener {
 
-		public void onStateOrProgress(int message, int error, Object info);
-		
-	}
+        final int STATE_IN_IDLE = 0;
+        final int STATE_IN_CHECKED = 1; // state in checking whether new available.
+        final int STATE_IN_DOWNLOADING = 2; // state in download upgrade package
+        final int STATE_IN_UPGRADING = 3;  // In upgrade state
 
-	private OTAStateChangeListener mListener;	
-	private OTAServerConfig mConfig;
-	private BuildPropParser parser = null;
-	long mCacheProgress = -1;
-	boolean mStop = false;
-	Context mContext;
-	String mUpdatePackageLocation = "/cache/update.zip";
-	String TAG = "OTA";
-	Handler mSelfHandler;
-	WakeLock mWakelock;
-	
-	public OTAServerManager(Context context) throws MalformedURLException {
-		mConfig = new OTAServerConfig(Build.PRODUCT);
-		PowerManager pm = (PowerManager)context.getSystemService(Context.POWER_SERVICE);
-		mWakelock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "OTA Wakelock");
-		mContext = context;
-	}
+        final int MESSAGE_DOWNLOAD_PROGRESS = 4;
+        final int MESSAGE_VERIFY_PROGRESS = 5;
+        final int MESSAGE_STATE_CHANGE = 6;
+        final int MESSAGE_ERROR = 7;
 
-	public OTAStateChangeListener getmListener() {
-		return mListener;
-	}
+        // should be raise exception ? but how to do exception in async mode ?
+        final int NO_ERROR = 0;
+        final int ERROR_WIFI_NOT_AVALIBLE = 1;  // require wifi network, for OTA app.
+        final int ERROR_CANNOT_FIND_SERVER = 2;
+        final int ERROR_PACKAGE_VERIFY_FALIED = 3;
+        final int ERROR_WRITE_FILE_ERROR = 4;
+        final int ERROR_NETWORK_ERROR = 5;
+        final int ERROR_PACKAGE_INSTALL_FAILED = 6;
+        final int ERROR_PACKAGE_VERIFY_FAILED = 7;
 
-	public void setmListener(OTAStateChangeListener mListener) {
-		this.mListener = mListener;
-	}
-	
-	public boolean checkNetworkOnline() {
-		ConnectivityManager conMgr =  (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo ethInfo = conMgr.getNetworkInfo(ConnectivityManager.TYPE_ETHERNET);
-		NetworkInfo wlanInfo = conMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        // results
+        final int RESULTS_ALREADY_LATEST = 1;
 
-		if (((ethInfo != null) && ethInfo.isConnectedOrConnecting()) ||
-			((wlanInfo!= null) && (wlanInfo.isConnectedOrConnecting()))) {
-			return true;
-		} else {
-			return false;
-		}
-	}	
-	
-	public void startCheckingVersion() {
-		
-		Log.v(TAG, "startCheckingVersion");
-		if (checkURLOK(mConfig.getBuildPropURL()) == false) {
-			if (this.mListener != null) {
-				if (this.checkNetworkOnline()) {
-					reportCheckingError(OTAStateChangeListener.ERROR_CANNOT_FIND_SERVER);
-                                        Log.v(TAG, "error cannot find server!");
-                                } 
-				else {
-					reportCheckingError(OTAStateChangeListener.ERROR_WIFI_NOT_AVALIBLE);
-                                        Log.v(TAG, "error wifi or ethernet not avalible");
-                                }  
-			}
-			
-			return;
-		}
-		
-		parser = getTargetPackagePropertyList(mConfig.getBuildPropURL());
-		
-		if (parser != null) {
-			if (this.mListener != null)
-				this.mListener.onStateOrProgress(OTAStateChangeListener.STATE_IN_CHECKED, 
-						OTAStateChangeListener.NO_ERROR, parser);
-		} else {
-			reportCheckingError(OTAStateChangeListener.ERROR_WRITE_FILE_ERROR);
-		}
-	}
-	
-	// return true if needs to upgrade
-	public boolean compareLocalVersionToServer() {
-		if (parser == null) {
-			Log.d(TAG, "compareLocalVersion Without fetch remote prop list.");
-			return false;
-		}
-		String localNumVersion = Build.VERSION.INCREMENTAL;
-		Long buildutc = Build.TIME;
-		Long remoteBuildUTC = (Long.parseLong(parser.getProp("ro.build.date.utc"))) * 1000;
-		// *1000 because Build.java also *1000, align with it.
-		Log.d(TAG, "Local Version:" + Build.VERSION.INCREMENTAL + "server Version:" + parser.getNumRelease());
-                 Log.d(TAG, "BOARD BOOTTYPE:" + SystemProperties.get("ro.boot.storage_type"));
-		boolean upgrade = false;
-		upgrade = remoteBuildUTC > buildutc;
-		// here only check build time, in your case, you may also check build id, etc.
-		Log.d(TAG, "remote BUILD TIME: " + remoteBuildUTC + " local build rtc:" + buildutc);
-		return upgrade;
-	}
-	
-	void publishDownloadProgress(long total, long downloaded) {
-		//Log.v(TAG, "download Progress: total: " + total + "download:" + downloaded);
-		Long progress = new Long((downloaded*100)/total);
-		if (this.mListener != null && progress.longValue() != mCacheProgress) {
-			this.mListener.onStateOrProgress(OTAStateChangeListener.MESSAGE_DOWNLOAD_PROGRESS,
-					0, progress);
-			mCacheProgress = progress.longValue();
-		}
-	}
-	
-	void reportCheckingError(int error) {
-		if (this.mListener != null ) {
-			this.mListener.onStateOrProgress(OTAStateChangeListener.STATE_IN_CHECKED, error, null);
-	                Log.v(TAG, "---------state in checked----------- ");
-                }
+        public void onStateOrProgress(int message, int error, Object info);
+
+    }
+
+    private OTAStateChangeListener mListener;
+    private OTAServerConfig mConfig;
+    private BuildPropParser parser = null;
+    long mCacheProgress = -1;
+    boolean mStop = false;
+    Context mContext;
+    String mUpdatePackageLocation = "/cache/update.zip";
+    String TAG = "OTA";
+    Handler mSelfHandler;
+    WakeLock mWakelock;
+
+    public OTAServerManager(Context context) throws MalformedURLException {
+        mConfig = new OTAServerConfig(Build.PRODUCT);
+        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        mWakelock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "OTA Wakelock");
+        mContext = context;
+    }
+
+    public OTAStateChangeListener getmListener() {
+        return mListener;
+    }
+
+    public void setmListener(OTAStateChangeListener mListener) {
+        this.mListener = mListener;
+    }
+
+    public boolean checkNetworkOnline() {
+        ConnectivityManager conMgr = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo ethInfo = conMgr.getNetworkInfo(ConnectivityManager.TYPE_ETHERNET);
+        NetworkInfo wlanInfo = conMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+
+        if (((ethInfo != null) && ethInfo.isConnectedOrConnecting()) ||
+                ((wlanInfo != null) && (wlanInfo.isConnectedOrConnecting()))) {
+            return true;
+        } else {
+            return false;
         }
-	
-	void reportDownloadError(int error) {
-		if (this.mListener != null)
-			this.mListener.onStateOrProgress(OTAStateChangeListener.STATE_IN_DOWNLOADING, error, null);
-	}
-	
-	void reportInstallError(int error) {
-		if (this.mListener != null) {
-			this.mListener.onStateOrProgress(OTAStateChangeListener.STATE_IN_UPGRADING, error, null);
-                        Log.v(TAG, "---------state in upgrading----------- "); 
-                }   
-	}
-	
-	public long getUpgradePackageSize() {
-		if (checkURLOK(mConfig.getPackageURL()) == false) {
-			Log.e(TAG, "getUpgradePckageSize Failed");
-			return -1;
-		}
-		
-		URL url = mConfig.getPackageURL();
-		URLConnection con;
-		try {
-			con = url.openConnection();
-			return con.getContentLength();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return -1;
-		}
-	}
-	
-	public void onStop() {
-		mStop = true;
-	}
-	
-	public void startDownloadUpgradePackage() {
-		
-		Log.v(TAG, "startDownloadUpgradePackage()");
+    }
 
-		if (checkURLOK(mConfig.getPackageURL()) == false) {
-			if (this.mListener != null)
-				reportDownloadError(OTAStateChangeListener.ERROR_CANNOT_FIND_SERVER);
-			return;
-		}
+    public void startCheckingVersion() {
+
+        Log.v(TAG, "startCheckingVersion");
+        if (checkURLOK(mConfig.getBuildPropURL()) == false) {
+            if (this.mListener != null) {
+                if (this.checkNetworkOnline()) {
+                    reportCheckingError(OTAStateChangeListener.ERROR_CANNOT_FIND_SERVER);
+                    Log.v(TAG, "error cannot find server!");
+                } else {
+                    reportCheckingError(OTAStateChangeListener.ERROR_WIFI_NOT_AVALIBLE);
+                    Log.v(TAG, "error wifi or ethernet not avalible");
+                }
+            }
+
+            return;
+        }
+
+        parser = getTargetPackagePropertyList(mConfig.getBuildPropURL());
+
+        if (parser != null) {
+            if (this.mListener != null)
+                this.mListener.onStateOrProgress(OTAStateChangeListener.STATE_IN_CHECKED,
+                        OTAStateChangeListener.NO_ERROR, parser);
+        } else {
+            reportCheckingError(OTAStateChangeListener.ERROR_WRITE_FILE_ERROR);
+        }
+    }
+
+    // return true if needs to upgrade
+    public boolean compareLocalVersionToServer() {
+        if (parser == null) {
+            Log.d(TAG, "compareLocalVersion Without fetch remote prop list.");
+            return false;
+        }
+        String localNumVersion = Build.VERSION.INCREMENTAL;
+        Long buildutc = Build.TIME;
+        Long remoteBuildUTC = (Long.parseLong(parser.getProp("ro.build.date.utc"))) * 1000;
+        // *1000 because Build.java also *1000, align with it.
+        Log.d(TAG, "Local Version:" + Build.VERSION.INCREMENTAL + "server Version:" + parser.getNumRelease());
+        Log.d(TAG, "BOARD BOOTTYPE:" + SystemProperties.get("ro.boot.storage_type"));
+        boolean upgrade = false;
+        upgrade = remoteBuildUTC > buildutc;
+        // here only check build time, in your case, you may also check build id, etc.
+        Log.d(TAG, "remote BUILD TIME: " + remoteBuildUTC + " local build rtc:" + buildutc);
+        return upgrade;
+    }
+
+    void publishDownloadProgress(long total, long downloaded) {
+        //Log.v(TAG, "download Progress: total: " + total + "download:" + downloaded);
+        Long progress = new Long((downloaded * 100) / total);
+        if (this.mListener != null && progress.longValue() != mCacheProgress) {
+            this.mListener.onStateOrProgress(OTAStateChangeListener.MESSAGE_DOWNLOAD_PROGRESS,
+                    0, progress);
+            mCacheProgress = progress.longValue();
+        }
+    }
+
+    void reportCheckingError(int error) {
+        if (this.mListener != null) {
+            this.mListener.onStateOrProgress(OTAStateChangeListener.STATE_IN_CHECKED, error, null);
+            Log.v(TAG, "---------state in checked----------- ");
+        }
+    }
+
+    void reportDownloadError(int error) {
+        if (this.mListener != null)
+            this.mListener.onStateOrProgress(OTAStateChangeListener.STATE_IN_DOWNLOADING, error, null);
+    }
+
+    void reportInstallError(int error) {
+        if (this.mListener != null) {
+            this.mListener.onStateOrProgress(OTAStateChangeListener.STATE_IN_UPGRADING, error, null);
+            Log.v(TAG, "---------state in upgrading----------- ");
+        }
+    }
+
+    public long getUpgradePackageSize() {
+        if (checkURLOK(mConfig.getPackageURL()) == false) {
+            Log.e(TAG, "getUpgradePckageSize Failed");
+            return -1;
+        }
+
+        URL url = mConfig.getPackageURL();
+        URLConnection con;
+        try {
+            con = url.openConnection();
+            return con.getContentLength();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    public void onStop() {
+        mStop = true;
+    }
+
+    public void startDownloadUpgradePackage() {
+
+        Log.v(TAG, "startDownloadUpgradePackage()");
+
+        if (checkURLOK(mConfig.getPackageURL()) == false) {
+            if (this.mListener != null)
+                reportDownloadError(OTAStateChangeListener.ERROR_CANNOT_FIND_SERVER);
+            return;
+        }
 
 
-		File targetFile = new File(mUpdatePackageLocation);
-		try {
-			targetFile.createNewFile();
-		} catch (IOException e) {
-			e.printStackTrace();
-			reportDownloadError(OTAStateChangeListener.ERROR_WRITE_FILE_ERROR);
-			return;
-		}
+        File targetFile = new File(mUpdatePackageLocation);
+        try {
+            targetFile.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+            reportDownloadError(OTAStateChangeListener.ERROR_WRITE_FILE_ERROR);
+            return;
+        }
 
-		try {
-			mWakelock.acquire();
-			
-			URL url = mConfig.getPackageURL();
-			Log.d(TAG, "start downoading package:" + url.toString());
-			URLConnection conexion = url.openConnection();
-			conexion.setReadTimeout(10000);
-			// this will be useful so that you can show a topical 0-100% progress bar
+        try {
+            mWakelock.acquire();
 
-			int lengthOfFile = 96038693;
-			lengthOfFile = conexion.getContentLength();			
-			// download the file
-			InputStream input = new BufferedInputStream(url.openStream());
-			OutputStream output = new FileOutputStream(targetFile);
-			
-			Log.d(TAG, "file size:" + lengthOfFile);
-			byte data[] = new byte[100 * 1024];
-			long total = 0, count;
-			while ((count = input.read(data)) >= 0 && !mStop) {
-				total += count;
-				
-				// publishing the progress....
-				publishDownloadProgress(lengthOfFile, total);
-				output.write(data, 0, (int)count);
-			}
-			
-			output.flush();
-			output.close();
-			input.close();
-			if (this.mListener != null && !mStop)
-				this.mListener.onStateOrProgress(OTAStateChangeListener.STATE_IN_DOWNLOADING, 0, null);
-		} catch (IOException e) {
-			e.printStackTrace();
-			reportDownloadError(OTAStateChangeListener.ERROR_WRITE_FILE_ERROR);
-		} finally {
-			mWakelock.release();
-			mWakelock.acquire(2);
-		}
-	}
-	
-	RecoverySystem.ProgressListener recoveryVerifyListener = new RecoverySystem.ProgressListener() {
-		public void onProgress(int progress) {
-			Log.d(TAG, "verify progress" + progress);
-			if (mListener != null)
-				mListener.onStateOrProgress(OTAStateChangeListener.MESSAGE_VERIFY_PROGRESS, 
-						0, new Long(progress));
-		}
-	};
-	
-	public void startInstallUpgradePackage() {
-		File recoveryFile = new File(mUpdatePackageLocation);
-		
-		// first verify package
-         try {
-        	 mWakelock.acquire();
-        	 RecoverySystem.verifyPackage(recoveryFile, recoveryVerifyListener, null);
-         } catch (IOException e1) {
-        	 reportInstallError(OTAStateChangeListener.ERROR_PACKAGE_VERIFY_FALIED);
-        	 e1.printStackTrace();
-        	 return;
-         } catch (GeneralSecurityException e1) {
-        	 reportInstallError(OTAStateChangeListener.ERROR_PACKAGE_VERIFY_FALIED);
-        	 e1.printStackTrace();
-        	 return;
-         } finally {
-        	 mWakelock.release();
-         }
+            URL url = mConfig.getPackageURL();
+            Log.d(TAG, "start downoading package:" + url.toString());
+            URLConnection conexion = url.openConnection();
+            conexion.setReadTimeout(10000);
+            // this will be useful so that you can show a topical 0-100% progress bar
 
-         // then install package
-         try {
-        	 mWakelock.acquire();
-      	   RecoverySystem.installPackage(mContext, recoveryFile);
-         } catch (IOException e) {
-      	   // TODO Auto-generated catch block
-        	 reportInstallError(OTAStateChangeListener.ERROR_PACKAGE_INSTALL_FAILED);
-        	 e.printStackTrace();
-        	 return;
-         } catch (SecurityException e){
-        	 e.printStackTrace();
-        	 reportInstallError(OTAStateChangeListener.ERROR_PACKAGE_INSTALL_FAILED);
-        	 return;
-         } finally {
-        	 mWakelock.release();
-         }
-         // cannot reach here...
+            int lengthOfFile = 96038693;
+            lengthOfFile = conexion.getContentLength();
+            // download the file
+            InputStream input = new BufferedInputStream(url.openStream());
+            OutputStream output = new FileOutputStream(targetFile);
 
-	}
+            Log.d(TAG, "file size:" + lengthOfFile);
+            byte data[] = new byte[100 * 1024];
+            long total = 0, count;
+            while ((count = input.read(data)) >= 0 && !mStop) {
+                total += count;
 
-	boolean checkURLOK(URL url) {
-		try {
-			HttpURLConnection.setFollowRedirects(false);
-			
-			HttpURLConnection con =  (HttpURLConnection) url.openConnection();
-			
-			con.setRequestMethod("HEAD");
-			
-			return (con.getResponseCode() == HttpURLConnection.HTTP_OK);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
-	
-	
-	// function: 
-	// download the property list from remote site, and parse it to peroerty list.
-	// the caller can parser this list and get information.
-	BuildPropParser getTargetPackagePropertyList(URL configURL) {
-		
-		// first try to download the property list file. the build.prop of target image.
-		try {
-			URL url =  configURL;
-			url.openConnection();
-			InputStream reader = url.openStream();
-			ByteArrayOutputStream writer = new ByteArrayOutputStream();
-			byte[] buffer = new byte[153600];
-			int totalBufRead = 0;
-			int bytesRead;
-			
-			Log.d(TAG, "start download: " + url.toString() + "to buffer");
-		
-			while ((bytesRead = reader.read(buffer)) > 0) {
-				writer.write(buffer, 0, bytesRead);
-				buffer = new byte[153600];
-				totalBufRead += bytesRead;
-			}
-			
-		
-		Log.d(TAG, "download finish:" + (new Integer(totalBufRead).toString()) + "bytes download");
-		reader.close();
-		
-		BuildPropParser parser = new BuildPropParser(writer, mContext);
-		
-		return parser;
-		
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
+                // publishing the progress....
+                publishDownloadProgress(lengthOfFile, total);
+                output.write(data, 0, (int) count);
+            }
 
-	public boolean handleMessage(Message arg0) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+            output.flush();
+            output.close();
+            input.close();
+            if (this.mListener != null && !mStop)
+                this.mListener.onStateOrProgress(OTAStateChangeListener.STATE_IN_DOWNLOADING, 0, null);
+        } catch (IOException e) {
+            e.printStackTrace();
+            reportDownloadError(OTAStateChangeListener.ERROR_WRITE_FILE_ERROR);
+        } finally {
+            mWakelock.release();
+            mWakelock.acquire(2);
+        }
+    }
+
+    RecoverySystem.ProgressListener recoveryVerifyListener = new RecoverySystem.ProgressListener() {
+        public void onProgress(int progress) {
+            Log.d(TAG, "verify progress" + progress);
+            if (mListener != null)
+                mListener.onStateOrProgress(OTAStateChangeListener.MESSAGE_VERIFY_PROGRESS,
+                        0, new Long(progress));
+        }
+    };
+
+    public void startInstallUpgradePackage() {
+        File recoveryFile = new File(mUpdatePackageLocation);
+
+        // first verify package
+        try {
+            mWakelock.acquire();
+            RecoverySystem.verifyPackage(recoveryFile, recoveryVerifyListener, null);
+        } catch (IOException e1) {
+            reportInstallError(OTAStateChangeListener.ERROR_PACKAGE_VERIFY_FALIED);
+            e1.printStackTrace();
+            return;
+        } catch (GeneralSecurityException e1) {
+            reportInstallError(OTAStateChangeListener.ERROR_PACKAGE_VERIFY_FALIED);
+            e1.printStackTrace();
+            return;
+        } finally {
+            mWakelock.release();
+        }
+
+        // then install package
+        try {
+            mWakelock.acquire();
+            RecoverySystem.installPackage(mContext, recoveryFile);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            reportInstallError(OTAStateChangeListener.ERROR_PACKAGE_INSTALL_FAILED);
+            e.printStackTrace();
+            return;
+        } catch (SecurityException e) {
+            e.printStackTrace();
+            reportInstallError(OTAStateChangeListener.ERROR_PACKAGE_INSTALL_FAILED);
+            return;
+        } finally {
+            mWakelock.release();
+        }
+        // cannot reach here...
+
+    }
+
+    boolean checkURLOK(URL url) {
+        try {
+            HttpURLConnection.setFollowRedirects(false);
+
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+            con.setRequestMethod("HEAD");
+
+            return (con.getResponseCode() == HttpURLConnection.HTTP_OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+    // function:
+    // download the property list from remote site, and parse it to peroerty list.
+    // the caller can parser this list and get information.
+    BuildPropParser getTargetPackagePropertyList(URL configURL) {
+
+        // first try to download the property list file. the build.prop of target image.
+        try {
+            URL url = configURL;
+            url.openConnection();
+            InputStream reader = url.openStream();
+            ByteArrayOutputStream writer = new ByteArrayOutputStream();
+            byte[] buffer = new byte[153600];
+            int totalBufRead = 0;
+            int bytesRead;
+
+            Log.d(TAG, "start download: " + url.toString() + "to buffer");
+
+            while ((bytesRead = reader.read(buffer)) > 0) {
+                writer.write(buffer, 0, bytesRead);
+                buffer = new byte[153600];
+                totalBufRead += bytesRead;
+            }
+
+
+            Log.d(TAG, "download finish:" + (new Integer(totalBufRead).toString()) + "bytes download");
+            reader.close();
+
+            BuildPropParser parser = new BuildPropParser(writer, mContext);
+
+            return parser;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public boolean handleMessage(Message arg0) {
+        // TODO Auto-generated method stub
+        return false;
+    }
 
 }
