@@ -38,7 +38,8 @@ public class BuildPropParser {
     BuildPropParser(File file, Context context) throws IOException {
         mContext = context;
         propHM = new HashMap<String, String>();
-        setFile(file);
+        if (file.exists())
+            setFile(file);
     }
 
     public HashMap<String, String> getPropMap()         { return propHM;};
