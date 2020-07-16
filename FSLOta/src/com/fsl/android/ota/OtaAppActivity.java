@@ -19,6 +19,7 @@ package com.fsl.android.ota;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -41,6 +42,7 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
     private final int CANNOT_FIND_SERVER = 5;
     private final int WRITE_FILE_ERROR = 6;
     private final int WAIT_REBOOT = 7;
+    private boolean mAskUser = true;
     Button mUpgradeButton;
     Button mDiffUpgradeButton;
     Button mRebootButton;
@@ -140,6 +142,10 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
                     Log.i(TAG, "using URL from intent " + mOTAPath);
                     mOTAManager.setUpdatePackageURL(mOTAPath);
                 }
+                if (b.getBoolean("force", false)) {
+                    Log.i(TAG, "Not asking user for confirmation...");
+                    mAskUser = false;
+                }
             }
         }
     }
@@ -189,6 +195,15 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
         super.onStop();
         mOTAManager.onStop();
         Log.d(TAG, "OTAAppActivity : onStop");
+    }
+
+    private void startUpgrade() {
+        new Thread(new Runnable() {
+            public void run() {
+                mOTAManager.startDownloadUpgradePackage();
+            }
+        }).start();
+        onStateChangeUI(STATE_IN_DOWNLOADING);
     }
 
     OnClickListener mUpgradeListener =
@@ -414,6 +429,11 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
                                 onStateChangeUI(STATE_IN_CHECKED);
                                 mMessageTextView.setText(getText(R.string.have_new));
 
+                                if (!mAskUser) {
+                                    Log.v(TAG, "start upgrade without asking the user");
+                                    startUpgrade();
+                                    return;
+                                }
                                 if (bytes > 0)
                                     if (parser != null) {
                                         mVersionTextView.setText(
