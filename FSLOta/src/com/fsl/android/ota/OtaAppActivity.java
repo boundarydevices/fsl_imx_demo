@@ -41,6 +41,7 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
     private final int CANNOT_FIND_SERVER = 5;
     private final int WRITE_FILE_ERROR = 6;
     private final int WAIT_REBOOT = 7;
+    private boolean mAskUser = true;
     Button mUpgradeButton;
     Button mDiffUpgradeButton;
     Button mRebootButton;
@@ -140,6 +141,10 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
                     Log.i(TAG, "using URL from intent " + mOTAPath);
                     mOTAManager.setUpdatePackageURL(mOTAPath);
                 }
+                if (b.getBoolean("force", false)) {
+                    Log.i(TAG, "Not asking user for confirmation...");
+                    mAskUser = false;
+                }
             }
         }
     }
@@ -188,15 +193,19 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
         Log.d(TAG, "OTAAppActivity : onStop");
     }
 
+    private void startUpgrade() {
+        new Thread(new Runnable() {
+            public void run() {
+                mOTAManager.startDownloadUpgradePackage();
+            }
+        }).start();
+        onStateChangeUI(STATE_IN_DOWNLOADING);
+    }
+
     OnClickListener mUpgradeListener = new OnClickListener() {
         public void onClick(View v) {
             Log.v(TAG, "upgrade button clicked.");
-            new Thread(new Runnable() {
-                public void run() {
-                    mOTAManager.startDownloadUpgradePackage();
-                }
-            }).start();
-            onStateChangeUI(STATE_IN_DOWNLOADING);
+            startUpgrade();
         }
 
     };
@@ -381,6 +390,11 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
                         onStateChangeUI(STATE_IN_CHECKED);
                         mMessageTextView.setText(getText(R.string.have_new));
 
+                        if (!mAskUser) {
+                            Log.v(TAG, "start upgrade without asking the user");
+                            startUpgrade();
+                            return;
+                        }
                         if (bytes > 0)
                             if (parser != null) {
                                 mVersionTextView.setText(getText(R.string.version) +  ":" +
