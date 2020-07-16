@@ -42,6 +42,7 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
     private final int WIFI_NOT_AVALIBLE = 4;
     private final int CANNOT_FIND_SERVER = 5;
     private final int WRITE_FILE_ERROR = 6;
+    private boolean mAskUser = true;
     Button mUpgradeButton;
     TextView mMessageTextView;
     TextView mVersionTextView;
@@ -155,19 +156,21 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
         Log.d(TAG, "OTAAppActivity : onStop");
     }
 
+    private void startUpgrade() {
+        new Thread(new Runnable() {
+            public void run() {
+                mOTAManager.startDownloadUpgradePackage();
+            }
+        }).start();
+        onStateChangeUI(STATE_IN_DOWNLOADING);
+    }
+
     OnClickListener mUpgradeListener = new OnClickListener() {
         public void onClick(View v) {
             Log.v(TAG, "upgrade button clicked.");
-            new Thread(new Runnable() {
-                public void run() {
-                    mOTAManager.startDownloadUpgradePackage();
-                }
-            }).start();
-            onStateChangeUI(STATE_IN_DOWNLOADING);
+            startUpgrade();
         }
-
     };
-
 
     public void onStateOrProgress(int message, int error, Object info) {
         Log.v(TAG, "onStateOrProgress: " + "message: " + message + " error:" + error + " info: " + info);
@@ -210,7 +213,6 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
     }
 
     void onStateUpgrade(int error, Object info) {
-
         if (error == ERROR_PACKAGE_VERIFY_FAILED) {
             Log.v(TAG, "package verify failed, signaure not match");
             mMessageTextView.post(new Runnable() {
@@ -328,7 +330,12 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
                                 getText(R.string.full_version) + ":" +
                                 parser.getProp("ro.build.description") + "\n" +
                                 getText(R.string.size) + " " + length);
-                        mUpgradeButton.setVisibility(View.VISIBLE);
+                        if (mAskUser) {
+                            mUpgradeButton.setVisibility(View.VISIBLE);
+                        } else {
+                            Log.v(TAG, "start upgrade without asking the user");
+                            startUpgrade();
+                        }
                     }
                 });
             }
