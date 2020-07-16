@@ -107,6 +107,15 @@ public class OTAServerConfig {
         return true;
     }
 
+    public void setUpdatePackageURL(String url)
+    {
+        try {
+            updatePackageURL = new URL(url);
+        } catch (Exception e) {
+            Log.e(TAG, "Wrong URL format " + url);
+        }
+    }
+
     void defaultConfigure(String productname) throws MalformedURLException
     {
         product = productname;
