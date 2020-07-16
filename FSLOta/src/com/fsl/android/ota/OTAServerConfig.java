@@ -29,7 +29,7 @@ public class OTAServerConfig {
 
     final String default_serveraddr = "10.193.108.180";
     final String default_protocol = "http";
-    final int default_port = 10888;
+    final int default_port = 0;
     URL updatePackageURL;
     URL buildpropURL;
     URL diffbuildpropURL;
@@ -110,8 +110,15 @@ public class OTAServerConfig {
         product = productname;
         String fileaddr = new String(product + "/" + product + ".ota.zip");
         String buildconfigAddr = new String(product + "/" + "build.prop");
-        updatePackageURL = new URL(default_protocol, default_serveraddr, default_port, fileaddr);
-        buildpropURL = new URL(default_protocol, default_serveraddr, default_port, buildconfigAddr);
+        if (default_port > 0) {
+            updatePackageURL =
+                    new URL(default_protocol, default_serveraddr, default_port, fileaddr);
+            buildpropURL =
+                    new URL(default_protocol, default_serveraddr, default_port, buildconfigAddr);
+        } else {
+            updatePackageURL = new URL(default_protocol, default_serveraddr, fileaddr);
+            buildpropURL = new URL(default_protocol, default_serveraddr, buildconfigAddr);
+        }
         Log.d(
                 TAG,
                 "create a new server config: package url "
