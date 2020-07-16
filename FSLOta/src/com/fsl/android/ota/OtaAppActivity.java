@@ -52,6 +52,7 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
     Context mContext;
 
     OTAServerManager mOTAManager;
+    String mOTAPath = null;
     int mState = 0;
     private Handler mHandler = new MainHandler();
     /* state change will be 0 -> Checked -> Downloading -> upgrading.  */
@@ -129,6 +130,18 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
             e.printStackTrace();
         }
         mOTAManager.setmListener(this);
+        // Check if we received a local archive path
+        Intent intent = getIntent();
+        if (intent != null) {
+            Bundle b = intent.getExtras();
+            if (b != null) {
+                mOTAPath = b.getString("OTA");
+                if (mOTAPath != null) {
+                    Log.i(TAG, "using URL from intent " + mOTAPath);
+                    mOTAManager.setUpdatePackageURL(mOTAPath);
+                }
+            }
+        }
     }
 
     @Override
@@ -142,7 +155,11 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
         if (mState == 0) {
             new Thread(new Runnable() {
                 public void run() {
-                    mOTAManager.startCheckingVersion();
+                    if (mOTAPath == null) {
+                        mOTAManager.startCheckingVersion();
+                    } else {
+                        mOTAManager.startDownloadUpgradePackage();
+                    }
                 }
             }).start();
         }
