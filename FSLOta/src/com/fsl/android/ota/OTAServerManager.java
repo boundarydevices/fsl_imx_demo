@@ -116,6 +116,10 @@ public class OTAServerManager {
         mUpdateEngine = new UpdateEngine();
     }
 
+    public void setUpdatePackageURL(String updatePackageUrl) {
+        mConfig.setUpdatePackageURL(updatePackageUrl);
+    }
+
     public OTAStateChangeListener getmListener() {
         return mListener;
     }
@@ -293,7 +297,8 @@ public class OTAServerManager {
 
         Log.v(TAG, "startDownloadUpgradePackage()");
 
-        if (checkURLOK(mConfig.getPackageURL()) == false) {
+        if (!mConfig.getPackageURL().toString().contains("file://")
+                && (checkURLOK(mConfig.getPackageURL()) == false)) {
             if (this.mListener != null)
                 reportDownloadError(OTAStateChangeListener.ERROR_CANNOT_FIND_SERVER);
             return;
