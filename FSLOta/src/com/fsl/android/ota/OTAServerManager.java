@@ -49,11 +49,10 @@ public class OTAServerManager {
         final int NO_ERROR = 0;
         final int ERROR_WIFI_NOT_AVALIBLE = 1;  // require wifi network, for OTA app.
         final int ERROR_CANNOT_FIND_SERVER = 2;
-        final int ERROR_PACKAGE_VERIFY_FALIED = 3;
+        final int ERROR_PACKAGE_VERIFY_FAILED = 3;
         final int ERROR_WRITE_FILE_ERROR = 4;
         final int ERROR_NETWORK_ERROR = 5;
         final int ERROR_PACKAGE_INSTALL_FAILED = 6;
-        final int ERROR_PACKAGE_VERIFY_FAILED = 7;
 
         // results
         final int RESULTS_ALREADY_LATEST = 1;
@@ -275,12 +274,16 @@ public class OTAServerManager {
             mWakelock.acquire();
             RecoverySystem.verifyPackage(recoveryFile, recoveryVerifyListener, null);
         } catch (IOException e1) {
-            reportInstallError(OTAStateChangeListener.ERROR_PACKAGE_VERIFY_FALIED);
+            reportInstallError(OTAStateChangeListener.ERROR_PACKAGE_VERIFY_FAILED);
             e1.printStackTrace();
             return;
         } catch (GeneralSecurityException e1) {
-            reportInstallError(OTAStateChangeListener.ERROR_PACKAGE_VERIFY_FALIED);
+            reportInstallError(OTAStateChangeListener.ERROR_PACKAGE_VERIFY_FAILED);
             e1.printStackTrace();
+            return;
+        } catch (SecurityException e) {
+            e.printStackTrace();
+            reportInstallError(OTAStateChangeListener.ERROR_PACKAGE_VERIFY_FAILED);
             return;
         } finally {
             mWakelock.release();
