@@ -147,6 +147,8 @@ public class OtaAppActivity extends Activity implements OTAServerManager.OTAStat
                     if (mOTAPath == null) {
                         mOTAManager.startCheckingVersion();
                     } else {
+                        // wait in case this is an app restart during reboot
+                        try { Thread.sleep(3000); } catch(InterruptedException ex) {}
                         mOTAManager.startDownloadUpgradePackage();
                     }
                 }
