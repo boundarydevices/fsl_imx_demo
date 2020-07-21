@@ -328,7 +328,7 @@ public class OTAServerManager {
             lengthOfFile = conexion.getContentLength();
             // download the file
             InputStream input = new BufferedInputStream(url.openStream());
-            OutputStream output = new FileOutputStream(targetFile);
+            FileOutputStream output = new FileOutputStream(targetFile);
 
             Log.d(TAG, "file size:" + lengthOfFile);
             byte data[] = new byte[100 * 1024];
@@ -342,6 +342,7 @@ public class OTAServerManager {
             }
 
             output.flush();
+            output.getFD().sync();
             output.close();
             input.close();
             if (this.mListener != null && !mStop)
