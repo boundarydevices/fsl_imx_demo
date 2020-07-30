@@ -17,4 +17,5 @@
 android_app {
     name: "AudioRoute",
     srcs: ["src/**/*.java"],
+    platform_apis: true,
 }
