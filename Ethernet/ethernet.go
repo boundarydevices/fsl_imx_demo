@@ -40,7 +40,7 @@ func ethernetDefaults(ctx android.LoadHookContext) {
     }
 
     p := &props{}
-    if ctx.Config().VendorConfig("IMXPLUGIN").String("PRODUCT_MANUFACTURER") == "freescale" {
+    if ctx.Config().VendorConfig("IMXPLUGIN").String("PRODUCT_MANUFACTURER") == "nxp" {
         p.Target.Android.Enabled = proptools.BoolPtr(true)
     }  else {
         p.Target.Android.Enabled = proptools.BoolPtr(false)
