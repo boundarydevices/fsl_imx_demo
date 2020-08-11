@@ -160,9 +160,7 @@ public class EthernetConfigDialog extends AlertDialog implements
         public void run() {
             mEthEnabler.getManager().updateDevInfo(info);
             mEthEnabler.setEthEnabled();
-
         }
-
     }
 
     public void onClick(DialogInterface dialog, int which) {
@@ -179,16 +177,14 @@ public class EthernetConfigDialog extends AlertDialog implements
     }
 
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
     }
 
     public void onNothingSelected(AdapterView<?> parent) {
-
     }
 
     public void onClick(View v) {
-
     }
+
     public void updateDevNameList(String[] DevList) {
         if (DevList != null) {
             ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(
@@ -197,8 +193,6 @@ public class EthernetConfigDialog extends AlertDialog implements
                     android.R.layout.simple_spinner_dropdown_item);
             mDevList.setAdapter(adapter);
         }
-
     }
-
 }
 

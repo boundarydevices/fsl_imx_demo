@@ -19,7 +19,7 @@ import android.content.Context;
 import android.net.NetworkInfo;
 import android.text.TextUtils;
 import android.util.Log;
-import com.fsl.ethernet.EthernetManager;
+import com.fsl.ethernet.LocalEthernetManager;
 /**
  * Created by B38613 on 9/27/13.
  */
@@ -27,7 +27,7 @@ public class EthernetEnabler {
     public static final String TAG = "SettingsEthEnabler";
 
     private Context mContext;
-    private EthernetManager mEthManager;
+    private LocalEthernetManager mLocalEthManager;
     private EthernetConfigDialog mEthConfigDialog;
     private EthernetAdvDialog mEthAdvancedDialog;
 
@@ -41,14 +41,15 @@ public class EthernetEnabler {
 
     public EthernetEnabler(Context context) {
         mContext = context;
-        mEthManager = new EthernetManager(context);
+        mLocalEthManager = new LocalEthernetManager(context);
 
-        mEthManager.resetInterface();
+        mLocalEthManager.resetInterface();
     }
 
-    public EthernetManager getManager() {
-        return mEthManager;
+    public LocalEthernetManager getManager() {
+        return mLocalEthManager;
     }
+
     public void resume() {
     }
 
@@ -56,11 +57,10 @@ public class EthernetEnabler {
     }
 
     public void setEthEnabled() {
-
-        if (mEthManager.isConfigured() != true) {
+        if (mLocalEthManager.isConfigured() != true) {
             mEthConfigDialog.show();
         } else {
-            mEthManager.resetInterface();
+            mLocalEthManager.resetInterface();
         }
     }
 }

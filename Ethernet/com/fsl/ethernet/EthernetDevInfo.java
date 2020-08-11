@@ -29,7 +29,7 @@ public class EthernetDevInfo {
     /**
      * The ethernet interface is configured manually
      */
-    public static final String ETHERNET_CONN_MODE_MANUAL = "manual";
+    public static final String ETHERNET_CONN_MODE_MANUAL = "static";
 
     private String dev_name;
     private String ipaddr;

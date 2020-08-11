@@ -15,6 +15,7 @@
  */
 
 package com.fsl.ethernet;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
@@ -31,7 +32,6 @@ import android.os.IBinder;
 import android.content.ContentResolver;
 import android.os.INetworkManagementService;
 import android.net.ConnectivityManager;
-import android.net.DhcpInfo;
 import android.net.NetworkUtils;
 import android.net.LinkAddress;
 import android.net.NetworkInfo;
@@ -43,107 +43,36 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Parcel;
-import android.os.SystemProperties;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.widget.Toast;
-import android.net.LinkAddress;
 import android.net.StaticIpConfiguration;
 import android.net.IpConfiguration;
 import android.net.IpConfiguration.*;
 import java.util.ArrayList;
 import java.net.Inet4Address;
 import java.lang.Integer;
-
 /**
  * Created by B38613 on 9/27/13.
  */
-public class EthernetManager {
-    public static final String TAG = "EthernetManager";
+public class LocalEthernetManager {
+    public static final String TAG = "LocalEthernetManager";
 
-    public static final int ETHERNET_DEVICE_SCAN_RESULT_READY = 0;
-    public static final String ETHERNET_STATE_CHANGED_ACTION =
-            "android.net.ethernet.ETHERNET_STATE_CHANGED";
-    public static final String NETWORK_STATE_CHANGED_ACTION =
-            "android.net.ethernet.STATE_CHANGE";
-
-    public static final String EXTRA_NETWORK_INFO = "networkInfo";
-    public static final String EXTRA_ETHERNET_STATE = "ETHERNET_state";
-    public static final String EXTRA_PREVIOUS_ETHERNET_STATE = "previous_ETHERNET_state";
-    /**
-     * The lookup key for a {@link android.net.LinkProperties} object associated with the
-     * Ethernet network. Retrieve with
-     * {@link android.content.Intent#getParcelableExtra(String)}.
-     * @hide
-     */
-    public static final String EXTRA_LINK_PROPERTIES = "linkProperties";
-
-    /**
-     * The lookup key for a {@link android.net.LinkCapabilities} object associated with the
-     * Ethernet network. Retrieve with
-     * {@link android.content.Intent#getParcelableExtra(String)}.
-     * @hide
-     */
-    public static final String EXTRA_LINK_CAPABILITIES = "linkCapabilities";
-
-    public static final int ETHERNET_STATE_UNKNOWN = 0;
-    public static final int ETHERNET_STATE_DISABLED = 1;
-    public static final int ETHERNET_STATE_ENABLED = 2;
-    private static final int ETHERNET_HAS_CONFIG = 1;
-
-
-    /** @hide */
-    public static final int DATA_ACTIVITY_NONE         = 0x00;
-    /** @hide */
-    public static final int DATA_ACTIVITY_IN           = 0x01;
-    /** @hide */
-    public static final int DATA_ACTIVITY_OUT          = 0x02;
-    /** @hide */
-    public static final int DATA_ACTIVITY_INOUT        = 0x03;
-
-    private android.net.EthernetManager ethernetService;
+    public  android.net.EthernetManager mEthManager;
     private Context mContext;
     private String[] DevName;
-    private int mEthState= ETHERNET_STATE_UNKNOWN;
-    private INetworkManagementService mNMService;
-    private DhcpInfo mDhcpInfo;
-    private String mode;
-    private String ip_address;
-    private String dns_address;
+
     private ConnectivityManager mConnMgr;
 
-    public EthernetManager(Context context) {
+    public LocalEthernetManager(Context context) {
         mContext = context;
 
         DevName = new String[1];
-        String sIfaceMatch = context.getResources().getString(
-                        com.android.internal.R.string.config_ethernet_iface_regex);
-
-
-        DevName[0] = "eth0";//mTracker.getLinkProperties().getInterfaceName();
+        DevName[0] = "eth0";
 
         mConnMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         IBinder b = ServiceManager.getService(Context.NETWORKMANAGEMENT_SERVICE);
-        ethernetService = (android.net.EthernetManager) context.getSystemService(Context.ETHERNET_SERVICE);
-        mNMService = INetworkManagementService.Stub.asInterface(b);
-
-        try {
-            final String[] ifaces = mNMService.listInterfaces();
-            for (String iface : ifaces) {
-                if (iface.matches(sIfaceMatch)) {
-                    DevName[0] = iface;
-                    Log.d(TAG, "We will operate iface:" + DevName[0]);
-                    break;
-                }
-            }
-        } catch (RemoteException | IllegalStateException e) {
-            Log.e(TAG, "Could not get list of interfaces " + e);
-        }
-
-
-        HandlerThread dhcpThread = new HandlerThread("DHCP Handler Thread");
-        dhcpThread.start();
-        mDhcpInfo = new DhcpInfo();
+        mEthManager = (android.net.EthernetManager) context.getSystemService(Context.ETHERNET_SERVICE);
     }
 
     /**
@@ -151,7 +80,6 @@ public class EthernetManager {
      * @return {@code true} if configured {@code false} otherwise
      */
     public boolean isConfigured() {
-        //return "1".equals(SystemProperties.get("net."+ DevName[0] + ".config", "0"));
         return (getSharedPreMode() != null);
     }
 
@@ -178,44 +106,20 @@ public class EthernetManager {
         return info;
     }
 
-    /**
-     * update a ethernet interface information
-     * @param info  the interface infomation
-     */
-    private int scanDevice() {
-        return 1;
-    }
-
-    /**
-     * get all the ethernet device names
-     * @return interface name list on success, {@code null} on failure
-     */
     public String[] getDeviceNameList() {
-        return (scanDevice() > 0) ? DevName : null;
-    }
-
-    private void setInterfaceUp(String InterfaceName)
-    {
-        try {
-            mNMService.setInterfaceUp(InterfaceName);
-        } catch (RemoteException re){
-            Log.e(TAG,"Set interface up failed: " + re);
-        } catch (IllegalStateException e) {
-            Log.e(TAG,"Set interface up fialed: " + e);
-        }
-
+        return mEthManager.getAvailableInterfaces();
     }
 
     void configureInterface(EthernetDevInfo info) {
         if (info.getConnectMode().equals(EthernetDevInfo.ETHERNET_CONN_MODE_DHCP)) {
             IpConfiguration ipcfg = new IpConfiguration();
             ipcfg.ipAssignment = IpAssignment.DHCP;
-            ethernetService.setConfiguration(DevName[0], ipcfg);
+            mEthManager.setConfiguration(DevName[0], ipcfg);
         } else {
             InterfaceConfiguration ifcg = null;
             Log.d(TAG, "Static IP =" + info.getIpAddress());
             try {
-                IpConfiguration ipcfg = ethernetService.getConfiguration(DevName[0]);
+                IpConfiguration ipcfg = mEthManager.getConfiguration(DevName[0]);
                 ipcfg.ipAssignment = IpAssignment.STATIC;
 
                 Inet4Address iNetmask = (Inet4Address)InetAddress.getByName(info.getNetMask());
@@ -228,9 +132,9 @@ public class EthernetManager {
                 config.gateway = gwAddr;
                 if (info.getDnsAddr() != null)
                     config.dnsServers.add(InetAddress.getByName(info.getDnsAddr()));
-                   ipcfg.staticIpConfiguration = config;
-                  ethernetService.setConfiguration(DevName[0] ,ipcfg);
 
+                ipcfg.staticIpConfiguration = config;
+                mEthManager.setConfiguration(DevName[0] ,ipcfg);
                 Log.d(TAG,"Static IP configuration succeeded");
             } catch (UnknownHostException e){
                 Log.e(TAG,"Static IP configuration failed: " + e);
@@ -244,10 +148,71 @@ public class EthernetManager {
                 Toast.makeText(mContext, "We got exception when set the static IP.",Toast.LENGTH_SHORT).show();
             }
             Log.d(TAG, "set ip manually " + info.toString());
-            SystemProperties.set("net.dns1", info.getDnsAddr());
-            SystemProperties.set("net." + info.getIfName() + ".dns1",info.getDnsAddr());
             updateDevInfo(info);
         }
+    }
+
+    public String interMask2String(int prefixLength) {
+        String netMask = null;
+        int inetMask = prefixLength;
+
+        int part = inetMask / 8;
+        int remainder = inetMask % 8;
+        int sum = 0;
+
+        for (int i = 8; i > 8 - remainder; i--) {
+            sum = sum + (int) Math.pow(2, i - 1);
+        }
+
+        if (part == 0) {
+            netMask = sum + ".0.0.0";
+        } else if (part == 1) {
+            netMask = "255." + sum + ".0.0";
+        } else if (part == 2) {
+            netMask = "255.255." + sum + ".0";
+        } else if (part == 3) {
+            netMask = "255.255.255." + sum;
+        } else if (part == 4) {
+            netMask = "255.255.255.255";
+        }
+        return netMask;
+    }
+
+    public EthernetDevInfo getStaticInfo() {
+        EthernetDevInfo infotemp = new EthernetDevInfo();
+        String [] DevName = getDeviceNameList();
+        infotemp.setIfName(DevName[0]);
+        infotemp.setConnectMode(EthernetDevInfo.ETHERNET_CONN_MODE_MANUAL);
+        String ip;
+
+        StaticIpConfiguration staticIpConfiguration = mEthManager.getConfiguration(DevName[0]).getStaticIpConfiguration();
+
+        LinkAddress ipAddr = staticIpConfiguration.ipAddress;
+        InetAddress gwAddr = staticIpConfiguration.gateway;
+        ArrayList<InetAddress> dnsServers = staticIpConfiguration.dnsServers;
+
+        if( ipAddr !=null ) {
+            infotemp.setIpAddress(ipAddr.getAddress().getHostAddress());
+            infotemp.setNetMask(interMask2String(ipAddr.getPrefixLength()));
+        }
+
+        if(gwAddr !=null) {
+            infotemp.setGateway(gwAddr.getHostAddress());
+        }
+
+        infotemp.setDnsAddr(dnsServers.get(0).getHostAddress());
+        //now only use dns1, need optimization later here.
+        //if(dnsServers.size() > 1) {
+        //    infotemp.setDnsAddr(dnsServers.get(1).getHostAddress());
+        //}
+
+        String proxyAddress = getSharedPreProxyAddress();
+        String proxyPort = getSharedPreProxyPort();
+        String proxyExclusionList=getSharedPreProxyExclusionList();
+        infotemp.setProxyAddr(proxyAddress);
+        infotemp.setProxyPort(proxyPort);
+        infotemp.setProxyExclusionList(proxyExclusionList);
+        return infotemp;
     }
 
     public EthernetDevInfo getDhcpInfo() {
@@ -303,7 +268,6 @@ public class EthernetManager {
             //First boot using AOSP dhcp
             updateDevInfo(getDhcpInfo());
         }
-
     }
 
     /**
@@ -312,9 +276,6 @@ public class EthernetManager {
      */
     public synchronized void updateDevInfo(EthernetDevInfo info) {
         sharedPreferencesStore(info);
-        SystemProperties.set("net.dns1", info.getDnsAddr());
-        SystemProperties.set("net." + info.getIfName() + ".dns1",info.getDnsAddr());
-        SystemProperties.set("net." + info.getIfName() + ".dns2", "0.0.0.0");
     }
 
     public SharedPreferences sharedPreferences(){
@@ -426,7 +387,6 @@ public class EthernetManager {
         exclusionList=getSharedPreProxyExclusionList();
         if (getSharedPreProxyAddress() == null || getSharedPreProxyPort() == null) {
             mConnMgr.setGlobalProxy(null);
-            SystemProperties.set("rw.HTTP_PROXY", "");
             return;
         }
         LinkProperties lp = mConnMgr.getLinkProperties(ConnectivityManager.TYPE_ETHERNET);
@@ -441,7 +401,6 @@ public class EthernetManager {
             new ProxyInfo(getSharedPreProxyAddress(), port, exclusionList);
         mConnMgr.setGlobalProxy(null);
         mConnMgr.setGlobalProxy(proxyProperties);
-        SystemProperties.set("rw.HTTP_PROXY", proxyProperties.getHost() + ":" + proxyProperties.getPort());
     }
 
     public void initProxy(){
@@ -449,8 +408,9 @@ public class EthernetManager {
         if (info != null) {
             updateDevInfo(info);
             setProxy();
-	}
+        }
     }
+
     public boolean isEthernetConnect(){
         return mConnMgr.getNetworkInfo(ConnectivityManager.TYPE_ETHERNET).isConnected();
     }
