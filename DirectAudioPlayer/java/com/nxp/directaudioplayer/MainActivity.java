@@ -326,35 +326,19 @@ public class MainActivity extends Activity {
             // AudioPolicyManager will use mixer thread(primary thread) to play them.
             // In App layer, we can use FLAG_HW_AV_SYNC to explicitly request AudioPolicyManager
             // to use DirectOutput thread.
-            if (rate <= 192000 && chans <= 2) {
-                mTrack = new AudioTrack(
-                        new AudioAttributes.Builder()
-                                .setFlags(AudioAttributes.FLAG_HW_AV_SYNC)
-                                .setUsage(AudioAttributes.USAGE_MEDIA)
-                                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build(),
-                        new AudioFormat.Builder()
-                                .setSampleRate(rate)
-                                .setEncoding(AudioFmtBits)
-                                .setChannelMask(AudioFmtChn).build(),
-                        minBufSize,
-                        AudioTrack.MODE_STREAM,
-                        AudioManager.AUDIO_SESSION_ID_GENERATE
-                );
-            } else {
-                mTrack = new AudioTrack(
-                        new AudioAttributes.Builder()
-
-                                .setUsage(AudioAttributes.USAGE_MEDIA)
-                                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build(),
-                        new AudioFormat.Builder()
-                                .setSampleRate(rate)
-                                .setEncoding(AudioFmtBits)
-                                .setChannelMask(AudioFmtChn).build(),
-                        minBufSize,
-                        AudioTrack.MODE_STREAM,
-                        AudioManager.AUDIO_SESSION_ID_GENERATE
-                );
-            }
+            mTrack = new AudioTrack(
+                    new AudioAttributes.Builder()
+                            .setFlags(AudioAttributes.FLAG_HW_AV_SYNC)
+                            .setUsage(AudioAttributes.USAGE_MEDIA)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build(),
+                    new AudioFormat.Builder()
+                            .setSampleRate(rate)
+                            .setEncoding(AudioFmtBits)
+                            .setChannelMask(AudioFmtChn).build(),
+                    minBufSize,
+                    AudioTrack.MODE_STREAM,
+                    AudioManager.AUDIO_SESSION_ID_GENERATE
+            );
 
             mTrack.play();
             long totalFeedSize = 0;
