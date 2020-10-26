@@ -17,7 +17,7 @@
 android_app {
     name: "FSLOta",
     srcs: ["src/**/*.java"],
-    platform_apis: true,
+    sdk_version: "current",
     privileged: true,
     product_specific: true,
 }
