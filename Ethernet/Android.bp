@@ -22,9 +22,10 @@ android_app {
     name: "ethernet",
     defaults: ["ethernet_default"],
     srcs: ["com/**/*.java"],
-    product_specific: true,
-    sdk_version: "current",
     certificate: "platform",
+    privileged: true,
+    platform_apis: true,
+    system_ext_specific: true,
 }
 
 bootstrap_go_package {
