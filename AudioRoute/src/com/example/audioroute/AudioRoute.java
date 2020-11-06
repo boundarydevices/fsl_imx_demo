@@ -103,8 +103,8 @@ public class AudioRoute extends Activity {
 
       if(fileHdmi.exists()&&!fileSpdif.exists())
         {
-        String value = SystemProperties.get("persist.audio.pass.through");
-        Log.d(TAG,"property persist.audio.pass.through is " + value);
+        String value = SystemProperties.get("vendor.persist.audio.pass.through");
+        Log.d(TAG,"property vendor.persist.audio.pass.through is " + value);
         if(value.equals("2000"))
             mCheckBoxPassthrough.setChecked(true);
         else
@@ -113,7 +113,7 @@ public class AudioRoute extends Activity {
         mCheckBoxPassthrough.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 Log.d(TAG, "CheckBox Passthrough is clicked");
-                SystemProperties.set("persist.audio.pass.through",mCheckBoxPassthrough.isChecked() ? "2000" : "0" );
+                SystemProperties.set("vendor.persist.audio.pass.through",mCheckBoxPassthrough.isChecked() ? "2000" : "0" );
             }
         });
         }
@@ -147,8 +147,8 @@ public class AudioRoute extends Activity {
             }
         });
 
-        String value = SystemProperties.get("persist.audio.pass.through");
-        Log.d(TAG,"property persist.audio.pass.through is " + value);
+        String value = SystemProperties.get("vendor.persist.audio.pass.through");
+        Log.d(TAG,"property vendor.persist.audio.pass.through is " + value);
         if(value.equals("2000"))
             mCheckBoxPassthrough.setChecked(true);
         else
@@ -157,7 +157,7 @@ public class AudioRoute extends Activity {
         mCheckBoxPassthrough.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 Log.d(TAG, "CheckBox Passthrough is clicked");
-                SystemProperties.set("persist.audio.pass.through",mCheckBoxPassthrough.isChecked() ? "2000" : "0" );
+                SystemProperties.set("vendor.persist.audio.pass.through",mCheckBoxPassthrough.isChecked() ? "2000" : "0" );
             }
         });
        }
