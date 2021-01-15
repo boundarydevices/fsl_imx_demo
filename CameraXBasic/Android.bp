@@ -1,0 +1,98 @@
+/*
+ * Copyright 2021 NXP 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+android_library_import {  //camerax lib aar
+   name: "camera-core",
+   aars: ["libs/camera-core-1.0.0-rc01.aar"],
+   sdk_version: "current",
+}
+
+android_library_import {  //camerax lib aar
+   name: "camera-camera2",
+   aars: ["libs/camera-camera2-1.0.0-rc01.aar"],
+   sdk_version: "current",
+}
+
+android_library_import {  //camerax lib aar
+   name: "camera-lifecycle",
+   aars: ["libs/camera-lifecycle-1.0.0-rc01.aar"],
+   sdk_version: "current",
+}
+
+android_library_import {  //camerax lib aar
+   name: "camera-view",
+   aars: ["libs/camera-view-1.0.0-alpha20.aar"],
+   sdk_version: "current",
+}
+
+java_import {  //camerax lib jar
+   name: "navigation-safe-args-gradle-plugin-2.3.0",
+   jars: ["libs/navigation-safe-args-gradle-plugin-2.3.0.jar"],
+   sdk_version: "current",
+}
+
+java_import {  //camerax lib jar
+   name: "concurrent-futures-1.1.0",
+   jars: ["libs/concurrent-futures-1.1.0.jar"],
+   sdk_version: "current",
+}
+
+android_app {
+    name: "CameraXBasic",
+    sdk_version: "current",
+    srcs: [
+        "java/**/*.kt",
+        "gen/**/*.java",
+    ],
+    resource_dirs: ["res"],
+
+
+    static_libs: [
+        "guava",
+        "glide-prebuilt",
+        "concurrent-futures-1.1.0",
+        "navigation-safe-args-gradle-plugin-2.3.0",
+        "androidx-constraintlayout_constraintlayout",
+        "androidx.core_core",
+        "androidx.fragment_fragment",
+        "androidx.appcompat_appcompat",
+        "androidx.preference_preference",
+        "androidx.recyclerview_recyclerview",
+        "androidx.lifecycle_lifecycle-extensions",
+        "androidx.lifecycle_lifecycle-common-java8",
+        "kotlin-stdlib",
+        "kotlinx-coroutines-android",
+        "androidx.navigation_navigation-common-ktx",
+        "androidx.navigation_navigation-fragment",
+        "androidx.navigation_navigation-fragment-ktx",
+        "androidx.navigation_navigation-ui-ktx",
+        "androidx.navigation_navigation-ui",
+        "androidx.navigation_navigation-runtime-ktx",
+        "androidx.lifecycle_lifecycle-runtime-ktx",
+        "camera-core",
+        "camera-camera2",
+        "camera-lifecycle",
+        "camera-view",
+    ],
+
+    manifest: "AndroidManifest.xml",
+
+    optimize: {
+         enabled: false,
+    },
+
+    kotlincflags: ["-Xjvm-default=enable"],
+}
