@@ -60,10 +60,10 @@ android_app {
     name: "CameraXBasic",
     sdk_version: "current",
     srcs: [
-        "java/**/*.kt",
+        "app/src/main/java/**/*.kt",
         "gen/**/*.java",
     ],
-    resource_dirs: ["res"],
+    resource_dirs: ["app/src/main/res"],
 
 
     static_libs: [
@@ -95,7 +95,7 @@ android_app {
         "exifinterface",
     ],
 
-    manifest: "AndroidManifest.xml",
+    manifest: "app/src/main/AndroidManifest.xml",
 
     optimize: {
          enabled: false,
