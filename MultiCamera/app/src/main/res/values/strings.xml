@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Multi-Rear-Camera</string>
+    <string name="request_permission">This sample needs camera permission.</string>
+    <string name="no">NO</string>
+    <string name="multi_camera_supported">Multi Camera Supported</string>
+    <string name="logical_camera">Logical Camera:</string>
+    <string name="physical_camera">Physical Camera:</string>
+    <string name="zoom">Zoom</string>
+    <string name="camera_2">CAMERA 2</string>
+    <string name="camera_1">CAMERA 1</string>
+</resources>
