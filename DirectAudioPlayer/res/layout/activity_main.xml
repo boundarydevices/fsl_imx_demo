@@ -68,6 +68,13 @@
             android:layout_height="60dp"
             android:src="@android:drawable/ic_media_play" />
 
+        <CheckBox
+            android:id="@+id/checkBox"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:text="Loop Playback"
+            android:checked="false" />
+
     </LinearLayout>
 
 

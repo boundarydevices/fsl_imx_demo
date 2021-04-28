@@ -19,6 +19,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.ListView;
@@ -55,9 +57,11 @@ public class MainActivity extends Activity {
     private SeekBar seekbar;
     private ImageButton imageButton;
     private Timer timer;
+    int loopTimes = 0;
+    boolean isLoopPlay = false;
 
     private boolean isSeekBarChanging;
-    private static String TAG = "AudioTrack";
+    private static String TAG = "PLAYMUSIC";
     public final static int PERMISSION_REQUESTCODE = 1;
     public final static String LPA_ENABLE_PROPERTY = "vendor.audio.lpa.enable";
     private static final int AUTO_UPDATE_TIMER = 1000;
@@ -130,6 +134,20 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View view) {
                 isPlayOrPause();
+            }
+        });
+
+        final CheckBox mCheckBox = (CheckBox)findViewById(R.id.checkBox);
+        mCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView,
+                    boolean isChecked) {
+                if (isChecked){
+                    isLoopPlay = true;
+                } else {
+                    isLoopPlay = false;
+                }
+                Log.i(TAG, "Loop Playback: " + isLoopPlay);
             }
         });
     }
@@ -367,7 +385,28 @@ public class MainActivity extends Activity {
                     ex.printStackTrace();
                 }
 
-                if(read<0) { Log.i(TAG, "break since read meet EOF, ret " + read); break; }
+                if (read < 0) {
+                    Log.i(TAG, "Read meet EOF");
+
+                    if (isLoopPlay) {
+                        loopTimes++;
+                        Log.i(TAG, "Loop playback: " + loopTimes);
+
+                        try {
+                            minputStream.close();
+                            mTempFile = new File(Environment.getExternalStorageDirectory().getAbsoluteFile() + "/" + mFileName);
+                            minputStream = new FileInputStream(mTempFile);
+                        } catch (Exception ex) {
+                            Log.e(TAG,"Fail to find the file");
+                        }
+
+                        paserWAVheader();
+                        totalFeedSize = 0;
+                        continue;
+                    }
+
+                    break;
+                }
 
                 int ret = 0;
                 int written = 0;
@@ -540,6 +579,7 @@ public class MainActivity extends Activity {
                     if (threadPlay.mTrack.getPlayState() == 0|| threadPlay.mTrack.getPlayState() == 2||
                             threadPlay.mTrack.getPlayState() == 3 ) {
                         CurrentPosition = threadPlay.mTrack.getPlaybackHeadPosition() / threadPlay.rate;
+                        CurrentPosition %= threadPlay.getDuration();
                     }else{
                         CurrentPosition = 0;
                     }
