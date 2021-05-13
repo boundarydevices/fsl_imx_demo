@@ -42,7 +42,10 @@
             android:id="@+id/action_selector_to_camera"
             app:launchSingleTop="true"
             app:destination="@id/camera_fragment" />
-
+        <action
+            android:id="@+id/action_camera_to_video"
+            app:launchSingleTop="true"
+            app:destination="@id/videoselector_fragment" />
     </fragment>
 
     <fragment
@@ -92,6 +95,50 @@
             android:name="depth"
             app:argType="boolean"
             android:defaultValue="false" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/videoselector_fragment"
+        android:name="com.example.android.camera2.basic.video.VideoSelectorFragment"
+        android:label="VideoSelector" >
+
+        <action
+            android:id="@+id/action_selector_to_video"
+            app:launchSingleTop="true"
+            app:destination="@id/video_fragment" />
+        <action
+            android:id="@+id/action_video_to_camera"
+            app:launchSingleTop="true"
+            app:destination="@id/selector_fragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/video_fragment"
+        android:name="com.example.android.camera2.basic.video.VideoFragment"
+        android:label="Video" >
+
+        <argument
+            android:name="camera_id"
+            app:argType="string"
+            app:nullable="false"/>
+
+        <argument
+            android:name="width"
+            app:argType="integer" />
+
+        <argument
+            android:name="height"
+            app:argType="integer" />
+
+        <argument
+            android:name="fps"
+            app:argType="integer" />
+
+        <action
+            android:id="@+id/action_camera_to_permissions"
+            app:destination="@id/permissions_fragment"
+            app:popUpTo="@id/camera_fragment"
+            app:popUpToInclusive="true"/>
     </fragment>
 
 </navigation>

@@ -23,6 +23,7 @@ import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
 import android.hardware.camera2.CameraMetadata
 import android.os.Bundle
+import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -33,6 +34,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.camera.utils.GenericListAdapter
 import com.example.android.camera2.basic.R
+import com.example.android.camera2.basic.SwipeGestureDetector
 
 class SelectorFragment : Fragment() {
 
@@ -65,6 +67,18 @@ class SelectorFragment : Fragment() {
             }
         }
 
+        // This swipe gesture adds a fun gesture to switch between video and photo
+        val swipeGestures = SwipeGestureDetector().apply {
+            setSwipeCallback(right = {
+                Navigation.findNavController(view).navigate(R.id.action_camera_to_video)
+            })
+        }
+
+        val gestureDetectorCompat = GestureDetector(requireContext(), swipeGestures)
+        view.setOnTouchListener { _, motionEvent ->
+            if (gestureDetectorCompat.onTouchEvent(motionEvent)) return@setOnTouchListener false
+            return@setOnTouchListener true
+        }
     }
 
     companion object {
@@ -93,7 +107,6 @@ class SelectorFragment : Fragment() {
                 capabilities?.contains(
                         CameraMetadata.REQUEST_AVAILABLE_CAPABILITIES_BACKWARD_COMPATIBLE) ?: false
             }
-
 
             // Iterate over the list of cameras and return all the compatible ones
             cameraIds.forEach { id ->
