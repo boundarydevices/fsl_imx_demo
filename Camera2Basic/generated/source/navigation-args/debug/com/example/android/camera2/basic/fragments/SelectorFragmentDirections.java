@@ -2,6 +2,7 @@ package com.example.android.camera2.basic.fragments;
 
 import android.os.Bundle;
 import androidx.annotation.NonNull;
+import androidx.navigation.ActionOnlyNavDirections;
 import androidx.navigation.NavDirections;
 import com.example.android.camera2.basic.R;
 import java.lang.IllegalArgumentException;
@@ -19,6 +20,11 @@ public class SelectorFragmentDirections {
   public static ActionSelectorToCamera actionSelectorToCamera(@NonNull String cameraId,
       int pixelFormat) {
     return new ActionSelectorToCamera(cameraId, pixelFormat);
+  }
+
+  @NonNull
+  public static NavDirections actionCameraToVideo() {
+    return new ActionOnlyNavDirections(R.id.action_camera_to_video);
   }
 
   public static class ActionSelectorToCamera implements NavDirections {
