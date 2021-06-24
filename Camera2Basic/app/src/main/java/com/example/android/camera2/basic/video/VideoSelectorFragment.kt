@@ -20,6 +20,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
+import android.media.MediaCodec
+import android.media.MediaCodecInfo.VideoCapabilities
 import android.media.MediaRecorder
 import android.os.Bundle
 import android.util.Log
@@ -36,6 +38,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.android.camera.utils.GenericListAdapter
 import com.example.android.camera2.basic.R
 import com.example.android.camera2.basic.SwipeGestureDetector
+import java.util.*
+
 
 /**
  * In this [Fragment] we let users pick a camera, size and FPS to use for high
@@ -141,8 +145,15 @@ class VideoSelectorFragment : Fragment() {
                             // Compute the frames per second to let user select a configuration
                             val fps = if (secondsPerFrame > 0) (1.0 / secondsPerFrame).toInt() else 0
                             val fpsLabel = if (fps > 0) "$fps" else "N/A"
-                            availableCameras.add(CameraInfo(
-                                    "$orientation ($id) $size $fpsLabel FPS", id, size, fps))
+
+                            val mEncoder: MediaCodec = MediaCodec.createEncoderByType("video/avc")
+                            val encCaps: VideoCapabilities = mEncoder.getCodecInfo().getCapabilitiesForType("video/avc").getVideoCapabilities()
+                            if (!encCaps.isSizeSupported(size.width, size.height)) {
+                                Log.i("VideoSelector", "The encoder does not support size: " + size)
+                            }
+                            else
+                                availableCameras.add(CameraInfo(
+                                        "$orientation ($id) $size $fpsLabel FPS", id, size, fps))
                         }
                     }
                 }
