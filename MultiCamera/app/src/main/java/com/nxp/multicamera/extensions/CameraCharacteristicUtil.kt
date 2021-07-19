@@ -46,7 +46,7 @@ fun CameraCharacteristics.getCaptureSize(comparator: Comparator<Size>): Size {
         get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP) ?: return Size(0, 0)
     return map.getOutputSizes(ImageFormat.JPEG)
         .asList()
-        .maxWith(comparator) ?: Size(0, 0)
+        .maxWithOrNull(comparator) ?: Size(0, 0)
 }
 
 fun CameraCharacteristics.getVideoSize(aspectRatio: Float): Size {
