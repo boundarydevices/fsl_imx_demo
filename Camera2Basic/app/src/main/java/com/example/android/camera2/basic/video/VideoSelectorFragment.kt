@@ -154,6 +154,7 @@ class VideoSelectorFragment : Fragment() {
                             else
                                 availableCameras.add(CameraInfo(
                                         "$orientation ($id) $size $fpsLabel FPS", id, size, fps))
+                            mEncoder.release()
                         }
                     }
                 }
