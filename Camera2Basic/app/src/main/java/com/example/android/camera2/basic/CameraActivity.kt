@@ -32,6 +32,7 @@ class CameraActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_camera)
         container = findViewById(R.id.fragment_container)
+        hideBottomMenu()
     }
 
     override fun onResume() {
@@ -41,6 +42,15 @@ class CameraActivity : AppCompatActivity() {
         container.postDelayed({
             container.systemUiVisibility = FLAGS_FULLSCREEN
         }, IMMERSIVE_FLAG_TIMEOUT)
+        hideBottomMenu()
+    }
+
+    private fun hideBottomMenu() {
+        val decorView:View  = getWindow().getDecorView()
+        var uiOptions = (View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) or
+                (View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY) or
+                (View.SYSTEM_UI_FLAG_FULLSCREEN)
+        decorView.setSystemUiVisibility(uiOptions)
     }
 
     companion object {
