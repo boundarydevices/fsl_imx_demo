@@ -40,7 +40,8 @@ func ethernetDefaults(ctx android.LoadHookContext) {
     }
 
     p := &props{}
-    if ctx.Config().VendorConfig("IMXPLUGIN").String("PRODUCT_MANUFACTURER") == "nxp" {
+    var sdkVersion int = (ctx.AConfig().PlatformSdkVersion().FinalOrFutureInt())
+    if (sdkVersion < 31) && (ctx.Config().VendorConfig("IMXPLUGIN").String("PRODUCT_MANUFACTURER") == "nxp") {
         p.Target.Android.Enabled = proptools.BoolPtr(true)
     }  else {
         p.Target.Android.Enabled = proptools.BoolPtr(false)
