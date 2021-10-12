@@ -653,7 +653,7 @@ class CameraFragment : Fragment() {
     private fun updateDewarpSwitchButton() {
         val switchDewarpButton = container.findViewById<ImageButton>(R.id.dewarp_switch_button)
         try {
-            switchDewarpButton.isEnabled = hasBackCamera() && hasFrontCamera()
+            switchDewarpButton.isEnabled = hasBackCamera()
         } catch (exception: CameraInfoUnavailableException) {
             switchDewarpButton.isEnabled = false
         }
@@ -663,7 +663,7 @@ class CameraFragment : Fragment() {
     private fun updateHflipSwitchButton() {
         val switchHflipButton = container.findViewById<ImageButton>(R.id.hflip_switch_button)
         try {
-            switchHflipButton.isEnabled = hasBackCamera() && hasFrontCamera()
+            switchHflipButton.isEnabled = hasBackCamera()
         } catch (exception: CameraInfoUnavailableException) {
             switchHflipButton.isEnabled = false
         }
@@ -673,7 +673,7 @@ class CameraFragment : Fragment() {
     private fun updateVflipSwitchButton() {
         val switchVflipButton = container.findViewById<ImageButton>(R.id.vflip_switch_button)
         try {
-            switchVflipButton.isEnabled = hasBackCamera() && hasFrontCamera()
+            switchVflipButton.isEnabled = hasBackCamera()
         } catch (exception: CameraInfoUnavailableException) {
             switchVflipButton.isEnabled = false
         }
@@ -683,7 +683,7 @@ class CameraFragment : Fragment() {
     private fun updateAecSwitchButton() {
         val switchAecButton = container.findViewById<ImageButton>(R.id.aec_switch_button)
         try {
-            switchAecButton.isEnabled = hasBackCamera() && hasFrontCamera()
+            switchAecButton.isEnabled = hasBackCamera()
         } catch (exception: CameraInfoUnavailableException) {
             switchAecButton.isEnabled = false
         }
@@ -693,7 +693,7 @@ class CameraFragment : Fragment() {
     private fun updateAwbSwitchButton() {
         val switchAwbButton = container.findViewById<ImageButton>(R.id.awb_switch_button)
         try {
-            switchAwbButton.isEnabled = hasBackCamera() && hasFrontCamera()
+            switchAwbButton.isEnabled = hasBackCamera()
         } catch (exception: CameraInfoUnavailableException) {
             switchAwbButton.isEnabled = false
         }
@@ -703,7 +703,7 @@ class CameraFragment : Fragment() {
     private fun updateCameraSwitchButton() {
         val switchCamerasButton = container.findViewById<ImageButton>(R.id.camera_switch_button)
         try {
-            switchCamerasButton.isEnabled = hasBackCamera() && hasFrontCamera()
+            switchCamerasButton.isEnabled = hasBackCamera()
         } catch (exception: CameraInfoUnavailableException) {
             switchCamerasButton.isEnabled = false
         }
