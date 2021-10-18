@@ -1,4 +1,4 @@
-// Copyright 2019 NXP
+// Copyright 2021 NXP
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,33 +14,28 @@
 
 // This is the NXP ethernet APP for i.MX.
 
-ethernet_defaults {
-    name: "ethernet_default",
-}
-
 android_app {
     name: "ethernet",
-    defaults: ["ethernet_default"],
-    srcs: ["com/**/*.java"],
-    certificate: "platform",
-    privileged: true,
+    manifest: "app/src/main/AndroidManifest.xml",
+    srcs: ["app/src/**/*.java"],
+    resource_dirs: [
+        "app/src/main/res",
+    ],
     platform_apis: true,
+    certificate: "platform",
     system_ext_specific: true,
-}
-
-bootstrap_go_package {
-    name: "soong-ethernet",
-    pkgPath: "android/soong/vendor/nxp-opensource/fsl_imx_demo/Ethernet",
-    deps: [
-        "blueprint",
-        "blueprint-pathtools",
-        "soong",
-        "soong-android",
-        "soong-cc",
-        "soong-genrule",
+    privileged: true,
+    
+    static_libs: [
+        "androidx-constraintlayout_constraintlayout",
+        "androidx.recyclerview_recyclerview",
+        "androidx.preference_preference",
+        "androidx.appcompat_appcompat",
+        "androidx.legacy_legacy-preference-v14",
+        "androidx.leanback_leanback-preference",
+        "androidx.leanback_leanback",
+        "androidx.lifecycle_lifecycle-extensions",
+        "androidx.lifecycle_lifecycle-common-java8",
+        "androidx.annotation_annotation",
     ],
-    srcs: [
-        "ethernet.go",
-    ],
-    pluginFor: ["soong_build"],
 }
