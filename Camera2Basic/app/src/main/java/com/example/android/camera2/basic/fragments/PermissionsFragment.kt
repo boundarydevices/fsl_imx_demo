@@ -23,6 +23,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import com.example.android.camera2.basic.R
 
@@ -43,8 +44,7 @@ class PermissionsFragment : Fragment() {
 
         if (hasPermissions(requireContext())) {
             // If permissions have already been granted, proceed
-            Navigation.findNavController(requireActivity(), R.id.fragment_container).navigate(
-                    PermissionsFragmentDirections.actionPermissionsToSelector())
+            navigateToSelector()
         } else {
             // Request camera-related permissions
             requestPermissions(PERMISSIONS_REQUIRED, PERMISSIONS_REQUEST_CODE)
@@ -57,11 +57,17 @@ class PermissionsFragment : Fragment() {
         if (requestCode == PERMISSIONS_REQUEST_CODE) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Takes the user to the success fragment when permission is granted
-                Navigation.findNavController(requireActivity(), R.id.fragment_container).navigate(
-                        PermissionsFragmentDirections.actionPermissionsToSelector())
+                navigateToSelector()
             } else {
                 Toast.makeText(context, "Permission request denied", Toast.LENGTH_LONG).show()
             }
+        }
+    }
+
+    private fun navigateToSelector() {
+        lifecycleScope.launchWhenStarted {
+            Navigation.findNavController(requireActivity(), R.id.fragment_container).navigate(
+                PermissionsFragmentDirections.actionPermissionsToSelector())
         }
     }
 
