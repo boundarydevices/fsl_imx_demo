@@ -14,8 +14,9 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<FrameLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -34,9 +35,124 @@
         android:id="@+id/capture_button"
         android:layout_width="96dp"
         android:layout_height="96dp"
-        android:layout_gravity="center|right"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
         android:scaleType="fitCenter"
         android:background="@drawable/ic_shutter"
         android:contentDescription="@string/capture" />
 
-</FrameLayout>
+    <RadioGroup
+        android:id="@+id/wb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        tools:visibility="visible">
+
+        <RadioButton
+            android:id="@+id/AWB"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:clickable="true"
+            android:text="AWB" />
+
+        <RadioButton
+            android:id="@+id/INCANDESCENT"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="INCANDESCENT" />
+
+        <RadioButton
+            android:id="@+id/FLUORESCENT"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="FLUORESCENT" />
+
+        <RadioButton
+            android:id="@+id/WARM_FLUORESCENT"
+            android:layout_width="185dp"
+            android:layout_height="wrap_content"
+            android:text="WARM_FLUORESCENT" />
+
+        <RadioButton
+            android:id="@+id/DAYLIGHT"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="DAYLIGHT" />
+
+        <RadioButton
+            android:id="@+id/CLOUDY_DAYLIGHT"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="CLOUDY_DAYLIGHT" />
+
+        <RadioButton
+            android:id="@+id/TWILIGHT"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TWILIGHT" />
+
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/hflip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/wb"
+        android:alpha="0.3"
+        android:text="hflip" />
+
+    <Button
+        android:id="@+id/vflip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/hflip"
+        android:alpha="0.3"
+        android:text="vflip" />
+
+    <Button
+        android:id="@+id/dewarp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/vflip"
+        android:alpha="0.3"
+        android:text="dewarp" />
+
+    <TextView
+        android:id="@+id/text_exposure_gain"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/dewarp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="exposure gain" />
+
+    <SeekBar
+        android:id="@+id/exposure_gain"
+        style="@style/Widget.AppCompat.SeekBar.Discrete"
+        android:layout_width="200dp"
+        android:layout_height="58dp"
+        android:layout_below="@id/text_exposure_gain" />
+
+    <TextView
+        android:id="@+id/text_exposure_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/exposure_gain"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="exposure time (ns)" />
+
+    <SeekBar
+        android:id="@+id/exposure_time"
+        android:layout_width="200dp"
+        android:layout_height="58dp"
+        android:layout_below="@id/text_exposure_time" />
+
+    <TextView
+        android:id="@+id/current_exposure_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/exposure_time" />
+
+</RelativeLayout>

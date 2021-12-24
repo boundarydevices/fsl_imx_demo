@@ -18,7 +18,7 @@
 
 buildscript {
     // Top-level variables used for versioning
-    ext.kotlin_version = '+'
+    ext.kotlin_version = '1.6.0'
     ext.java_version = JavaVersion.VERSION_1_8
 
     repositories {
@@ -27,7 +27,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.6.4'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.30"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.20"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:2.2.2"
 
         // NOTE: Do not place your application dependencies here; they belong

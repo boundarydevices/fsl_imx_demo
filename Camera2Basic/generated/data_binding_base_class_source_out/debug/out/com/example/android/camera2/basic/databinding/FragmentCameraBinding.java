@@ -4,8 +4,12 @@ package com.example.android.camera2.basic.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
+import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.SeekBar;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.viewbinding.ViewBinding;
@@ -17,28 +21,307 @@ import java.lang.String;
 
 public final class FragmentCameraBinding implements ViewBinding {
   @NonNull
-  private final FrameLayout rootView;
+  private final View rootView;
+
+  /**
+   * This binding is not available in all configurations.
+   * <p>
+   * Present:
+   * <ul>
+   *   <li>layout-land/</li>
+   * </ul>
+   *
+   * Absent:
+   * <ul>
+   *   <li>layout/</li>
+   * </ul>
+   */
+  @Nullable
+  public final RadioButton AWB;
+
+  /**
+   * This binding is not available in all configurations.
+   * <p>
+   * Present:
+   * <ul>
+   *   <li>layout-land/</li>
+   * </ul>
+   *
+   * Absent:
+   * <ul>
+   *   <li>layout/</li>
+   * </ul>
+   */
+  @Nullable
+  public final RadioButton CLOUDYDAYLIGHT;
+
+  /**
+   * This binding is not available in all configurations.
+   * <p>
+   * Present:
+   * <ul>
+   *   <li>layout-land/</li>
+   * </ul>
+   *
+   * Absent:
+   * <ul>
+   *   <li>layout/</li>
+   * </ul>
+   */
+  @Nullable
+  public final RadioButton DAYLIGHT;
+
+  /**
+   * This binding is not available in all configurations.
+   * <p>
+   * Present:
+   * <ul>
+   *   <li>layout-land/</li>
+   * </ul>
+   *
+   * Absent:
+   * <ul>
+   *   <li>layout/</li>
+   * </ul>
+   */
+  @Nullable
+  public final RadioButton FLUORESCENT;
+
+  /**
+   * This binding is not available in all configurations.
+   * <p>
+   * Present:
+   * <ul>
+   *   <li>layout-land/</li>
+   * </ul>
+   *
+   * Absent:
+   * <ul>
+   *   <li>layout/</li>
+   * </ul>
+   */
+  @Nullable
+  public final RadioButton INCANDESCENT;
+
+  /**
+   * This binding is not available in all configurations.
+   * <p>
+   * Present:
+   * <ul>
+   *   <li>layout-land/</li>
+   * </ul>
+   *
+   * Absent:
+   * <ul>
+   *   <li>layout/</li>
+   * </ul>
+   */
+  @Nullable
+  public final RadioButton TWILIGHT;
+
+  /**
+   * This binding is not available in all configurations.
+   * <p>
+   * Present:
+   * <ul>
+   *   <li>layout-land/</li>
+   * </ul>
+   *
+   * Absent:
+   * <ul>
+   *   <li>layout/</li>
+   * </ul>
+   */
+  @Nullable
+  public final RadioButton WARMFLUORESCENT;
 
   @NonNull
   public final ImageButton captureButton;
 
+  /**
+   * This binding is not available in all configurations.
+   * <p>
+   * Present:
+   * <ul>
+   *   <li>layout-land/</li>
+   * </ul>
+   *
+   * Absent:
+   * <ul>
+   *   <li>layout/</li>
+   * </ul>
+   */
+  @Nullable
+  public final TextView currentExposureTime;
+
+  /**
+   * This binding is not available in all configurations.
+   * <p>
+   * Present:
+   * <ul>
+   *   <li>layout-land/</li>
+   * </ul>
+   *
+   * Absent:
+   * <ul>
+   *   <li>layout/</li>
+   * </ul>
+   */
+  @Nullable
+  public final Button dewarp;
+
+  /**
+   * This binding is not available in all configurations.
+   * <p>
+   * Present:
+   * <ul>
+   *   <li>layout-land/</li>
+   * </ul>
+   *
+   * Absent:
+   * <ul>
+   *   <li>layout/</li>
+   * </ul>
+   */
+  @Nullable
+  public final SeekBar exposureGain;
+
+  /**
+   * This binding is not available in all configurations.
+   * <p>
+   * Present:
+   * <ul>
+   *   <li>layout-land/</li>
+   * </ul>
+   *
+   * Absent:
+   * <ul>
+   *   <li>layout/</li>
+   * </ul>
+   */
+  @Nullable
+  public final SeekBar exposureTime;
+
+  /**
+   * This binding is not available in all configurations.
+   * <p>
+   * Present:
+   * <ul>
+   *   <li>layout-land/</li>
+   * </ul>
+   *
+   * Absent:
+   * <ul>
+   *   <li>layout/</li>
+   * </ul>
+   */
+  @Nullable
+  public final Button hflip;
+
   @NonNull
   public final View overlay;
+
+  /**
+   * This binding is not available in all configurations.
+   * <p>
+   * Present:
+   * <ul>
+   *   <li>layout-land/</li>
+   * </ul>
+   *
+   * Absent:
+   * <ul>
+   *   <li>layout/</li>
+   * </ul>
+   */
+  @Nullable
+  public final TextView textExposureGain;
+
+  /**
+   * This binding is not available in all configurations.
+   * <p>
+   * Present:
+   * <ul>
+   *   <li>layout-land/</li>
+   * </ul>
+   *
+   * Absent:
+   * <ul>
+   *   <li>layout/</li>
+   * </ul>
+   */
+  @Nullable
+  public final TextView textExposureTime;
+
+  /**
+   * This binding is not available in all configurations.
+   * <p>
+   * Present:
+   * <ul>
+   *   <li>layout-land/</li>
+   * </ul>
+   *
+   * Absent:
+   * <ul>
+   *   <li>layout/</li>
+   * </ul>
+   */
+  @Nullable
+  public final Button vflip;
 
   @NonNull
   public final AutoFitSurfaceView viewFinder;
 
-  private FragmentCameraBinding(@NonNull FrameLayout rootView, @NonNull ImageButton captureButton,
-      @NonNull View overlay, @NonNull AutoFitSurfaceView viewFinder) {
+  /**
+   * This binding is not available in all configurations.
+   * <p>
+   * Present:
+   * <ul>
+   *   <li>layout-land/</li>
+   * </ul>
+   *
+   * Absent:
+   * <ul>
+   *   <li>layout/</li>
+   * </ul>
+   */
+  @Nullable
+  public final RadioGroup wb;
+
+  private FragmentCameraBinding(@NonNull View rootView, @Nullable RadioButton AWB,
+      @Nullable RadioButton CLOUDYDAYLIGHT, @Nullable RadioButton DAYLIGHT,
+      @Nullable RadioButton FLUORESCENT, @Nullable RadioButton INCANDESCENT,
+      @Nullable RadioButton TWILIGHT, @Nullable RadioButton WARMFLUORESCENT,
+      @NonNull ImageButton captureButton, @Nullable TextView currentExposureTime,
+      @Nullable Button dewarp, @Nullable SeekBar exposureGain, @Nullable SeekBar exposureTime,
+      @Nullable Button hflip, @NonNull View overlay, @Nullable TextView textExposureGain,
+      @Nullable TextView textExposureTime, @Nullable Button vflip,
+      @NonNull AutoFitSurfaceView viewFinder, @Nullable RadioGroup wb) {
     this.rootView = rootView;
+    this.AWB = AWB;
+    this.CLOUDYDAYLIGHT = CLOUDYDAYLIGHT;
+    this.DAYLIGHT = DAYLIGHT;
+    this.FLUORESCENT = FLUORESCENT;
+    this.INCANDESCENT = INCANDESCENT;
+    this.TWILIGHT = TWILIGHT;
+    this.WARMFLUORESCENT = WARMFLUORESCENT;
     this.captureButton = captureButton;
+    this.currentExposureTime = currentExposureTime;
+    this.dewarp = dewarp;
+    this.exposureGain = exposureGain;
+    this.exposureTime = exposureTime;
+    this.hflip = hflip;
     this.overlay = overlay;
+    this.textExposureGain = textExposureGain;
+    this.textExposureTime = textExposureTime;
+    this.vflip = vflip;
     this.viewFinder = viewFinder;
+    this.wb = wb;
   }
 
   @Override
   @NonNull
-  public FrameLayout getRoot() {
+  public View getRoot() {
     return rootView;
   }
 
@@ -63,22 +346,41 @@ public final class FragmentCameraBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     String missingId;
     missingId: {
+      RadioButton AWB = rootView.findViewById(R.id.AWB);
+      RadioButton CLOUDYDAYLIGHT = rootView.findViewById(R.id.CLOUDY_DAYLIGHT);
+      RadioButton DAYLIGHT = rootView.findViewById(R.id.DAYLIGHT);
+      RadioButton FLUORESCENT = rootView.findViewById(R.id.FLUORESCENT);
+      RadioButton INCANDESCENT = rootView.findViewById(R.id.INCANDESCENT);
+      RadioButton TWILIGHT = rootView.findViewById(R.id.TWILIGHT);
+      RadioButton WARMFLUORESCENT = rootView.findViewById(R.id.WARM_FLUORESCENT);
       ImageButton captureButton = rootView.findViewById(R.id.capture_button);
       if (captureButton == null) {
         missingId = "captureButton";
         break missingId;
       }
+      TextView currentExposureTime = rootView.findViewById(R.id.current_exposure_time);
+      Button dewarp = rootView.findViewById(R.id.dewarp);
+      SeekBar exposureGain = rootView.findViewById(R.id.exposure_gain);
+      SeekBar exposureTime = rootView.findViewById(R.id.exposure_time);
+      Button hflip = rootView.findViewById(R.id.hflip);
       View overlay = rootView.findViewById(R.id.overlay);
       if (overlay == null) {
         missingId = "overlay";
         break missingId;
       }
+      TextView textExposureGain = rootView.findViewById(R.id.text_exposure_gain);
+      TextView textExposureTime = rootView.findViewById(R.id.text_exposure_time);
+      Button vflip = rootView.findViewById(R.id.vflip);
       AutoFitSurfaceView viewFinder = rootView.findViewById(R.id.view_finder);
       if (viewFinder == null) {
         missingId = "viewFinder";
         break missingId;
       }
-      return new FragmentCameraBinding((FrameLayout) rootView, captureButton, overlay, viewFinder);
+      RadioGroup wb = rootView.findViewById(R.id.wb);
+      return new FragmentCameraBinding(rootView, AWB, CLOUDYDAYLIGHT, DAYLIGHT, FLUORESCENT,
+          INCANDESCENT, TWILIGHT, WARMFLUORESCENT, captureButton, currentExposureTime, dewarp,
+          exposureGain, exposureTime, hflip, overlay, textExposureGain, textExposureTime, vflip,
+          viewFinder, wb);
     }
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));
   }

@@ -29,6 +29,7 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.util.Log
 import android.view.*
+import androidx.annotation.RequiresApi
 import androidx.core.graphics.drawable.toDrawable
 import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.Fragment
@@ -58,8 +59,16 @@ import java.util.concurrent.TimeoutException
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
+import android.widget.SeekBar
+import android.widget.SeekBar.OnSeekBarChangeListener
+import android.hardware.camera2.CameraCharacteristics
+import android.util.Range
+import kotlin.Float
 
 class CameraFragment : Fragment() {
+    private var mHflip = 0
+    private var mVflip = 0
+    private var mDewarp = 0
 
     /** AndroidX navigation arguments */
     private val args: CameraFragmentArgs by navArgs()
@@ -192,6 +201,7 @@ class CameraFragment : Fragment() {
      * - Starts the preview by dispatching a repeating capture request
      * - Sets up the still image capture listeners
      */
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun initializeCamera() = lifecycleScope.launch(Dispatchers.Main) {
         // Open the selected camera
         camera = openCamera(cameraManager, args.cameraId, cameraHandler)
@@ -254,6 +264,111 @@ class CameraFragment : Fragment() {
                 it.post { it.isEnabled = true }
             }
         }
+
+        /* WB process */
+        _binding?.AWB?.setOnClickListener {
+            SetWB(captureRequest, CameraMetadata.CONTROL_AWB_MODE_AUTO)
+        }
+
+        _binding?.INCANDESCENT ?.setOnClickListener {
+            SetWB(captureRequest, CameraMetadata.CONTROL_AWB_MODE_INCANDESCENT)
+        }
+
+        _binding?.FLUORESCENT?.setOnClickListener {
+            SetWB(captureRequest, CameraMetadata.CONTROL_AWB_MODE_FLUORESCENT)
+        }
+
+        _binding?.WARMFLUORESCENT?.setOnClickListener {
+            SetWB(captureRequest, CameraMetadata.CONTROL_AWB_MODE_WARM_FLUORESCENT)
+        }
+
+        _binding?.DAYLIGHT?.setOnClickListener {
+            SetWB(captureRequest, CameraMetadata.CONTROL_AWB_MODE_DAYLIGHT)
+        }
+
+        _binding?.CLOUDYDAYLIGHT?.setOnClickListener {
+            SetWB(captureRequest, CameraMetadata.CONTROL_AWB_MODE_CLOUDY_DAYLIGHT)
+        }
+
+        _binding?.TWILIGHT?.setOnClickListener {
+            SetWB(captureRequest, CameraMetadata.CONTROL_AWB_MODE_TWILIGHT)
+        }
+
+        /* hflip/vflip/dewarp */
+        _binding?.hflip?.setOnClickListener {
+            val HFLIP_ENABLE = CaptureRequest.Key("vsi.hflip.enable", Int::class.java)
+            mHflip = 1 - mHflip;
+            captureRequest.set(HFLIP_ENABLE, mHflip)
+            session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
+        }
+
+        _binding?.vflip?.setOnClickListener {
+            val VFLIP_ENABLE = CaptureRequest.Key("vsi.vflip.enable", Int::class.java)
+            mVflip = 1 - mVflip;
+            captureRequest.set(VFLIP_ENABLE, mVflip)
+            session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
+        }
+
+        _binding?.dewarp?.setOnClickListener {
+            val DEWARP_ENABLE = CaptureRequest.Key("vsi.dewarp.enable", Int::class.java)
+            mDewarp = 1 - mDewarp;
+            captureRequest.set(DEWARP_ENABLE, mDewarp)
+            session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
+        }
+
+        /* exposure gain */
+        var gainRange: Range<Int>  = characteristics.get(CameraCharacteristics.CONTROL_AE_COMPENSATION_RANGE) as Range<Int>
+        Log.i(TAG, "exposure gain range $gainRange")
+
+        _binding?.exposureGain?.setMin(gainRange.lower)
+        _binding?.exposureGain?.setMax(gainRange.upper)
+
+        _binding?.exposureGain?.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                var expGain = progress;
+                captureRequest.set(CaptureRequest.CONTROL_AE_EXPOSURE_COMPENSATION, expGain)
+                session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+            }
+
+        })
+
+        /* exposure time */
+        var timeRange: Range<Long>  = characteristics.get(CameraCharacteristics.SENSOR_INFO_EXPOSURE_TIME_RANGE) as Range<Long>
+        Log.i(TAG, "exposure time range $timeRange")
+
+        _binding?.exposureTime?.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                var expTime =  timeRange.lower + (timeRange.upper - timeRange.lower) * progress / 100;
+                captureRequest.set(CaptureRequest.SENSOR_EXPOSURE_TIME, expTime)
+                session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
+
+                val left = _binding?.exposureTime?.getLeft()
+                val right = _binding?.exposureTime?.getRight()
+                if ((left != null) && (right != null)) {
+                    var pox = left + (right - left) * progress / 100
+                    _binding?.currentExposureTime?.setText(expTime.toString());
+                    _binding?.currentExposureTime?.setX(java.lang.Float.valueOf(pox.toString()));
+                }
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+            }
+
+        })
+
+    }
+
+    private fun SetWB(captureRequest: android.hardware.camera2.CaptureRequest.Builder, wbMode: Int) {
+        captureRequest.set(CaptureRequest.CONTROL_AWB_MODE, wbMode)
+        session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
     }
 
     /** Opens the camera and returns the opened device (as the result of the suspend coroutine) */
