@@ -68,7 +68,7 @@ android_app {
     srcs: [
         "app/src/main/java/**/*.kt",
         "utils/src/main/java/**/*.kt",
-        "generated/**/*.java",
+        "app/**/*.java",
     ],
     resource_dirs: [
         "app/src/main/res",

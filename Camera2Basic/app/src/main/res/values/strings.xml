@@ -16,4 +16,16 @@
 <resources>
     <string name="app_name">Camera2Basic</string>
     <string name="capture">Capture</string>
+    <string name="exposure_time_ns">exposure time (ns)</string>
+    <string name="exposure_gain">exposure gain</string>
+    <string name="dewarp">dewarp</string>
+    <string name="vflip">vflip</string>
+    <string name="hflip">hflip</string>
+    <string name="twilight">TWILIGHT</string>
+    <string name="cloudy_daylight">CLOUDY_DAYLIGHT</string>
+    <string name="daylight">DAYLIGHT</string>
+    <string name="warm_fluorescent">WARM_FLUORESCENT</string>
+    <string name="fluorescent">FLUORESCENT</string>
+    <string name="incandescent">INCANDESCENT</string>
+    <string name="awb">AWB</string>
 </resources>

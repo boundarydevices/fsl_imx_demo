@@ -14,11 +14,11 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <com.example.android.camera.utils.AutoFitSurfaceView
         android:id="@+id/view_finder"
@@ -35,124 +35,135 @@
         android:id="@+id/capture_button"
         android:layout_width="96dp"
         android:layout_height="96dp"
-        android:layout_centerVertical="true"
-        android:layout_alignParentRight="true"
+        android:layout_marginRight="96dp"
         android:scaleType="fitCenter"
         android:background="@drawable/ic_shutter"
-        android:contentDescription="@string/capture" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:contentDescription="@string/capture"
+        tools:ignore="RtlHardcoded" />
 
     <RadioGroup
         android:id="@+id/wb"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         android:visibility="visible"
         tools:visibility="visible">
 
         <RadioButton
             android:id="@+id/AWB"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="true"
             android:clickable="true"
-            android:text="AWB" />
+            android:text="@string/awb"
+            android:focusable="true" />
 
         <RadioButton
             android:id="@+id/INCANDESCENT"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="INCANDESCENT" />
+            android:text="@string/incandescent" />
 
         <RadioButton
             android:id="@+id/FLUORESCENT"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="FLUORESCENT" />
+            android:text="@string/fluorescent" />
 
         <RadioButton
             android:id="@+id/WARM_FLUORESCENT"
-            android:layout_width="185dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="WARM_FLUORESCENT" />
+            android:text="@string/warm_fluorescent" />
 
         <RadioButton
             android:id="@+id/DAYLIGHT"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="DAYLIGHT" />
+            android:text="@string/daylight" />
 
         <RadioButton
             android:id="@+id/CLOUDY_DAYLIGHT"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="CLOUDY_DAYLIGHT" />
+            android:text="@string/cloudy_daylight" />
 
         <RadioButton
             android:id="@+id/TWILIGHT"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="TWILIGHT" />
-
+            android:text="@string/twilight" />
     </RadioGroup>
 
     <Button
         android:id="@+id/hflip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/wb"
         android:alpha="0.3"
-        android:text="hflip" />
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/wb"
+        android:text="@string/hflip" />
 
     <Button
         android:id="@+id/vflip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/hflip"
         android:alpha="0.3"
-        android:text="vflip" />
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/hflip"
+        android:text="@string/vflip" />
 
     <Button
         android:id="@+id/dewarp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/vflip"
         android:alpha="0.3"
-        android:text="dewarp" />
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/vflip"
+        android:text="@string/dewarp" />
 
     <TextView
         android:id="@+id/text_exposure_gain"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/dewarp"
         android:ems="10"
-        android:inputType="textPersonName"
-        android:text="exposure gain" />
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dewarp"
+        android:text="@string/exposure_gain" />
 
     <SeekBar
         android:id="@+id/exposure_gain"
         style="@style/Widget.AppCompat.SeekBar.Discrete"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_exposure_gain"
         android:layout_width="200dp"
-        android:layout_height="58dp"
-        android:layout_below="@id/text_exposure_gain" />
+        android:layout_height="30dp" />
 
     <TextView
         android:id="@+id/text_exposure_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/exposure_gain"
         android:ems="10"
-        android:inputType="textPersonName"
-        android:text="exposure time (ns)" />
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/exposure_gain"
+        android:text="@string/exposure_time_ns" />
 
     <SeekBar
         android:id="@+id/exposure_time"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_exposure_time"
         android:layout_width="200dp"
-        android:layout_height="58dp"
-        android:layout_below="@id/text_exposure_time" />
+        android:layout_height="30dp" />
 
     <TextView
         android:id="@+id/current_exposure_time"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/exposure_time"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/exposure_time" />
+        android:layout_height="wrap_content" />
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
