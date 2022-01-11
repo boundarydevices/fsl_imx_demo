@@ -63,11 +63,13 @@ import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.hardware.camera2.CameraCharacteristics
 import android.util.Range
+import android.widget.CompoundButton
 
 class CameraFragment : Fragment() {
     private var mHflip = 0
     private var mVflip = 0
     private var mDewarp = 0
+    private var scene_mode = 0
 
     /** AndroidX navigation arguments */
     private val args: CameraFragmentArgs by navArgs()
@@ -369,6 +371,22 @@ class CameraFragment : Fragment() {
 
             })
         }
+
+        /* HDR */
+        class HDRCheckListener : CompoundButton.OnCheckedChangeListener {
+            override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
+                Log.i(TAG, "HDR mode isChecked $isChecked")
+
+                if (isChecked)
+                    scene_mode = CaptureRequest.CONTROL_SCENE_MODE_HDR
+                else
+                    scene_mode = CaptureRequest.CONTROL_SCENE_MODE_DISABLED
+
+                captureRequest.set(CaptureRequest.CONTROL_SCENE_MODE, scene_mode)
+                session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
+            }
+        }
+        _binding?.HDR?.setOnCheckedChangeListener(HDRCheckListener())
     }
 
     private fun SetWB(captureRequest: android.hardware.camera2.CaptureRequest.Builder, wbMode: Int) {
@@ -453,6 +471,8 @@ class CameraFragment : Fragment() {
 
         val captureRequest = session.device.createCaptureRequest(
                 CameraDevice.TEMPLATE_STILL_CAPTURE).apply { addTarget(imageReader.surface) }
+
+        captureRequest.set(CaptureRequest.CONTROL_SCENE_MODE, scene_mode)
         session.capture(captureRequest.build(), object : CameraCaptureSession.CaptureCallback() {
 
             override fun onCaptureStarted(

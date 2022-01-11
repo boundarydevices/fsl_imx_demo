@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -35,6 +36,22 @@ public final class FragmentCameraBinding implements ViewBinding {
 
   @NonNull
   public final RadioButton FLUORESCENT;
+
+  /**
+   * This binding is not available in all configurations.
+   * <p>
+   * Present:
+   * <ul>
+   *   <li>layout-land/</li>
+   * </ul>
+   *
+   * Absent:
+   * <ul>
+   *   <li>layout/</li>
+   * </ul>
+   */
+  @Nullable
+  public final CheckBox HDR;
 
   @NonNull
   public final RadioButton INCANDESCENT;
@@ -83,7 +100,7 @@ public final class FragmentCameraBinding implements ViewBinding {
 
   private FragmentCameraBinding(@NonNull ConstraintLayout rootView, @NonNull RadioButton AWB,
       @NonNull RadioButton CLOUDYDAYLIGHT, @NonNull RadioButton DAYLIGHT,
-      @NonNull RadioButton FLUORESCENT, @NonNull RadioButton INCANDESCENT,
+      @NonNull RadioButton FLUORESCENT, @Nullable CheckBox HDR, @NonNull RadioButton INCANDESCENT,
       @NonNull RadioButton TWILIGHT, @NonNull RadioButton WARMFLUORESCENT,
       @NonNull ImageButton captureButton, @NonNull TextView currentExposureTime,
       @NonNull Button dewarp, @NonNull SeekBar exposureGain, @NonNull SeekBar exposureTime,
@@ -95,6 +112,7 @@ public final class FragmentCameraBinding implements ViewBinding {
     this.CLOUDYDAYLIGHT = CLOUDYDAYLIGHT;
     this.DAYLIGHT = DAYLIGHT;
     this.FLUORESCENT = FLUORESCENT;
+    this.HDR = HDR;
     this.INCANDESCENT = INCANDESCENT;
     this.TWILIGHT = TWILIGHT;
     this.WARMFLUORESCENT = WARMFLUORESCENT;
@@ -162,6 +180,8 @@ public final class FragmentCameraBinding implements ViewBinding {
       if (FLUORESCENT == null) {
         break missingId;
       }
+
+      CheckBox HDR = rootView.findViewById(R.id.HDR);
 
       id = R.id.INCANDESCENT;
       RadioButton INCANDESCENT = rootView.findViewById(id);
@@ -254,9 +274,9 @@ public final class FragmentCameraBinding implements ViewBinding {
       }
 
       return new FragmentCameraBinding((ConstraintLayout) rootView, AWB, CLOUDYDAYLIGHT, DAYLIGHT,
-          FLUORESCENT, INCANDESCENT, TWILIGHT, WARMFLUORESCENT, captureButton, currentExposureTime,
-          dewarp, exposureGain, exposureTime, hflip, overlay, textExposureGain, textExposureTime,
-          vflip, viewFinder, wb);
+          FLUORESCENT, HDR, INCANDESCENT, TWILIGHT, WARMFLUORESCENT, captureButton,
+          currentExposureTime, dewarp, exposureGain, exposureTime, hflip, overlay, textExposureGain,
+          textExposureTime, vflip, viewFinder, wb);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));
