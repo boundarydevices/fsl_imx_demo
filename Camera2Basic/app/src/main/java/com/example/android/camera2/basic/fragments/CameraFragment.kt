@@ -214,6 +214,13 @@ class CameraFragment : Fragment() {
         imageReader = ImageReader.newInstance(
                 size.width, size.height, args.pixelFormat, IMAGE_BUFFER_SIZE)
 
+        val cap_list = characteristics.get(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES)
+        var raw_cap = false
+        if (cap_list != null) {
+            if (cap_list.contains(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_RAW))
+                raw_cap = true
+        }
+
         // Creates list of Surfaces where the camera will output frames
         val targets = listOf(viewFinder.holder.surface, imageReader.surface)
 
@@ -266,127 +273,147 @@ class CameraFragment : Fragment() {
             }
         }
 
-        /* WB process */
-        _binding?.AWB?.setOnClickListener {
-            SetWB(captureRequest, CameraMetadata.CONTROL_AWB_MODE_AUTO)
-        }
+        if (raw_cap) {
+            /* WB process */
+            _binding?.AWB?.setOnClickListener {
+                SetWB(captureRequest, CameraMetadata.CONTROL_AWB_MODE_AUTO)
+            }
 
-        _binding?.INCANDESCENT ?.setOnClickListener {
-            SetWB(captureRequest, CameraMetadata.CONTROL_AWB_MODE_INCANDESCENT)
-        }
+            _binding?.INCANDESCENT?.setOnClickListener {
+                SetWB(captureRequest, CameraMetadata.CONTROL_AWB_MODE_INCANDESCENT)
+            }
 
-        _binding?.FLUORESCENT?.setOnClickListener {
-            SetWB(captureRequest, CameraMetadata.CONTROL_AWB_MODE_FLUORESCENT)
-        }
+            _binding?.FLUORESCENT?.setOnClickListener {
+                SetWB(captureRequest, CameraMetadata.CONTROL_AWB_MODE_FLUORESCENT)
+            }
 
-        _binding?.WARMFLUORESCENT?.setOnClickListener {
-            SetWB(captureRequest, CameraMetadata.CONTROL_AWB_MODE_WARM_FLUORESCENT)
-        }
+            _binding?.WARMFLUORESCENT?.setOnClickListener {
+                SetWB(captureRequest, CameraMetadata.CONTROL_AWB_MODE_WARM_FLUORESCENT)
+            }
 
-        _binding?.DAYLIGHT?.setOnClickListener {
-            SetWB(captureRequest, CameraMetadata.CONTROL_AWB_MODE_DAYLIGHT)
-        }
+            _binding?.DAYLIGHT?.setOnClickListener {
+                SetWB(captureRequest, CameraMetadata.CONTROL_AWB_MODE_DAYLIGHT)
+            }
 
-        _binding?.CLOUDYDAYLIGHT?.setOnClickListener {
-            SetWB(captureRequest, CameraMetadata.CONTROL_AWB_MODE_CLOUDY_DAYLIGHT)
-        }
+            _binding?.CLOUDYDAYLIGHT?.setOnClickListener {
+                SetWB(captureRequest, CameraMetadata.CONTROL_AWB_MODE_CLOUDY_DAYLIGHT)
+            }
 
-        _binding?.TWILIGHT?.setOnClickListener {
-            SetWB(captureRequest, CameraMetadata.CONTROL_AWB_MODE_TWILIGHT)
-        }
+            _binding?.TWILIGHT?.setOnClickListener {
+                SetWB(captureRequest, CameraMetadata.CONTROL_AWB_MODE_TWILIGHT)
+            }
 
-        /* hflip/vflip/dewarp */
-        _binding?.hflip?.setOnClickListener {
-            val HFLIP_ENABLE = CaptureRequest.Key("vsi.hflip.enable", Int::class.java)
-            mHflip = 1 - mHflip
-            captureRequest.set(HFLIP_ENABLE, mHflip)
-            session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
-        }
+            /* hflip/vflip/dewarp */
+            _binding?.hflip?.setOnClickListener {
+                val HFLIP_ENABLE = CaptureRequest.Key("vsi.hflip.enable", Int::class.java)
+                mHflip = 1 - mHflip
+                captureRequest.set(HFLIP_ENABLE, mHflip)
+                session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
 
-        _binding?.vflip?.setOnClickListener {
-            val VFLIP_ENABLE = CaptureRequest.Key("vsi.vflip.enable", Int::class.java)
-            mVflip = 1 - mVflip
-            captureRequest.set(VFLIP_ENABLE, mVflip)
-            session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
-        }
+            }
 
-        _binding?.dewarp?.setOnClickListener {
-            val DEWARP_ENABLE = CaptureRequest.Key("vsi.dewarp.enable", Int::class.java)
-            mDewarp = 1 - mDewarp
-            captureRequest.set(DEWARP_ENABLE, mDewarp)
-            session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
-        }
+            _binding?.vflip?.setOnClickListener {
+                val VFLIP_ENABLE = CaptureRequest.Key("vsi.vflip.enable", Int::class.java)
+                mVflip = 1 - mVflip
+                captureRequest.set(VFLIP_ENABLE, mVflip)
+                session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
 
-        /* exposure gain */
-        val supportedExposure = characteristics.get(CameraCharacteristics.CONTROL_AE_COMPENSATION_RANGE)
-        if (supportedExposure != null) {
-            val gainRange: Range<Int> = supportedExposure
-            Log.i(TAG, "exposure gain range $gainRange")
-            _binding?.exposureGain?.setMin(gainRange.lower)
-            _binding?.exposureGain?.setMax(gainRange.upper)
+            }
 
-            _binding?.exposureGain?.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
-                override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                    val expGain = progress
-                    captureRequest.set(CaptureRequest.CONTROL_AE_EXPOSURE_COMPENSATION, expGain)
-                    session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
-                }
-
-                override fun onStartTrackingTouch(seekBar: SeekBar) {
-                }
-
-                override fun onStopTrackingTouch(seekBar: SeekBar) {
-                }
-
-            })
-        }
-
-        /* exposure time */
-        val supportedExposureTime = characteristics.get(CameraCharacteristics.SENSOR_INFO_EXPOSURE_TIME_RANGE)
-        if (supportedExposureTime != null) {
-            val timeRange: Range<Long>  = supportedExposureTime
-            Log.i(TAG, "exposure time range $timeRange")
-
-            _binding?.exposureTime?.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
-                override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                    val expTime =
-                        timeRange.lower + (timeRange.upper - timeRange.lower) * progress / 100
-                    captureRequest.set(CaptureRequest.SENSOR_EXPOSURE_TIME, expTime)
-                    session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
-
-                    val left = _binding?.exposureTime?.getLeft()
-                    val right = _binding?.exposureTime?.getRight()
-                    if ((left != null) && (right != null)) {
-                        val pox = left + (right - left) * progress / 100
-                        _binding?.currentExposureTime?.setText(expTime.toString())
-                        _binding?.currentExposureTime?.setX(java.lang.Float.valueOf(pox.toString()))
-                    }
-                }
-
-                override fun onStartTrackingTouch(seekBar: SeekBar) {
-                }
-
-                override fun onStopTrackingTouch(seekBar: SeekBar) {
-                }
-
-            })
-        }
-
-        /* HDR */
-        class HDRCheckListener : CompoundButton.OnCheckedChangeListener {
-            override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
-                Log.i(TAG, "HDR mode isChecked $isChecked")
-
-                if (isChecked)
-                    scene_mode = CaptureRequest.CONTROL_SCENE_MODE_HDR
-                else
-                    scene_mode = CaptureRequest.CONTROL_SCENE_MODE_DISABLED
-
-                captureRequest.set(CaptureRequest.CONTROL_SCENE_MODE, scene_mode)
+            _binding?.dewarp?.setOnClickListener {
+                val DEWARP_ENABLE = CaptureRequest.Key("vsi.dewarp.enable", Int::class.java)
+                mDewarp = 1 - mDewarp
+                captureRequest.set(DEWARP_ENABLE, mDewarp)
                 session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
             }
+
+            /* exposure gain */
+            val supportedExposure = characteristics.get(CameraCharacteristics.CONTROL_AE_COMPENSATION_RANGE)
+            if (supportedExposure != null) {
+                val gainRange: Range<Int> = supportedExposure
+                Log.i(TAG, "exposure gain range $gainRange")
+                _binding?.exposureGain?.setMin(gainRange.lower)
+                _binding?.exposureGain?.setMax(gainRange.upper)
+
+                _binding?.exposureGain?.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+                    override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                        val expGain = progress
+                        captureRequest.set(CaptureRequest.CONTROL_AE_EXPOSURE_COMPENSATION, expGain)
+                        session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
+                    }
+
+                    override fun onStartTrackingTouch(seekBar: SeekBar) {
+                    }
+
+                    override fun onStopTrackingTouch(seekBar: SeekBar) {
+                    }
+
+                })
+            }
+
+            /* exposure time */
+            val supportedExposureTime = characteristics.get(CameraCharacteristics.SENSOR_INFO_EXPOSURE_TIME_RANGE)
+            if (supportedExposureTime != null) {
+                val timeRange: Range<Long> = supportedExposureTime
+                Log.i(TAG, "exposure time range $timeRange")
+
+                _binding?.exposureTime?.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+                    override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                        val expTime =
+                                timeRange.lower + (timeRange.upper - timeRange.lower) * progress / 100
+                        captureRequest.set(CaptureRequest.SENSOR_EXPOSURE_TIME, expTime)
+                        session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
+
+                        val left = _binding?.exposureTime?.getLeft()
+                        val right = _binding?.exposureTime?.getRight()
+                        if ((left != null) && (right != null)) {
+                            val pox = left + (right - left) * progress / 100
+                            _binding?.currentExposureTime?.setText(expTime.toString())
+                            _binding?.currentExposureTime?.setX(java.lang.Float.valueOf(pox.toString()))
+                        }
+                    }
+
+                    override fun onStartTrackingTouch(seekBar: SeekBar) {
+                    }
+
+                    override fun onStopTrackingTouch(seekBar: SeekBar) {
+                    }
+
+                })
+            }
+
+            /* HDR */
+            class HDRCheckListener : CompoundButton.OnCheckedChangeListener {
+                override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
+                    Log.i(TAG, "HDR mode isChecked $isChecked")
+
+                    if (isChecked)
+                        scene_mode = CaptureRequest.CONTROL_SCENE_MODE_HDR
+                    else
+                        scene_mode = CaptureRequest.CONTROL_SCENE_MODE_DISABLED
+
+                    captureRequest.set(CaptureRequest.CONTROL_SCENE_MODE, scene_mode)
+                    session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
+                }
+            }
+            _binding?.HDR?.setOnCheckedChangeListener(HDRCheckListener())
+
+            /* LSC */
+            class LSCCheckListener : CompoundButton.OnCheckedChangeListener {
+                override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
+                    Log.i(TAG, "LSC isChecked $isChecked")
+                    val LSC_ENABLE = CaptureRequest.Key("vsi.lsc.enable", Int::class.java)
+                    var lsc: Int;
+                    if (isChecked)
+                        lsc = 1
+                    else
+                        lsc = 0
+                    captureRequest.set(LSC_ENABLE, lsc)
+                    session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
+                }
+            }
+            _binding?.LSC?.setOnCheckedChangeListener(LSCCheckListener())
         }
-        _binding?.HDR?.setOnCheckedChangeListener(HDRCheckListener())
     }
 
     private fun SetWB(captureRequest: android.hardware.camera2.CaptureRequest.Builder, wbMode: Int) {

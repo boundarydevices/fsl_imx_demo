@@ -56,6 +56,22 @@ public final class FragmentCameraBinding implements ViewBinding {
   @NonNull
   public final RadioButton INCANDESCENT;
 
+  /**
+   * This binding is not available in all configurations.
+   * <p>
+   * Present:
+   * <ul>
+   *   <li>layout-land/</li>
+   * </ul>
+   *
+   * Absent:
+   * <ul>
+   *   <li>layout/</li>
+   * </ul>
+   */
+  @Nullable
+  public final CheckBox LSC;
+
   @NonNull
   public final RadioButton TWILIGHT;
 
@@ -101,7 +117,7 @@ public final class FragmentCameraBinding implements ViewBinding {
   private FragmentCameraBinding(@NonNull ConstraintLayout rootView, @NonNull RadioButton AWB,
       @NonNull RadioButton CLOUDYDAYLIGHT, @NonNull RadioButton DAYLIGHT,
       @NonNull RadioButton FLUORESCENT, @Nullable CheckBox HDR, @NonNull RadioButton INCANDESCENT,
-      @NonNull RadioButton TWILIGHT, @NonNull RadioButton WARMFLUORESCENT,
+      @Nullable CheckBox LSC, @NonNull RadioButton TWILIGHT, @NonNull RadioButton WARMFLUORESCENT,
       @NonNull ImageButton captureButton, @NonNull TextView currentExposureTime,
       @NonNull Button dewarp, @NonNull SeekBar exposureGain, @NonNull SeekBar exposureTime,
       @NonNull Button hflip, @NonNull View overlay, @NonNull TextView textExposureGain,
@@ -114,6 +130,7 @@ public final class FragmentCameraBinding implements ViewBinding {
     this.FLUORESCENT = FLUORESCENT;
     this.HDR = HDR;
     this.INCANDESCENT = INCANDESCENT;
+    this.LSC = LSC;
     this.TWILIGHT = TWILIGHT;
     this.WARMFLUORESCENT = WARMFLUORESCENT;
     this.captureButton = captureButton;
@@ -188,6 +205,8 @@ public final class FragmentCameraBinding implements ViewBinding {
       if (INCANDESCENT == null) {
         break missingId;
       }
+
+      CheckBox LSC = rootView.findViewById(R.id.LSC);
 
       id = R.id.TWILIGHT;
       RadioButton TWILIGHT = rootView.findViewById(id);
@@ -274,7 +293,7 @@ public final class FragmentCameraBinding implements ViewBinding {
       }
 
       return new FragmentCameraBinding((ConstraintLayout) rootView, AWB, CLOUDYDAYLIGHT, DAYLIGHT,
-          FLUORESCENT, HDR, INCANDESCENT, TWILIGHT, WARMFLUORESCENT, captureButton,
+          FLUORESCENT, HDR, INCANDESCENT, LSC, TWILIGHT, WARMFLUORESCENT, captureButton,
           currentExposureTime, dewarp, exposureGain, exposureTime, hflip, overlay, textExposureGain,
           textExposureTime, vflip, viewFinder, wb);
     }

@@ -174,4 +174,12 @@
         android:layout_height="wrap_content"
         android:text="HDR" />
 
+    <CheckBox
+        android:id="@+id/LSC"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="LSC"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/HDR" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
