@@ -413,6 +413,33 @@ class CameraFragment : Fragment() {
                 }
             }
             _binding?.LSC?.setOnCheckedChangeListener(LSCCheckListener())
+
+            /* GAMMA */
+            _binding?.gamma?.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+                override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                    val GammaMin = 1.0
+                    val GammaMax = 5.0
+
+                    var gamma: Float = (GammaMin + (GammaMax - GammaMin) * progress / 100).toFloat()
+                    captureRequest.set(CaptureRequest.TONEMAP_GAMMA, gamma)
+                    session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
+
+                    val left = _binding?.gamma?.getLeft()
+                    val right = _binding?.gamma?.getRight()
+                    if ((left != null) && (right != null)) {
+                        val pox = left + (right - left) * progress / 100
+                        _binding?.currentGamma?.setText(gamma.toString())
+                        _binding?.currentGamma?.setX(java.lang.Float.valueOf(pox.toString()))
+                    }
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar) {
+                }
+
+                override fun onStopTrackingTouch(seekBar: SeekBar) {
+                }
+
+            })
         }
     }
 

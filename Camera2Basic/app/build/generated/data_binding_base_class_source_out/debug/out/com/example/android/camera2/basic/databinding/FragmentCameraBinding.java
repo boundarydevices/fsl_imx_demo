@@ -84,6 +84,22 @@ public final class FragmentCameraBinding implements ViewBinding {
   @NonNull
   public final TextView currentExposureTime;
 
+  /**
+   * This binding is not available in all configurations.
+   * <p>
+   * Present:
+   * <ul>
+   *   <li>layout-land/</li>
+   * </ul>
+   *
+   * Absent:
+   * <ul>
+   *   <li>layout/</li>
+   * </ul>
+   */
+  @Nullable
+  public final TextView currentGamma;
+
   @NonNull
   public final Button dewarp;
 
@@ -92,6 +108,22 @@ public final class FragmentCameraBinding implements ViewBinding {
 
   @NonNull
   public final SeekBar exposureTime;
+
+  /**
+   * This binding is not available in all configurations.
+   * <p>
+   * Present:
+   * <ul>
+   *   <li>layout-land/</li>
+   * </ul>
+   *
+   * Absent:
+   * <ul>
+   *   <li>layout/</li>
+   * </ul>
+   */
+  @Nullable
+  public final SeekBar gamma;
 
   @NonNull
   public final Button hflip;
@@ -104,6 +136,22 @@ public final class FragmentCameraBinding implements ViewBinding {
 
   @NonNull
   public final TextView textExposureTime;
+
+  /**
+   * This binding is not available in all configurations.
+   * <p>
+   * Present:
+   * <ul>
+   *   <li>layout-land/</li>
+   * </ul>
+   *
+   * Absent:
+   * <ul>
+   *   <li>layout/</li>
+   * </ul>
+   */
+  @Nullable
+  public final TextView textGamma;
 
   @NonNull
   public final Button vflip;
@@ -119,10 +167,11 @@ public final class FragmentCameraBinding implements ViewBinding {
       @NonNull RadioButton FLUORESCENT, @Nullable CheckBox HDR, @NonNull RadioButton INCANDESCENT,
       @Nullable CheckBox LSC, @NonNull RadioButton TWILIGHT, @NonNull RadioButton WARMFLUORESCENT,
       @NonNull ImageButton captureButton, @NonNull TextView currentExposureTime,
-      @NonNull Button dewarp, @NonNull SeekBar exposureGain, @NonNull SeekBar exposureTime,
-      @NonNull Button hflip, @NonNull View overlay, @NonNull TextView textExposureGain,
-      @NonNull TextView textExposureTime, @NonNull Button vflip,
-      @NonNull AutoFitSurfaceView viewFinder, @NonNull RadioGroup wb) {
+      @Nullable TextView currentGamma, @NonNull Button dewarp, @NonNull SeekBar exposureGain,
+      @NonNull SeekBar exposureTime, @Nullable SeekBar gamma, @NonNull Button hflip,
+      @NonNull View overlay, @NonNull TextView textExposureGain, @NonNull TextView textExposureTime,
+      @Nullable TextView textGamma, @NonNull Button vflip, @NonNull AutoFitSurfaceView viewFinder,
+      @NonNull RadioGroup wb) {
     this.rootView = rootView;
     this.AWB = AWB;
     this.CLOUDYDAYLIGHT = CLOUDYDAYLIGHT;
@@ -135,13 +184,16 @@ public final class FragmentCameraBinding implements ViewBinding {
     this.WARMFLUORESCENT = WARMFLUORESCENT;
     this.captureButton = captureButton;
     this.currentExposureTime = currentExposureTime;
+    this.currentGamma = currentGamma;
     this.dewarp = dewarp;
     this.exposureGain = exposureGain;
     this.exposureTime = exposureTime;
+    this.gamma = gamma;
     this.hflip = hflip;
     this.overlay = overlay;
     this.textExposureGain = textExposureGain;
     this.textExposureTime = textExposureTime;
+    this.textGamma = textGamma;
     this.vflip = vflip;
     this.viewFinder = viewFinder;
     this.wb = wb;
@@ -232,6 +284,8 @@ public final class FragmentCameraBinding implements ViewBinding {
         break missingId;
       }
 
+      TextView currentGamma = rootView.findViewById(R.id.current_gamma);
+
       id = R.id.dewarp;
       Button dewarp = rootView.findViewById(id);
       if (dewarp == null) {
@@ -249,6 +303,8 @@ public final class FragmentCameraBinding implements ViewBinding {
       if (exposureTime == null) {
         break missingId;
       }
+
+      SeekBar gamma = rootView.findViewById(R.id.gamma);
 
       id = R.id.hflip;
       Button hflip = rootView.findViewById(id);
@@ -274,6 +330,8 @@ public final class FragmentCameraBinding implements ViewBinding {
         break missingId;
       }
 
+      TextView textGamma = rootView.findViewById(R.id.text_gamma);
+
       id = R.id.vflip;
       Button vflip = rootView.findViewById(id);
       if (vflip == null) {
@@ -294,8 +352,8 @@ public final class FragmentCameraBinding implements ViewBinding {
 
       return new FragmentCameraBinding((ConstraintLayout) rootView, AWB, CLOUDYDAYLIGHT, DAYLIGHT,
           FLUORESCENT, HDR, INCANDESCENT, LSC, TWILIGHT, WARMFLUORESCENT, captureButton,
-          currentExposureTime, dewarp, exposureGain, exposureTime, hflip, overlay, textExposureGain,
-          textExposureTime, vflip, viewFinder, wb);
+          currentExposureTime, currentGamma, dewarp, exposureGain, exposureTime, gamma, hflip,
+          overlay, textExposureGain, textExposureTime, textGamma, vflip, viewFinder, wb);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));
