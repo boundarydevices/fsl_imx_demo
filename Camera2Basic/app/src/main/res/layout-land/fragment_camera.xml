@@ -205,4 +205,93 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
+    <TextView
+        android:id="@+id/text_brightness"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toRightOf="@id/wb"
+        android:text="brightness(-127 - 127)" />
+
+
+    <SeekBar
+        android:id="@+id/brightness"
+        app:layout_constraintLeft_toRightOf="@id/wb"
+        app:layout_constraintTop_toBottomOf="@id/text_brightness"
+        android:layout_width="200dp"
+        android:layout_height="30dp" />
+
+    <TextView
+        android:id="@+id/current_brightness"
+        app:layout_constraintLeft_toRightOf="@id/wb"
+        app:layout_constraintTop_toBottomOf="@id/brightness"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/text_contrast"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toRightOf="@id/wb"
+        app:layout_constraintTop_toBottomOf="@id/current_brightness"
+        android:text="contrast(0.0 - 1.99)" />
+
+    <SeekBar
+        android:id="@+id/contrast"
+        app:layout_constraintLeft_toRightOf="@id/wb"
+        app:layout_constraintTop_toBottomOf="@id/text_contrast"
+        android:layout_width="200dp"
+        android:layout_height="30dp" />
+
+    <TextView
+        android:id="@+id/current_contrast"
+        app:layout_constraintLeft_toRightOf="@id/wb"
+        app:layout_constraintTop_toBottomOf="@id/contrast"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/text_saturation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toRightOf="@id/wb"
+        app:layout_constraintTop_toBottomOf="@id/current_contrast"
+        android:text="saturation(0.0 - 1.99)" />
+
+    <SeekBar
+        android:id="@+id/saturation"
+        app:layout_constraintLeft_toRightOf="@id/wb"
+        app:layout_constraintTop_toBottomOf="@id/text_saturation"
+        android:layout_width="200dp"
+        android:layout_height="30dp" />
+
+    <TextView
+        android:id="@+id/current_saturation"
+        app:layout_constraintLeft_toRightOf="@id/wb"
+        app:layout_constraintTop_toBottomOf="@id/saturation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/text_hue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toRightOf="@id/wb"
+        app:layout_constraintTop_toBottomOf="@id/current_saturation"
+        android:text="hue(-127 - 127)" />
+
+    <SeekBar
+        android:id="@+id/hue"
+        app:layout_constraintLeft_toRightOf="@id/wb"
+        app:layout_constraintTop_toBottomOf="@id/text_hue"
+        android:layout_width="200dp"
+        android:layout_height="30dp" />
+
+    <TextView
+        android:id="@+id/current_hue"
+        app:layout_constraintLeft_toRightOf="@id/wb"
+        app:layout_constraintTop_toBottomOf="@id/hue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

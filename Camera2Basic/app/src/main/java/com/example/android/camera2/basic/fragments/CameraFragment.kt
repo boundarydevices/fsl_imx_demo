@@ -438,7 +438,114 @@ class CameraFragment : Fragment() {
 
                 override fun onStopTrackingTouch(seekBar: SeekBar) {
                 }
+            })
 
+            /* brightness */
+            _binding?.brightness?.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+                override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                    val BrightnessMin = -127
+                    val BrightnessMax = 127
+                    var brightness = BrightnessMin + (BrightnessMax - BrightnessMin) * progress / 100
+
+                    val META_BRIGHTNESS = CaptureRequest.Key("vsi.brightness", Int::class.java)
+                    captureRequest.set(META_BRIGHTNESS, brightness)
+                    session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
+
+                    val left = _binding?.brightness?.getLeft()
+                    val right = _binding?.brightness?.getRight()
+                    if ((left != null) && (right != null)) {
+                        val pox = left + (right - left) * progress / 100
+                        _binding?.currentBrightness?.setText(brightness.toString())
+                        _binding?.currentBrightness?.setX(java.lang.Float.valueOf(pox.toString()))
+                    }
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar) {
+                }
+
+                override fun onStopTrackingTouch(seekBar: SeekBar) {
+                }
+            })
+
+            /* contrast */
+            _binding?.contrast?.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+                override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                    val ContrastMin = 0.0
+                    val ContrastMax = 1.99
+                    var contrast = (ContrastMin + (ContrastMax - ContrastMin) * progress / 100).toFloat()
+
+                    val META_CONTRAST = CaptureRequest.Key("vsi.contrast", Float::class.java)
+                    captureRequest.set(META_CONTRAST, contrast)
+                    session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
+
+                    val left = _binding?.contrast?.getLeft()
+                    val right = _binding?.contrast?.getRight()
+                    if ((left != null) && (right != null)) {
+                        val pox = left + (right - left) * progress / 100
+                        _binding?.currentContrast?.setText(contrast.toString())
+                        _binding?.currentContrast?.setX(java.lang.Float.valueOf(pox.toString()))
+                    }
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar) {
+                }
+
+                override fun onStopTrackingTouch(seekBar: SeekBar) {
+                }
+            })
+
+            /* saturation */
+            _binding?.saturation?.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+                override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                    val SaturationMin = 0.0
+                    val SaturationMax = 1.99
+                    var saturation = (SaturationMin + (SaturationMax - SaturationMin) * progress / 100).toFloat()
+
+                    val META_SATURATION = CaptureRequest.Key("vsi.saturation", Float::class.java)
+                    captureRequest.set(META_SATURATION, saturation)
+                    session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
+
+                    val left = _binding?.saturation?.getLeft()
+                    val right = _binding?.saturation?.getRight()
+                    if ((left != null) && (right != null)) {
+                        val pox = left + (right - left) * progress / 100
+                        _binding?.currentSaturation?.setText(saturation.toString())
+                        _binding?.currentSaturation?.setX(java.lang.Float.valueOf(pox.toString()))
+                    }
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar) {
+                }
+
+                override fun onStopTrackingTouch(seekBar: SeekBar) {
+                }
+            })
+
+            /* hue */
+            _binding?.hue?.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+                override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                    val HueMin = -127
+                    val HueMax = 127
+                    var hue = HueMin + (HueMax - HueMin) * progress / 100
+
+                    val META_HUE = CaptureRequest.Key("vsi.hue", Int::class.java)
+                    captureRequest.set(META_HUE, hue)
+                    session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
+
+                    val left = _binding?.hue?.getLeft()
+                    val right = _binding?.hue?.getRight()
+                    if ((left != null) && (right != null)) {
+                        val pox = left + (right - left) * progress / 100
+                        _binding?.currentHue?.setText(hue.toString())
+                        _binding?.currentHue?.setX(java.lang.Float.valueOf(pox.toString()))
+                    }
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar) {
+                }
+
+                override fun onStopTrackingTouch(seekBar: SeekBar) {
+                }
             })
         }
     }
