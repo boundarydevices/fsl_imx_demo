@@ -547,6 +547,33 @@ class CameraFragment : Fragment() {
                 override fun onStopTrackingTouch(seekBar: SeekBar) {
                 }
             })
+
+            /* sharp level */
+            _binding?.sharpLevel?.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+                override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                    val SharpLevelMin = 1
+                    val SharpLevelMax = 10
+                    var sharp_level = (SharpLevelMin + (SharpLevelMax - SharpLevelMin) * progress / 100).toByte()
+
+                    val META_SHARP_LEVEL = CaptureRequest.Key("vsi.sharp.level", Byte::class.java)
+                    captureRequest.set(META_SHARP_LEVEL, sharp_level)
+                    session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
+
+                    val left = _binding?.sharpLevel?.getLeft()
+                    val right = _binding?.sharpLevel?.getRight()
+                    if ((left != null) && (right != null)) {
+                        val pox = left + (right - left) * progress / 100
+                        _binding?.currentSharpLevel?.setText(sharp_level.toString())
+                        _binding?.currentSharpLevel?.setX(java.lang.Float.valueOf(pox.toString()))
+                    }
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar) {
+                }
+
+                override fun onStopTrackingTouch(seekBar: SeekBar) {
+                }
+            })
         }
     }
 

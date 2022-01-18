@@ -196,6 +196,22 @@ public final class FragmentCameraBinding implements ViewBinding {
   @Nullable
   public final TextView currentSaturation;
 
+  /**
+   * This binding is not available in all configurations.
+   * <p>
+   * Present:
+   * <ul>
+   *   <li>layout-land/</li>
+   * </ul>
+   *
+   * Absent:
+   * <ul>
+   *   <li>layout/</li>
+   * </ul>
+   */
+  @Nullable
+  public final TextView currentSharpLevel;
+
   @NonNull
   public final Button dewarp;
 
@@ -258,6 +274,22 @@ public final class FragmentCameraBinding implements ViewBinding {
    */
   @Nullable
   public final SeekBar saturation;
+
+  /**
+   * This binding is not available in all configurations.
+   * <p>
+   * Present:
+   * <ul>
+   *   <li>layout-land/</li>
+   * </ul>
+   *
+   * Absent:
+   * <ul>
+   *   <li>layout/</li>
+   * </ul>
+   */
+  @Nullable
+  public final SeekBar sharpLevel;
 
   /**
    * This binding is not available in all configurations.
@@ -345,6 +377,22 @@ public final class FragmentCameraBinding implements ViewBinding {
   @Nullable
   public final TextView textSaturation;
 
+  /**
+   * This binding is not available in all configurations.
+   * <p>
+   * Present:
+   * <ul>
+   *   <li>layout-land/</li>
+   * </ul>
+   *
+   * Absent:
+   * <ul>
+   *   <li>layout/</li>
+   * </ul>
+   */
+  @Nullable
+  public final TextView textSharpLevel;
+
   @NonNull
   public final Button vflip;
 
@@ -361,13 +409,14 @@ public final class FragmentCameraBinding implements ViewBinding {
       @Nullable SeekBar brightness, @NonNull ImageButton captureButton, @Nullable SeekBar contrast,
       @Nullable TextView currentBrightness, @Nullable TextView currentContrast,
       @NonNull TextView currentExposureTime, @Nullable TextView currentGamma,
-      @Nullable TextView currentHue, @Nullable TextView currentSaturation, @NonNull Button dewarp,
-      @NonNull SeekBar exposureGain, @NonNull SeekBar exposureTime, @Nullable SeekBar gamma,
-      @NonNull Button hflip, @Nullable SeekBar hue, @NonNull View overlay,
-      @Nullable SeekBar saturation, @Nullable TextView textBrightness,
+      @Nullable TextView currentHue, @Nullable TextView currentSaturation,
+      @Nullable TextView currentSharpLevel, @NonNull Button dewarp, @NonNull SeekBar exposureGain,
+      @NonNull SeekBar exposureTime, @Nullable SeekBar gamma, @NonNull Button hflip,
+      @Nullable SeekBar hue, @NonNull View overlay, @Nullable SeekBar saturation,
+      @Nullable SeekBar sharpLevel, @Nullable TextView textBrightness,
       @Nullable TextView textContrast, @NonNull TextView textExposureGain,
       @NonNull TextView textExposureTime, @Nullable TextView textGamma, @Nullable TextView textHue,
-      @Nullable TextView textSaturation, @NonNull Button vflip,
+      @Nullable TextView textSaturation, @Nullable TextView textSharpLevel, @NonNull Button vflip,
       @NonNull AutoFitSurfaceView viewFinder, @NonNull RadioGroup wb) {
     this.rootView = rootView;
     this.AWB = AWB;
@@ -388,6 +437,7 @@ public final class FragmentCameraBinding implements ViewBinding {
     this.currentGamma = currentGamma;
     this.currentHue = currentHue;
     this.currentSaturation = currentSaturation;
+    this.currentSharpLevel = currentSharpLevel;
     this.dewarp = dewarp;
     this.exposureGain = exposureGain;
     this.exposureTime = exposureTime;
@@ -396,6 +446,7 @@ public final class FragmentCameraBinding implements ViewBinding {
     this.hue = hue;
     this.overlay = overlay;
     this.saturation = saturation;
+    this.sharpLevel = sharpLevel;
     this.textBrightness = textBrightness;
     this.textContrast = textContrast;
     this.textExposureGain = textExposureGain;
@@ -403,6 +454,7 @@ public final class FragmentCameraBinding implements ViewBinding {
     this.textGamma = textGamma;
     this.textHue = textHue;
     this.textSaturation = textSaturation;
+    this.textSharpLevel = textSharpLevel;
     this.vflip = vflip;
     this.viewFinder = viewFinder;
     this.wb = wb;
@@ -507,6 +559,8 @@ public final class FragmentCameraBinding implements ViewBinding {
 
       TextView currentSaturation = rootView.findViewById(R.id.current_saturation);
 
+      TextView currentSharpLevel = rootView.findViewById(R.id.current_sharp_level);
+
       id = R.id.dewarp;
       Button dewarp = rootView.findViewById(id);
       if (dewarp == null) {
@@ -543,6 +597,8 @@ public final class FragmentCameraBinding implements ViewBinding {
 
       SeekBar saturation = rootView.findViewById(R.id.saturation);
 
+      SeekBar sharpLevel = rootView.findViewById(R.id.sharp_level);
+
       TextView textBrightness = rootView.findViewById(R.id.text_brightness);
 
       TextView textContrast = rootView.findViewById(R.id.text_contrast);
@@ -565,6 +621,8 @@ public final class FragmentCameraBinding implements ViewBinding {
 
       TextView textSaturation = rootView.findViewById(R.id.text_saturation);
 
+      TextView textSharpLevel = rootView.findViewById(R.id.text_sharp_level);
+
       id = R.id.vflip;
       Button vflip = rootView.findViewById(id);
       if (vflip == null) {
@@ -586,9 +644,10 @@ public final class FragmentCameraBinding implements ViewBinding {
       return new FragmentCameraBinding((ConstraintLayout) rootView, AWB, CLOUDYDAYLIGHT, DAYLIGHT,
           FLUORESCENT, HDR, INCANDESCENT, LSC, TWILIGHT, WARMFLUORESCENT, brightness, captureButton,
           contrast, currentBrightness, currentContrast, currentExposureTime, currentGamma,
-          currentHue, currentSaturation, dewarp, exposureGain, exposureTime, gamma, hflip, hue,
-          overlay, saturation, textBrightness, textContrast, textExposureGain, textExposureTime,
-          textGamma, textHue, textSaturation, vflip, viewFinder, wb);
+          currentHue, currentSaturation, currentSharpLevel, dewarp, exposureGain, exposureTime,
+          gamma, hflip, hue, overlay, saturation, sharpLevel, textBrightness, textContrast,
+          textExposureGain, textExposureTime, textGamma, textHue, textSaturation, textSharpLevel,
+          vflip, viewFinder, wb);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

@@ -293,5 +293,27 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
+    <TextView
+        android:id="@+id/text_sharp_level"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toRightOf="@id/wb"
+        app:layout_constraintTop_toBottomOf="@id/current_hue"
+        android:text="sharp_level(1 - 10)" />
+
+    <SeekBar
+        android:id="@+id/sharp_level"
+        app:layout_constraintLeft_toRightOf="@id/wb"
+        app:layout_constraintTop_toBottomOf="@id/text_sharp_level"
+        android:layout_width="200dp"
+        android:layout_height="30dp" />
+
+    <TextView
+        android:id="@+id/current_sharp_level"
+        app:layout_constraintLeft_toRightOf="@id/wb"
+        app:layout_constraintTop_toBottomOf="@id/sharp_level"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
