@@ -70,7 +70,7 @@ public class EthernetProxyDialog extends AlertDialog implements DialogInterface.
         mProxyIp.setText(mEthEnabler.getManager().getSharedPreProxyAddress(), TextView.BufferType.EDITABLE);
         mProxyPort.setText(mEthEnabler.getManager().getSharedPreProxyPort(), TextView.BufferType.EDITABLE);
         mProxyExclusionList.setText(mEthEnabler.getManager().getSharedPreProxyExclusionList(), TextView.BufferType.EDITABLE);
-        if (mEthEnabler.getManager().getSharedPreProxyAddress().equals("")) {
+        if (mEthEnabler.getManager().getSharedPreProxyAddress() == null) {
             mProxyEnableCheckBox.setChecked(false);
             mConfigWindow.setVisibility(View.GONE);
         } else {
