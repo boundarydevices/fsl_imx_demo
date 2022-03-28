@@ -553,7 +553,7 @@ class CameraFragment : Fragment() {
             it.setOnClickListener {
                 enableHflip = !enableHflip
                 mHflip = if (enableHflip) 1 else 0
-                Toast.makeText(requireContext(), "VFLIP  is : " + enableHflip, Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "HFLIP  is : " + enableHflip, Toast.LENGTH_SHORT).show()
 
                 // Re-bind use cases to update selected camera
                 bindCameraUseCases()
