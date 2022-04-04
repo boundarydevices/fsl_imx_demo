@@ -17,6 +17,7 @@
 android_app {
     name: "FSLOta",
     srcs: ["src/**/*.java"],
+    certificate: "platform",
     privileged: true,
     platform_apis: true,
     system_ext_specific: true,
