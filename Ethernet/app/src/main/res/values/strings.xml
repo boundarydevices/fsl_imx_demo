@@ -19,7 +19,7 @@
     <string name="eth_check_config" translatable="false">Check Ethernet</string>
     <string name="eth_do_config" translatable="false">Configure Ethernet</string>
     <string name="eth_conf_summary" translatable="false">Configure Ethernet devices</string>
-    <string name="network_prefix_length" translatable="false">Netmask</string>
+    <string name="network_prefix_length" translatable="false">Netmask Prefix Length</string>
     <string name="network_prefix_length_pre" translatable="false">24</string>
     <string name="eth_toggle_summary_off" translatable="false">Turn off Ethernet</string>
     <string name="eth_toggle_summary_on" translatable="false">Turn on Ethernet</string>

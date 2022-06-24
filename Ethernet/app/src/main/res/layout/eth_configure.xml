@@ -125,7 +125,9 @@
                       android:textAlignment="viewStart"
                       android:singleLine="true"
                       android:text="@string/network_prefix_length_pre"
-                      android:inputType="phone" />
+                      android:inputType="number"
+                      android:maxLength="2"
+                      android:hint="Enter number between 0-32 "/>
             <TextView android:id="@+id/gateway_text"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
