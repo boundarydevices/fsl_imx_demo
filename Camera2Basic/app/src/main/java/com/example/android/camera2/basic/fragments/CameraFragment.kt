@@ -69,7 +69,8 @@ class CameraFragment : Fragment() {
     private var mHflip = 0
     private var mVflip = 0
     private var mDewarp = 0
-    private var scene_mode = 0
+    private var scene_mode = CaptureRequest.CONTROL_SCENE_MODE_DISABLED
+    private var wb_mode = CameraMetadata.CONTROL_AWB_MODE_AUTO
 
     /** AndroidX navigation arguments */
     private val args: CameraFragmentArgs by navArgs()
@@ -229,6 +230,10 @@ class CameraFragment : Fragment() {
 
         val captureRequest = camera.createCaptureRequest(
                 CameraDevice.TEMPLATE_PREVIEW).apply { addTarget(viewFinder.holder.surface) }
+
+        captureRequest.set(CaptureRequest.CONTROL_SCENE_MODE, scene_mode)
+        captureRequest.set(CaptureRequest.CONTROL_AWB_MODE, wb_mode)
+        Log.i(TAG,"preview, set scene mode ${scene_mode}, wb mode ${wb_mode}")
 
         // This will keep sending the capture request as frequently as possible until the
         // session is torn down or session.stopRepeating() is called
@@ -580,6 +585,8 @@ class CameraFragment : Fragment() {
     private fun SetWB(captureRequest: android.hardware.camera2.CaptureRequest.Builder, wbMode: Int) {
         captureRequest.set(CaptureRequest.CONTROL_AWB_MODE, wbMode)
         session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
+        wb_mode = wbMode
+        Log.i(TAG, "SetWB mode ${wb_mode}")
     }
 
     /** Opens the camera and returns the opened device (as the result of the suspend coroutine) */
@@ -661,6 +668,9 @@ class CameraFragment : Fragment() {
                 CameraDevice.TEMPLATE_STILL_CAPTURE).apply { addTarget(imageReader.surface) }
 
         captureRequest.set(CaptureRequest.CONTROL_SCENE_MODE, scene_mode)
+        captureRequest.set(CaptureRequest.CONTROL_AWB_MODE, wb_mode)
+        Log.i(TAG, "takePhoto, set scene mode ${scene_mode}, wb mode ${wb_mode}")
+
         session.capture(captureRequest.build(), object : CameraCaptureSession.CaptureCallback() {
 
             override fun onCaptureStarted(
