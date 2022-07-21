@@ -4,52 +4,37 @@
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:layout_width="900dp"
+        android:layout_width="match_parent"
         android:layout_height="300dp"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" >
 
-        <GridLayout
-            android:id="@+id/grid"
+        <Button
+            android:id="@+id/btnCheck"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:columnCount="2"
-            android:rowCount="1" >
+            android:layout_weight="1"
+            android:clickable="true"
+            android:background="@drawable/btncheck_background" />
 
-            <Button
-                android:id="@+id/btnCheck"
-                android:layout_width="300dp"
-                android:layout_height="300dp"
-                android:layout_column="0"
-                android:layout_gravity="start|top"
-                android:layout_row="0"
-                android:clickable="true"
-                android:background="@drawable/btncheck_background" />
+        <Button
+            android:id="@+id/btnIPConfig"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/btnconfig_background"
+            android:clickable="true"
+            android:focusable="true" />
 
-            <Button
-                android:id="@+id/btnProxyConfig"
-                android:layout_width="300dp"
-                android:layout_height="300dp"
-                android:layout_column="1"
-                android:layout_gravity="end|center_vertical"
-                android:layout_row="0"
-                android:background="@drawable/btnadvanced_background"
-                android:clickable="true"
-                android:focusable="true" />
-
-            <Button
-                android:id="@+id/btnIPConfig"
-                android:layout_width="300dp"
-                android:layout_height="300dp"
-                android:layout_column="1"
-                android:layout_gravity="start|top"
-                android:layout_row="0"
-                android:background="@drawable/btnconfig_background"
-                android:clickable="true"
-                android:focusable="true" />
-        </GridLayout>
-
+        <Button
+            android:id="@+id/btnProxyConfig"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/btnadvanced_background"
+            android:clickable="true"
+            android:focusable="true" />
     </LinearLayout>
 
     <LinearLayout
@@ -77,4 +62,3 @@
     </LinearLayout>
 
 </RelativeLayout>
-

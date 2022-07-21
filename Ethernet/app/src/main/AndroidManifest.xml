@@ -23,7 +23,6 @@
         <activity
             android:name="com.nxp.ethernet.MainActivity"
             android:label="@string/app_name"
-            android:screenOrientation="landscape"
             android:hardwareAccelerated="true"
             android:exported="true">
             <intent-filter>
