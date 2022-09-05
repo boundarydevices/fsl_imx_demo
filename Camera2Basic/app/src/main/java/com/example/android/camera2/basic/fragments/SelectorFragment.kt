@@ -68,12 +68,8 @@ class SelectorFragment : Fragment() {
         }
 
         // This swipe gesture adds a fun gesture to switch between video and photo
-        val swipeGestures = SwipeGestureDetector().apply {
-            setSwipeCallback(right = {
-                Navigation.findNavController(view).navigate(R.id.action_camera_to_video)
-            })
-        }
-
+        view.setTag("right")
+        val swipeGestures = SwipeGestureDetector(view)
         val gestureDetectorCompat = GestureDetector(requireContext(), swipeGestures)
         view.setOnTouchListener { _, motionEvent ->
             if (gestureDetectorCompat.onTouchEvent(motionEvent)) return@setOnTouchListener false
