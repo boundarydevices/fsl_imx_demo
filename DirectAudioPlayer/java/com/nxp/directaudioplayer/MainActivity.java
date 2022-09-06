@@ -285,6 +285,7 @@ public class MainActivity extends Activity {
             this.mFileName = filename;
         }
         public void run() {
+            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_AUDIO);
             try {
                 mTempFile = new File(Environment.getExternalStorageDirectory().getAbsoluteFile() + "/" + mFileName);
             } catch (Exception ex) {
