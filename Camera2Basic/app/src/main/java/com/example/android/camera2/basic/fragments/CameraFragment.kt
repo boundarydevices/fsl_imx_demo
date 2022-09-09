@@ -64,6 +64,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener
 import android.hardware.camera2.CameraCharacteristics
 import android.util.Range
 import android.widget.CompoundButton
+import android.view.ScaleGestureDetector
 
 class CameraFragment : Fragment() {
     private var mHflip = 0
@@ -195,6 +196,25 @@ class CameraFragment : Fragment() {
             observe(viewLifecycleOwner, Observer {
                 orientation -> Log.d(TAG, "Orientation changed: $orientation")
             })
+        }
+
+        // scale gesture detector
+        var scaleFactor = 1f
+        val scaleGestureDetector = ScaleGestureDetector(
+            requireContext(),
+            object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+                override fun onScale(detector: ScaleGestureDetector): Boolean {
+                    scaleFactor *= detector.scaleFactor
+                    scaleFactor = scaleFactor.coerceIn(1.0f, 4.0f)
+
+                    viewFinder.scaleX = scaleFactor
+                    viewFinder.scaleY = scaleFactor
+                    return super.onScale(detector)
+                }
+            }
+        )
+        viewFinder.setOnTouchListener { _, event ->
+            scaleGestureDetector.onTouchEvent(event)
         }
     }
 

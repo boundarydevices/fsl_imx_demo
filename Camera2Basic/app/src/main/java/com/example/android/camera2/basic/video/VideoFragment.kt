@@ -53,6 +53,7 @@ import java.util.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
+import android.view.ScaleGestureDetector
 
 class VideoFragment : Fragment() {
 
@@ -217,6 +218,25 @@ class VideoFragment : Fragment() {
             observe(viewLifecycleOwner, Observer {
                 orientation -> Log.d(TAG, "Orientation changed: $orientation")
             })
+        }
+
+        // scale gesture detector
+        var scaleFactor = 1f
+        val scaleGestureDetector = ScaleGestureDetector(
+            requireContext(),
+            object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+                override fun onScale(detector: ScaleGestureDetector): Boolean {
+                    scaleFactor *= detector.scaleFactor
+                    scaleFactor = scaleFactor.coerceIn(1.0f, 4.0f)
+
+                    viewFinder.scaleX = scaleFactor
+                    viewFinder.scaleY = scaleFactor
+                    return super.onScale(detector)
+                }
+            }
+        )
+        viewFinder.setOnTouchListener { _, event ->
+            scaleGestureDetector.onTouchEvent(event)
         }
     }
 
