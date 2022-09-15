@@ -71,8 +71,6 @@ class CameraFragment : Fragment() {
     private var mDewarp = 0
     private var scene_mode = CaptureRequest.CONTROL_SCENE_MODE_DISABLED
     private var wb_mode = CameraMetadata.CONTROL_AWB_MODE_AUTO
-    private var m_expGain = -1;
-    private var m_expTime: Long = -1;
 
     /** AndroidX navigation arguments */
     private val args: CameraFragmentArgs by navArgs()
@@ -334,8 +332,7 @@ class CameraFragment : Fragment() {
                 session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
             }
 
-            /* AE_COMPENSATION */
-/*
+            /* exposure gain */
             val supportedExposure = characteristics.get(CameraCharacteristics.CONTROL_AE_COMPENSATION_RANGE)
             if (supportedExposure != null) {
                 val gainRange: Range<Int> = supportedExposure
@@ -345,8 +342,8 @@ class CameraFragment : Fragment() {
 
                 _binding?.exposureGain?.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
                     override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                        val m_expGain = progress
-                        captureRequest.set(CaptureRequest.CONTROL_AE_EXPOSURE_COMPENSATION, m_expGain)
+                        val expGain = progress
+                        captureRequest.set(CaptureRequest.CONTROL_AE_EXPOSURE_COMPENSATION, expGain)
                         session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
                     }
 
@@ -358,27 +355,6 @@ class CameraFragment : Fragment() {
 
                 })
             }
-*/
-            /* exposure gain */
-            _binding?.exposureGain?.setMin(1)
-            _binding?.exposureGain?.setMax(10)
-
-            _binding?.exposureGain?.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
-                override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                    captureRequest.set(CaptureRequest.CONTROL_AE_MODE, CameraMetadata.CONTROL_AE_MODE_OFF)
-
-                    m_expGain = progress
-                    val EXPOSURE_GAIN = CaptureRequest.Key("vsi.exposure.gain", Int::class.java)
-                    captureRequest.set(EXPOSURE_GAIN, m_expGain)
-                    session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
-                }
-
-                override fun onStartTrackingTouch(seekBar: SeekBar) {
-                }
-
-                override fun onStopTrackingTouch(seekBar: SeekBar) {
-                }
-            })
 
             /* exposure time */
             val supportedExposureTime = characteristics.get(CameraCharacteristics.SENSOR_INFO_EXPOSURE_TIME_RANGE)
@@ -388,18 +364,16 @@ class CameraFragment : Fragment() {
 
                 _binding?.exposureTime?.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
                     override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                        captureRequest.set(CaptureRequest.CONTROL_AE_MODE, CameraMetadata.CONTROL_AE_MODE_OFF)
-
-                        m_expTime =
+                        val expTime =
                                 timeRange.lower + (timeRange.upper - timeRange.lower) * progress / 100
-                        captureRequest.set(CaptureRequest.SENSOR_EXPOSURE_TIME, m_expTime)
+                        captureRequest.set(CaptureRequest.SENSOR_EXPOSURE_TIME, expTime)
                         session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
 
                         val left = _binding?.exposureTime?.getLeft()
                         val right = _binding?.exposureTime?.getRight()
                         if ((left != null) && (right != null)) {
                             val pox = left + (right - left) * progress / 100
-                            _binding?.currentExposureTime?.setText(m_expTime.toString())
+                            _binding?.currentExposureTime?.setText(expTime.toString())
                             _binding?.currentExposureTime?.setX(java.lang.Float.valueOf(pox.toString()))
                         }
                     }
@@ -696,19 +670,6 @@ class CameraFragment : Fragment() {
         captureRequest.set(CaptureRequest.CONTROL_SCENE_MODE, scene_mode)
         captureRequest.set(CaptureRequest.CONTROL_AWB_MODE, wb_mode)
         Log.i(TAG, "takePhoto, set scene mode ${scene_mode}, wb mode ${wb_mode}")
-
-        if (m_expGain > -1) {
-            captureRequest.set(CaptureRequest.CONTROL_AE_MODE, CameraMetadata.CONTROL_AE_MODE_OFF)
-            val EXPOSURE_GAIN = CaptureRequest.Key("vsi.exposure.gain", Int::class.java)
-            captureRequest.set(EXPOSURE_GAIN, m_expGain)
-        }
-
-        if (m_expTime > -1) {
-            captureRequest.set(CaptureRequest.CONTROL_AE_MODE, CameraMetadata.CONTROL_AE_MODE_OFF)
-            captureRequest.set(CaptureRequest.SENSOR_EXPOSURE_TIME, m_expTime)
-        }
-
-        Log.i(TAG, "takePhoto, set m_expGain ${m_expGain}, m_expTime ${m_expTime}")
 
         session.capture(captureRequest.build(), object : CameraCaptureSession.CaptureCallback() {
 
