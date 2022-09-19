@@ -198,21 +198,139 @@ class CameraFragment : Fragment() {
 
         // scale gesture detector
         var scaleFactor = 1f
-        val scaleGestureDetector = ScaleGestureDetector(
-            requireContext(),
-            object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
-                override fun onScale(detector: ScaleGestureDetector): Boolean {
-                    scaleFactor *= detector.scaleFactor
-                    scaleFactor = scaleFactor.coerceIn(1.0f, 4.0f)
+        var detectScaleFactor = 1f
+        var mListener = object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+            override fun onScale(detector: ScaleGestureDetector): Boolean {
+                scaleFactor *= detectScaleFactor
+                scaleFactor = scaleFactor.coerceIn(1.0f, 4.0f)
+                viewFinder.scaleX = scaleFactor
+                viewFinder.scaleY = scaleFactor
 
-                    viewFinder.scaleX = scaleFactor
-                    viewFinder.scaleY = scaleFactor
-                    return super.onScale(detector)
+                return super.onScale(detector)
+            }
+
+            override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
+                return true
+            }
+            override fun onScaleEnd(detector: ScaleGestureDetector): Unit {
+            }
+
+        }
+
+        val scaleGestureDetector = ScaleGestureDetector(
+            requireContext(), mListener)
+
+        var mCurrSpan : Float
+        var mPrevSpan = 0f
+        var mInProgress = false
+        fun onTouchEvent(event: MotionEvent): Boolean {
+            val mMinSpan = 100
+            val mSpanSlop = 24
+            var mInitialSpan = 0f
+            val action = event.actionMasked
+            val count = event.pointerCount
+
+            val streamComplete =
+                action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL
+            if (action == MotionEvent.ACTION_DOWN || streamComplete) {
+                // Reset any scale in progress with the listener.
+                // If it's an ACTION_DOWN we're beginning a new event stream.
+                // This means the app probably didn't give us all the events. Shame on it.
+                if (mInProgress) {
+                    mListener.onScaleEnd(scaleGestureDetector)
+                    mInProgress = false
+                    mInitialSpan = 0f
+                } else if (streamComplete) {
+                    mInProgress = false
+                    mInitialSpan = 0f
+                }
+                if (streamComplete) {
+                    return true
                 }
             }
-        )
+
+            val configChanged =
+                action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_UP || action == MotionEvent.ACTION_POINTER_DOWN
+
+            val pointerUp = action == MotionEvent.ACTION_POINTER_UP
+            val skipIndex = if (pointerUp) event.actionIndex else -1
+            // Determine focal point
+            var sumX = 0f
+            var sumY = 0f
+            val div = if (pointerUp) count - 1 else count
+            val focusX: Float
+            val focusY: Float
+
+            for (i in 0 until count) {
+                if (skipIndex == i) continue
+                sumX += event.getX(i)
+                sumY += event.getY(i)
+            }
+            focusX = sumX / div
+            focusY = sumY / div
+
+            // Determine average deviation from focal point
+            var devSumX = 0f
+            var devSumY = 0f
+            for (i in 0 until count) {
+                if (skipIndex == i) continue
+                // Convert the resulting diameter into a radius.
+                devSumX += Math.abs(event.getX(i) - focusX)
+                devSumY += Math.abs(event.getY(i) - focusY)
+            }
+            val devX = devSumX / div
+            val devY = devSumY / div
+
+            // Span is the average distance between touch points through the focal point;
+            // i.e. the diameter of the circle with a radius of the average deviation from
+            // the focal point.
+            val spanX = devX * 2
+            val spanY = devY * 2
+            val span: Float
+            span = Math.hypot(spanX.toDouble(), spanY.toDouble()).toFloat()
+
+            // Dispatch begin/end events as needed.
+            // If the configuration changes, notify the app to reset its current state by beginning
+            // a fresh scale event stream.
+            val wasInProgress: Boolean = mInProgress
+            if (mInProgress && (span < mMinSpan || configChanged)) {
+                mListener.onScaleEnd(scaleGestureDetector)
+                mInProgress = false
+                mInitialSpan = span
+            }
+            if (configChanged) {
+                mCurrSpan = span
+                mPrevSpan = mCurrSpan
+                mInitialSpan = mPrevSpan
+            }
+
+            val minSpan: Int = mMinSpan
+            if (!mInProgress && span >= minSpan && (wasInProgress || Math.abs(span - mInitialSpan) > mSpanSlop)
+            ) {
+                mCurrSpan = span
+                mPrevSpan = mCurrSpan
+                mInProgress = mListener.onScaleBegin(scaleGestureDetector)
+            }
+
+            // Handle motion; focal point and span/scale factor are changing.
+            if (action == MotionEvent.ACTION_MOVE) {
+                mCurrSpan = span
+                detectScaleFactor = mCurrSpan / mPrevSpan
+
+                var updatePrev = true
+                if (mInProgress) {
+                    updatePrev = mListener.onScale(scaleGestureDetector)
+                }
+                if (updatePrev) {
+                    mPrevSpan = mCurrSpan
+                }
+            }
+            return true
+        }
+
         viewFinder.setOnTouchListener { _, event ->
-            scaleGestureDetector.onTouchEvent(event)
+            onTouchEvent(event)
+            return@setOnTouchListener true
         }
     }
 
