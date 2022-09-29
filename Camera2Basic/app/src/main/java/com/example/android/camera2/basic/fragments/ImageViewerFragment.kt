@@ -38,12 +38,19 @@ import kotlinx.coroutines.launch
 import java.io.BufferedInputStream
 import java.io.File
 import kotlin.math.max
-
+import java.io.ByteArrayOutputStream
 
 class ImageViewerFragment : Fragment() {
 
     /** AndroidX navigation arguments */
     private val args: ImageViewerFragmentArgs by navArgs()
+
+    /** Convert bitmap to Byte **/
+    private fun bitmapToByte(bitmap: Bitmap): ByteArray? {
+        val stream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+        return stream.toByteArray()
+    }
 
     /** Default Bitmap decoding options */
     private val bitmapOptions = BitmapFactory.Options().apply {
@@ -80,7 +87,7 @@ class ImageViewerFragment : Fragment() {
                 bitmapList,
                 itemViewFactory = { imageViewFactory() }) { view, item, _ ->
             view as ImageView
-            Glide.with(view).load(item).into(view)
+            Glide.with(context).load(bitmapToByte(item)).asBitmap().into(view)
         }
     }
 

@@ -78,7 +78,7 @@ android_app {
 
     static_libs: [
         "guava",
-        "glide-prebuilt",
+        "glide",
         "concurrent-futures",
         "navigation-safe-args-gradle-plugin",
         "androidx-constraintlayout_constraintlayout",
