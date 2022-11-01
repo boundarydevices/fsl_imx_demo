@@ -47,6 +47,7 @@ import java.util.*
  */
 class VideoSelectorFragment : Fragment() {
 
+    lateinit var mView : RecyclerView
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
@@ -57,24 +58,6 @@ class VideoSelectorFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         view as RecyclerView
-        view.apply {
-            layoutManager = LinearLayoutManager(requireContext())
-
-            val cameraManager =
-                    requireContext().getSystemService(Context.CAMERA_SERVICE) as CameraManager
-
-            val cameraList = enumerateVideoCameras(cameraManager)
-
-            val layoutId = android.R.layout.simple_list_item_1
-            adapter = GenericListAdapter(cameraList, itemLayoutId = layoutId) { view, item, _ ->
-                view.findViewById<TextView>(android.R.id.text1).text = item.name
-                view.setOnClickListener {
-                    Navigation.findNavController(requireActivity(), R.id.fragment_container)
-                            .navigate(VideoSelectorFragmentDirections.actionSelectorToVideo(
-                                    item.cameraId, item.size.width, item.size.height, item.fps))
-                }
-            }
-        }
 
         // This swipe gesture adds a fun gesture to switch between video and photo
         view.setTag("left")
@@ -83,6 +66,30 @@ class VideoSelectorFragment : Fragment() {
         view.setOnTouchListener { _, motionEvent ->
             if (gestureDetectorCompat.onTouchEvent(motionEvent)) return@setOnTouchListener false
             return@setOnTouchListener true
+        }
+
+        mView = view
+    }
+
+    override fun onStart() {
+        super.onStart()
+        mView.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+
+            val cameraManager =
+                    requireContext().getSystemService(Context.CAMERA_SERVICE) as CameraManager
+
+            val cameraList = enumerateVideoCameras(cameraManager)
+
+            val layoutId = android.R.layout.simple_list_item_1
+            adapter = GenericListAdapter(cameraList, itemLayoutId = layoutId) { mView, item, _ ->
+                mView.findViewById<TextView>(android.R.id.text1).text = item.name
+                mView.setOnClickListener {
+                    Navigation.findNavController(requireActivity(), R.id.fragment_container)
+                            .navigate(VideoSelectorFragmentDirections.actionSelectorToVideo(
+                                    item.cameraId, item.size.width, item.size.height, item.fps))
+                }
+            }
         }
     }
 
