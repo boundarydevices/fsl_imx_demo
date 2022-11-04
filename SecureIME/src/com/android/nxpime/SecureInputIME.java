@@ -67,4 +67,13 @@ public class SecureInputIME extends InputMethodService {
 			return super.onEvaluateInputViewShown();
 		}
 	}
+
+	@Override
+	public void onStartInput(EditorInfo attribute, boolean restarting) {
+		ic = getCurrentInputConnection();
+		if (ic != null && imeSurfaceview != null) {
+			imeSurfaceview.setInputConnection(ic);
+		} else
+			Log.e(TAG, "Can not get valid InputConnection in onStartInput!");
+	}
 }

@@ -65,7 +65,7 @@ public class SecureIMESurfaceView extends SurfaceView implements Callback {
 				y = (int) event.getY(); // get Y coordinate
 				key = deliverInput(x, y);
 				/* only allow valid key */
-				Log.i(TAG, "coordinate: X " + x + " Y " + y + " key " + key);
+				Log.i(TAG, "coordinate: X " + x + " Y " + y);
 				if ((key >= 0) && (key <= 9)) {
 					mIC.commitText(String.valueOf(key), 0);
 				} else if (key == 10) {

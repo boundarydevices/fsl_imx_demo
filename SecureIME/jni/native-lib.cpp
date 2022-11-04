@@ -191,7 +191,7 @@ deliverInput(JNIEnv *env, jobject thiz, jint x, jint y){
             ALOGE("AIDL call SecureIMEHandleTouch failed!");
         }
     }
-    ALOGI("native get coordinate x %d, y %d key %d", x, y, key);
+    ALOGI("native get coordinate x %d, y %d", x, y);
 
     return key;
 }
