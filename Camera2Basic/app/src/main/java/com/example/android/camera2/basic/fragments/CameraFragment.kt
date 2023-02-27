@@ -74,7 +74,10 @@ class CameraFragment : Fragment() {
     private var wb_mode = CameraMetadata.CONTROL_AWB_MODE_AUTO
     private var m_expGain = -1;
     private var m_expTime: Long = -1;
-
+    private var mISPMapInt = hashMapOf<CaptureRequest.Key<Int>, Int>()
+    private var mISPMapLong = hashMapOf<CaptureRequest.Key<Long>, Long>()
+    private var mISPMapFloat = hashMapOf<CaptureRequest.Key<Float>, Float>()
+    private var mISPMapByte = hashMapOf<CaptureRequest.Key<Byte>, Byte>()
     /** AndroidX navigation arguments */
     private val args: CameraFragmentArgs by navArgs()
 
@@ -375,6 +378,9 @@ class CameraFragment : Fragment() {
         captureRequest.set(CaptureRequest.CONTROL_AWB_MODE, wb_mode)
         Log.i(TAG,"preview, set scene mode ${scene_mode}, wb mode ${wb_mode}")
 
+        RecoverISP(captureRequest)
+        Log.i(TAG, "Recover the ISP mode")
+
         // This will keep sending the capture request as frequently as possible until the
         // session is torn down or session.stopRepeating() is called
         session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
@@ -452,6 +458,7 @@ class CameraFragment : Fragment() {
             _binding?.hflip?.setOnClickListener {
                 val HFLIP_ENABLE = CaptureRequest.Key("vsi.hflip.enable", Int::class.java)
                 mHflip = 1 - mHflip
+                mISPMapInt[HFLIP_ENABLE] = mHflip
                 captureRequest.set(HFLIP_ENABLE, mHflip)
                 session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
 
@@ -460,6 +467,7 @@ class CameraFragment : Fragment() {
             _binding?.vflip?.setOnClickListener {
                 val VFLIP_ENABLE = CaptureRequest.Key("vsi.vflip.enable", Int::class.java)
                 mVflip = 1 - mVflip
+                mISPMapInt[VFLIP_ENABLE] = mVflip
                 captureRequest.set(VFLIP_ENABLE, mVflip)
                 session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
 
@@ -468,6 +476,7 @@ class CameraFragment : Fragment() {
             _binding?.dewarp?.setOnClickListener {
                 val DEWARP_ENABLE = CaptureRequest.Key("vsi.dewarp.enable", Int::class.java)
                 mDewarp = 1 - mDewarp
+                mISPMapInt[DEWARP_ENABLE] = mDewarp
                 captureRequest.set(DEWARP_ENABLE, mDewarp)
                 session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
             }
@@ -507,6 +516,7 @@ class CameraFragment : Fragment() {
 
                     m_expGain = progress
                     val EXPOSURE_GAIN = CaptureRequest.Key("vsi.exposure.gain", Int::class.java)
+                    mISPMapInt[EXPOSURE_GAIN] = m_expGain
                     captureRequest.set(EXPOSURE_GAIN, m_expGain)
                     session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
                 }
@@ -530,6 +540,7 @@ class CameraFragment : Fragment() {
 
                         m_expTime =
                                 timeRange.lower + (timeRange.upper - timeRange.lower) * progress / 100
+                        mISPMapLong[CaptureRequest.SENSOR_EXPOSURE_TIME] = m_expTime
                         captureRequest.set(CaptureRequest.SENSOR_EXPOSURE_TIME, m_expTime)
                         session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
 
@@ -561,6 +572,7 @@ class CameraFragment : Fragment() {
                     else
                         scene_mode = CaptureRequest.CONTROL_SCENE_MODE_DISABLED
 
+                    mISPMapInt[CaptureRequest.CONTROL_SCENE_MODE] = scene_mode
                     captureRequest.set(CaptureRequest.CONTROL_SCENE_MODE, scene_mode)
                     session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
                 }
@@ -577,6 +589,7 @@ class CameraFragment : Fragment() {
                         lsc = 1
                     else
                         lsc = 0
+                    mISPMapInt[LSC_ENABLE] = lsc
                     captureRequest.set(LSC_ENABLE, lsc)
                     session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
                 }
@@ -590,6 +603,7 @@ class CameraFragment : Fragment() {
                     val GammaMax = 5.0
 
                     var gamma: Float = (GammaMin + (GammaMax - GammaMin) * progress / 100).toFloat()
+                    mISPMapFloat[CaptureRequest.TONEMAP_GAMMA] = gamma
                     captureRequest.set(CaptureRequest.TONEMAP_GAMMA, gamma)
                     session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
 
@@ -617,6 +631,7 @@ class CameraFragment : Fragment() {
                     var brightness = BrightnessMin + (BrightnessMax - BrightnessMin) * progress / 100
 
                     val META_BRIGHTNESS = CaptureRequest.Key("vsi.brightness", Int::class.java)
+                    mISPMapInt[META_BRIGHTNESS] = brightness
                     captureRequest.set(META_BRIGHTNESS, brightness)
                     session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
 
@@ -644,6 +659,7 @@ class CameraFragment : Fragment() {
                     var contrast = (ContrastMin + (ContrastMax - ContrastMin) * progress / 100).toFloat()
 
                     val META_CONTRAST = CaptureRequest.Key("vsi.contrast", Float::class.java)
+                    mISPMapFloat[META_CONTRAST] = contrast
                     captureRequest.set(META_CONTRAST, contrast)
                     session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
 
@@ -671,6 +687,7 @@ class CameraFragment : Fragment() {
                     var saturation = (SaturationMin + (SaturationMax - SaturationMin) * progress / 100).toFloat()
 
                     val META_SATURATION = CaptureRequest.Key("vsi.saturation", Float::class.java)
+                    mISPMapFloat[META_SATURATION] = saturation
                     captureRequest.set(META_SATURATION, saturation)
                     session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
 
@@ -698,6 +715,7 @@ class CameraFragment : Fragment() {
                     var hue = HueMin + (HueMax - HueMin) * progress / 100
 
                     val META_HUE = CaptureRequest.Key("vsi.hue", Int::class.java)
+                    mISPMapInt[META_HUE] = hue
                     captureRequest.set(META_HUE, hue)
                     session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
 
@@ -725,6 +743,7 @@ class CameraFragment : Fragment() {
                     var sharp_level = (SharpLevelMin + (SharpLevelMax - SharpLevelMin) * progress / 100).toByte()
 
                     val META_SHARP_LEVEL = CaptureRequest.Key("vsi.sharp.level", Byte::class.java)
+                    mISPMapByte[META_SHARP_LEVEL] = sharp_level
                     captureRequest.set(META_SHARP_LEVEL, sharp_level)
                     session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
 
@@ -747,10 +766,29 @@ class CameraFragment : Fragment() {
     }
 
     private fun SetWB(captureRequest: android.hardware.camera2.CaptureRequest.Builder, wbMode: Int) {
+        mISPMapInt[CaptureRequest.CONTROL_AWB_MODE] = wbMode
         captureRequest.set(CaptureRequest.CONTROL_AWB_MODE, wbMode)
         session.setRepeatingRequest(captureRequest.build(), null, cameraHandler)
         wb_mode = wbMode
         Log.i(TAG, "SetWB mode ${wb_mode}")
+    }
+
+    private fun RecoverISP(captureRequest : CaptureRequest.Builder) {
+        if (m_expGain > -1 || m_expTime > -1) {
+            captureRequest.set(CaptureRequest.CONTROL_AE_MODE, CameraMetadata.CONTROL_AE_MODE_OFF)
+        }
+        for((key, value) in mISPMapInt) {
+            captureRequest.set(key, value)
+        }
+        for((key, value) in mISPMapLong) {
+            captureRequest.set(key, value)
+        }
+        for((key, value) in mISPMapFloat) {
+            captureRequest.set(key, value)
+        }
+        for((key, value) in mISPMapByte) {
+            captureRequest.set(key, value)
+        }
     }
 
     /** Opens the camera and returns the opened device (as the result of the suspend coroutine) */
