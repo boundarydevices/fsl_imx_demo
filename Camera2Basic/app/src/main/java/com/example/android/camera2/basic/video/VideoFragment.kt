@@ -829,6 +829,9 @@ class VideoFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
+        if (outputFile.exists() && (outputFile.length() == 0L) ){
+            outputFile.delete()
+        }
         try {
             camera.close()
         } catch (exc: Throwable) {
