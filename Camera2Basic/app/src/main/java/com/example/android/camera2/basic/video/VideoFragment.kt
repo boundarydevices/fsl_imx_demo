@@ -97,7 +97,7 @@ class VideoFragment : Fragment() {
     }
 
     /** File where the recording will be saved */
-    private val outputFile: File by lazy { createFile(requireContext(), "mp4") }
+    private lateinit var outputFile: File
 
     /**
      * Setup a persistent [Surface] for the recorder so we can use it as an output target for the
@@ -360,6 +360,10 @@ class VideoFragment : Fragment() {
         setAudioSource(MediaRecorder.AudioSource.MIC)
         setVideoSource(MediaRecorder.VideoSource.SURFACE)
         setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+        if (::outputFile.isInitialized) {
+            outputFile.delete()
+        }
+        outputFile = createFile(requireContext(), "mp4")
         setOutputFile(outputFile.absolutePath)
         setVideoEncodingBitRate(RECORDER_VIDEO_BITRATE)
         if (args.fps > 0) setVideoFrameRate(args.fps)
