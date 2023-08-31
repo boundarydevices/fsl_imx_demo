@@ -1,3 +1,10 @@
+/*
+ * Copyright 2023 NXP
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ */
+
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
