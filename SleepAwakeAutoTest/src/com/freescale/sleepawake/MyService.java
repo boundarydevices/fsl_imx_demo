@@ -26,54 +26,56 @@ import android.widget.RemoteViews;
 
 public class MyService extends Service {
 
-	private MyReceiver receiver;
-	private NotificationManager notificationManager;
-	private int sleeptime;
-	private int awaketime;
+    private MyReceiver receiver;
+    private NotificationManager notificationManager;
+    private int sleeptime;
+    private int awaketime;
 
+    @Override
+    public IBinder onBind(Intent intent) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public IBinder onBind(Intent intent) {
-		// TODO Auto-generated method stub	
-		return null;
-	}
+    @Override
+    public void onCreate() {
+        receiver = new MyReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("android.intent.action.MY_SLEEP_AWAKE");
+        filter.addAction("android.intent.action.CANCEL_MY_SLEEP_AWAKE");
+        registerReceiver(receiver, filter);
+    }
 
-	@Override
-	public void onCreate() {
-		receiver = new MyReceiver();
-		IntentFilter filter = new IntentFilter();  
-		filter.addAction("android.intent.action.MY_SLEEP_AWAKE");
-		filter.addAction("android.intent.action.CANCEL_MY_SLEEP_AWAKE");
-		registerReceiver(receiver, filter); 
-	}
+    @Override
+    public void onStart(Intent intent, int startId) {
+        // Get sleeptime and awaketime from the EditView
+        sleeptime = intent.getIntExtra("sleeptime", 5);
+        awaketime = intent.getIntExtra("awaketime", 5);
 
-	@Override  
-	public void onStart(Intent intent, int startId) {  
-		//Get sleeptime and awaketime from the EditView
-		sleeptime = intent.getIntExtra("sleeptime", 5);
-		awaketime = intent.getIntExtra("awaketime", 5);
+        // Set the notification
+        notificationManager =
+                (NotificationManager)
+                        this.getSystemService(android.content.Context.NOTIFICATION_SERVICE);
+        Notification notification =
+                new Notification(R.drawable.lock, "sleepawake", System.currentTimeMillis());
+        notification.flags |= Notification.FLAG_AUTO_CANCEL;
+        RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.notification);
+        notification.contentView = contentView;
+        Intent cancelIntent = new Intent("android.intent.action.CANCEL_MY_SLEEP_AWAKE");
+        PendingIntent cancelPendingIntent = PendingIntent.getBroadcast(this, 0, cancelIntent, 0);
+        notification.contentView.setOnClickPendingIntent(R.id.cancelButton, cancelPendingIntent);
+        notificationManager.notify(0, notification);
 
-		//Set the notification
-		notificationManager = (NotificationManager)this.getSystemService(android.content.Context.NOTIFICATION_SERVICE);
-		Notification notification = new Notification(R.drawable.lock, "sleepawake", System.currentTimeMillis());
-		notification.flags |= Notification.FLAG_AUTO_CANCEL;
-		RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.notification);
-		notification.contentView = contentView;
-		Intent cancelIntent = new Intent("android.intent.action.CANCEL_MY_SLEEP_AWAKE");
-		PendingIntent cancelPendingIntent = PendingIntent.getBroadcast(this, 0, cancelIntent, 0);
-		notification.contentView.setOnClickPendingIntent(R.id.cancelButton, cancelPendingIntent);
-		notificationManager.notify(0, notification);
+        Intent newIntent = new Intent("android.intent.action.MY_SLEEP_AWAKE");
+        newIntent.putExtra("action", "sleep");
+        newIntent.putExtra("SleepDelayTime", sleeptime);
+        newIntent.putExtra("AwakeDelayTime", awaketime);
+        sendBroadcast(newIntent);
+    }
 
-		Intent newIntent = new Intent("android.intent.action.MY_SLEEP_AWAKE");
-		newIntent.putExtra("action","sleep");
-		newIntent.putExtra("SleepDelayTime",sleeptime);
-		newIntent.putExtra("AwakeDelayTime",awaketime);
-		sendBroadcast(newIntent);
-	}
-
-	@Override
-	public void onDestroy() {
-		unregisterReceiver(receiver);
-		notificationManager.cancel(0);
-	}
+    @Override
+    public void onDestroy() {
+        unregisterReceiver(receiver);
+        notificationManager.cancel(0);
+    }
 }

@@ -7,224 +7,231 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.viewbinding.ViewBinding;
+
 import com.nxp.multicamera.R;
 import com.nxp.multicamera.ui.AutoFitTextureView;
-import java.lang.NullPointerException;
-import java.lang.Override;
-import java.lang.String;
 
 public final class FragmentCamera2Binding implements ViewBinding {
-  @NonNull
-  private final ConstraintLayout rootView;
+    @NonNull private final ConstraintLayout rootView;
 
-  @NonNull
-  public final TextView camera1TextView;
+    @NonNull public final TextView camera1TextView;
 
-  @NonNull
-  public final AutoFitTextureView camera1View;
+    @NonNull public final AutoFitTextureView camera1View;
 
-  @NonNull
-  public final RelativeLayout camera1ViewLayout;
+    @NonNull public final RelativeLayout camera1ViewLayout;
 
-  @NonNull
-  public final TextView camera2TextView;
+    @NonNull public final TextView camera2TextView;
 
-  @NonNull
-  public final AutoFitTextureView camera2View;
+    @NonNull public final AutoFitTextureView camera2View;
 
-  @NonNull
-  public final RelativeLayout camera2ViewLayout;
+    @NonNull public final RelativeLayout camera2ViewLayout;
 
-  @NonNull
-  public final TextView logicalCameraTv;
+    @NonNull public final TextView logicalCameraTv;
 
-  @NonNull
-  public final TextView multiCameraSupportTv;
+    @NonNull public final TextView multiCameraSupportTv;
 
-  @NonNull
-  public final TextView physicalCameraTv;
+    @NonNull public final TextView physicalCameraTv;
 
-  @NonNull
-  public final TextView textView;
+    @NonNull public final TextView textView;
 
-  @NonNull
-  public final TextView textView0;
+    @NonNull public final TextView textView0;
 
-  @NonNull
-  public final TextView textView2;
+    @NonNull public final TextView textView2;
 
-  @NonNull
-  public final TextView textView3;
+    @NonNull public final TextView textView3;
 
-  @NonNull
-  public final TextView textView5;
+    @NonNull public final TextView textView5;
 
-  @NonNull
-  public final TextView totalCamera;
+    @NonNull public final TextView totalCamera;
 
-  @NonNull
-  public final SeekBar zoomBar;
+    @NonNull public final SeekBar zoomBar;
 
-  private FragmentCamera2Binding(@NonNull ConstraintLayout rootView,
-      @NonNull TextView camera1TextView, @NonNull AutoFitTextureView camera1View,
-      @NonNull RelativeLayout camera1ViewLayout, @NonNull TextView camera2TextView,
-      @NonNull AutoFitTextureView camera2View, @NonNull RelativeLayout camera2ViewLayout,
-      @NonNull TextView logicalCameraTv, @NonNull TextView multiCameraSupportTv,
-      @NonNull TextView physicalCameraTv, @NonNull TextView textView, @NonNull TextView textView0,
-      @NonNull TextView textView2, @NonNull TextView textView3, @NonNull TextView textView5,
-      @NonNull TextView totalCamera, @NonNull SeekBar zoomBar) {
-    this.rootView = rootView;
-    this.camera1TextView = camera1TextView;
-    this.camera1View = camera1View;
-    this.camera1ViewLayout = camera1ViewLayout;
-    this.camera2TextView = camera2TextView;
-    this.camera2View = camera2View;
-    this.camera2ViewLayout = camera2ViewLayout;
-    this.logicalCameraTv = logicalCameraTv;
-    this.multiCameraSupportTv = multiCameraSupportTv;
-    this.physicalCameraTv = physicalCameraTv;
-    this.textView = textView;
-    this.textView0 = textView0;
-    this.textView2 = textView2;
-    this.textView3 = textView3;
-    this.textView5 = textView5;
-    this.totalCamera = totalCamera;
-    this.zoomBar = zoomBar;
-  }
-
-  @Override
-  @NonNull
-  public ConstraintLayout getRoot() {
-    return rootView;
-  }
-
-  @NonNull
-  public static FragmentCamera2Binding inflate(@NonNull LayoutInflater inflater) {
-    return inflate(inflater, null, false);
-  }
-
-  @NonNull
-  public static FragmentCamera2Binding inflate(@NonNull LayoutInflater inflater,
-      @Nullable ViewGroup parent, boolean attachToParent) {
-    View root = inflater.inflate(R.layout.fragment_camera_2, parent, false);
-    if (attachToParent) {
-      parent.addView(root);
+    private FragmentCamera2Binding(
+            @NonNull ConstraintLayout rootView,
+            @NonNull TextView camera1TextView,
+            @NonNull AutoFitTextureView camera1View,
+            @NonNull RelativeLayout camera1ViewLayout,
+            @NonNull TextView camera2TextView,
+            @NonNull AutoFitTextureView camera2View,
+            @NonNull RelativeLayout camera2ViewLayout,
+            @NonNull TextView logicalCameraTv,
+            @NonNull TextView multiCameraSupportTv,
+            @NonNull TextView physicalCameraTv,
+            @NonNull TextView textView,
+            @NonNull TextView textView0,
+            @NonNull TextView textView2,
+            @NonNull TextView textView3,
+            @NonNull TextView textView5,
+            @NonNull TextView totalCamera,
+            @NonNull SeekBar zoomBar) {
+        this.rootView = rootView;
+        this.camera1TextView = camera1TextView;
+        this.camera1View = camera1View;
+        this.camera1ViewLayout = camera1ViewLayout;
+        this.camera2TextView = camera2TextView;
+        this.camera2View = camera2View;
+        this.camera2ViewLayout = camera2ViewLayout;
+        this.logicalCameraTv = logicalCameraTv;
+        this.multiCameraSupportTv = multiCameraSupportTv;
+        this.physicalCameraTv = physicalCameraTv;
+        this.textView = textView;
+        this.textView0 = textView0;
+        this.textView2 = textView2;
+        this.textView3 = textView3;
+        this.textView5 = textView5;
+        this.totalCamera = totalCamera;
+        this.zoomBar = zoomBar;
     }
-    return bind(root);
-  }
 
-  @NonNull
-  public static FragmentCamera2Binding bind(@NonNull View rootView) {
-    // The body of this method is generated in a way you would not otherwise write.
-    // This is done to optimize the compiled bytecode for size and performance.
-    int id;
-    missingId: {
-      id = R.id.camera_1_textView;
-      TextView camera1TextView = rootView.findViewById(id);
-      if (camera1TextView == null) {
-        break missingId;
-      }
-
-      id = R.id.camera1View;
-      AutoFitTextureView camera1View = rootView.findViewById(id);
-      if (camera1View == null) {
-        break missingId;
-      }
-
-      id = R.id.camera1ViewLayout;
-      RelativeLayout camera1ViewLayout = rootView.findViewById(id);
-      if (camera1ViewLayout == null) {
-        break missingId;
-      }
-
-      id = R.id.camera_2_textView;
-      TextView camera2TextView = rootView.findViewById(id);
-      if (camera2TextView == null) {
-        break missingId;
-      }
-
-      id = R.id.camera2View;
-      AutoFitTextureView camera2View = rootView.findViewById(id);
-      if (camera2View == null) {
-        break missingId;
-      }
-
-      id = R.id.camera2ViewLayout;
-      RelativeLayout camera2ViewLayout = rootView.findViewById(id);
-      if (camera2ViewLayout == null) {
-        break missingId;
-      }
-
-      id = R.id.logicalCameraTv;
-      TextView logicalCameraTv = rootView.findViewById(id);
-      if (logicalCameraTv == null) {
-        break missingId;
-      }
-
-      id = R.id.multiCameraSupportTv;
-      TextView multiCameraSupportTv = rootView.findViewById(id);
-      if (multiCameraSupportTv == null) {
-        break missingId;
-      }
-
-      id = R.id.physicalCameraTv;
-      TextView physicalCameraTv = rootView.findViewById(id);
-      if (physicalCameraTv == null) {
-        break missingId;
-      }
-
-      id = R.id.textView;
-      TextView textView = rootView.findViewById(id);
-      if (textView == null) {
-        break missingId;
-      }
-
-      id = R.id.textView0;
-      TextView textView0 = rootView.findViewById(id);
-      if (textView0 == null) {
-        break missingId;
-      }
-
-      id = R.id.textView2;
-      TextView textView2 = rootView.findViewById(id);
-      if (textView2 == null) {
-        break missingId;
-      }
-
-      id = R.id.textView3;
-      TextView textView3 = rootView.findViewById(id);
-      if (textView3 == null) {
-        break missingId;
-      }
-
-      id = R.id.textView5;
-      TextView textView5 = rootView.findViewById(id);
-      if (textView5 == null) {
-        break missingId;
-      }
-
-      id = R.id.totalCamera;
-      TextView totalCamera = rootView.findViewById(id);
-      if (totalCamera == null) {
-        break missingId;
-      }
-
-      id = R.id.zoomBar;
-      SeekBar zoomBar = rootView.findViewById(id);
-      if (zoomBar == null) {
-        break missingId;
-      }
-
-      return new FragmentCamera2Binding((ConstraintLayout) rootView, camera1TextView, camera1View,
-          camera1ViewLayout, camera2TextView, camera2View, camera2ViewLayout, logicalCameraTv,
-          multiCameraSupportTv, physicalCameraTv, textView, textView0, textView2, textView3,
-          textView5, totalCamera, zoomBar);
+    @Override
+    @NonNull
+    public ConstraintLayout getRoot() {
+        return rootView;
     }
-    String missingId = rootView.getResources().getResourceName(id);
-    throw new NullPointerException("Missing required view with ID: ".concat(missingId));
-  }
+
+    @NonNull
+    public static FragmentCamera2Binding inflate(@NonNull LayoutInflater inflater) {
+        return inflate(inflater, null, false);
+    }
+
+    @NonNull
+    public static FragmentCamera2Binding inflate(
+            @NonNull LayoutInflater inflater, @Nullable ViewGroup parent, boolean attachToParent) {
+        View root = inflater.inflate(R.layout.fragment_camera_2, parent, false);
+        if (attachToParent) {
+            parent.addView(root);
+        }
+        return bind(root);
+    }
+
+    @NonNull
+    public static FragmentCamera2Binding bind(@NonNull View rootView) {
+        // The body of this method is generated in a way you would not otherwise write.
+        // This is done to optimize the compiled bytecode for size and performance.
+        int id;
+        missingId:
+        {
+            id = R.id.camera_1_textView;
+            TextView camera1TextView = rootView.findViewById(id);
+            if (camera1TextView == null) {
+                break missingId;
+            }
+
+            id = R.id.camera1View;
+            AutoFitTextureView camera1View = rootView.findViewById(id);
+            if (camera1View == null) {
+                break missingId;
+            }
+
+            id = R.id.camera1ViewLayout;
+            RelativeLayout camera1ViewLayout = rootView.findViewById(id);
+            if (camera1ViewLayout == null) {
+                break missingId;
+            }
+
+            id = R.id.camera_2_textView;
+            TextView camera2TextView = rootView.findViewById(id);
+            if (camera2TextView == null) {
+                break missingId;
+            }
+
+            id = R.id.camera2View;
+            AutoFitTextureView camera2View = rootView.findViewById(id);
+            if (camera2View == null) {
+                break missingId;
+            }
+
+            id = R.id.camera2ViewLayout;
+            RelativeLayout camera2ViewLayout = rootView.findViewById(id);
+            if (camera2ViewLayout == null) {
+                break missingId;
+            }
+
+            id = R.id.logicalCameraTv;
+            TextView logicalCameraTv = rootView.findViewById(id);
+            if (logicalCameraTv == null) {
+                break missingId;
+            }
+
+            id = R.id.multiCameraSupportTv;
+            TextView multiCameraSupportTv = rootView.findViewById(id);
+            if (multiCameraSupportTv == null) {
+                break missingId;
+            }
+
+            id = R.id.physicalCameraTv;
+            TextView physicalCameraTv = rootView.findViewById(id);
+            if (physicalCameraTv == null) {
+                break missingId;
+            }
+
+            id = R.id.textView;
+            TextView textView = rootView.findViewById(id);
+            if (textView == null) {
+                break missingId;
+            }
+
+            id = R.id.textView0;
+            TextView textView0 = rootView.findViewById(id);
+            if (textView0 == null) {
+                break missingId;
+            }
+
+            id = R.id.textView2;
+            TextView textView2 = rootView.findViewById(id);
+            if (textView2 == null) {
+                break missingId;
+            }
+
+            id = R.id.textView3;
+            TextView textView3 = rootView.findViewById(id);
+            if (textView3 == null) {
+                break missingId;
+            }
+
+            id = R.id.textView5;
+            TextView textView5 = rootView.findViewById(id);
+            if (textView5 == null) {
+                break missingId;
+            }
+
+            id = R.id.totalCamera;
+            TextView totalCamera = rootView.findViewById(id);
+            if (totalCamera == null) {
+                break missingId;
+            }
+
+            id = R.id.zoomBar;
+            SeekBar zoomBar = rootView.findViewById(id);
+            if (zoomBar == null) {
+                break missingId;
+            }
+
+            return new FragmentCamera2Binding(
+                    (ConstraintLayout) rootView,
+                    camera1TextView,
+                    camera1View,
+                    camera1ViewLayout,
+                    camera2TextView,
+                    camera2View,
+                    camera2ViewLayout,
+                    logicalCameraTv,
+                    multiCameraSupportTv,
+                    physicalCameraTv,
+                    textView,
+                    textView0,
+                    textView2,
+                    textView3,
+                    textView5,
+                    totalCamera,
+                    zoomBar);
+        }
+        String missingId = rootView.getResources().getResourceName(id);
+        throw new NullPointerException("Missing required view with ID: ".concat(missingId));
+    }
 }

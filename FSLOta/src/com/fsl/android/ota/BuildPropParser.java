@@ -16,47 +16,48 @@
 
 package com.fsl.android.ota;
 
-import java.io.*;
-import java.util.*;
-
 import android.content.Context;
 import android.util.Log;
+
+import java.io.*;
+import java.util.*;
 
 public class BuildPropParser {
     private HashMap<String, String> propHM = null;
     File tmpFile;
     Context mContext;
-    
+
     final String TAG = "OTA";
 
     BuildPropParser(ByteArrayOutputStream out, Context context) {
-    	mContext = context;
+        mContext = context;
         propHM = new HashMap<String, String>();
         setByteArrayStream(out);
     }
 
     BuildPropParser(File file, Context context) throws IOException {
-    	mContext = context;
+        mContext = context;
         propHM = new HashMap<String, String>();
         setFile(file);
     }
 
-    public HashMap<String, String> getPropMap()         { return propHM;};
-    public String getProp(String propname) { 
-    	if (propHM != null)
-    		return (String) propHM.get(propname); 
-    	else 
-    		return null;
+    public HashMap<String, String> getPropMap() {
+        return propHM;
+    }
+    ;
+
+    public String getProp(String propname) {
+        if (propHM != null) return (String) propHM.get(propname);
+        else return null;
     }
 
     private void setByteArrayStream(ByteArrayOutputStream out) {
         try {
-        	File tmpDir = null;
-        	if (mContext != null)
-        		tmpDir = mContext.getFilesDir();
-        	Log.d(TAG, "tmpDir:"  + tmpDir.toString() +  "\n");
+            File tmpDir = null;
+            if (mContext != null) tmpDir = mContext.getFilesDir();
+            Log.d(TAG, "tmpDir:" + tmpDir.toString() + "\n");
             tmpFile = File.createTempFile("buildprop", "ss", tmpDir);
-            
+
             tmpFile.deleteOnExit();
             FileOutputStream o2 = new FileOutputStream(tmpFile);
             out.writeTo(o2);
@@ -88,19 +89,14 @@ public class BuildPropParser {
             throw e;
         }
     }
-    
-    public String getRelease() { 
-    	if (propHM != null) 
-               return propHM.get("ro.build.version.release");
-    	else 
-    		return null;
-    }
-    public String getNumRelease()  {
-    	if (propHM != null) 
-    		return propHM.get("ro.build.version.incremental");
-    	else
-    		return null;
+
+    public String getRelease() {
+        if (propHM != null) return propHM.get("ro.build.version.release");
+        else return null;
     }
 
-
+    public String getNumRelease() {
+        if (propHM != null) return propHM.get("ro.build.version.incremental");
+        else return null;
+    }
 }

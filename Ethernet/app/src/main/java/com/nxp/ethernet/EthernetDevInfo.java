@@ -17,13 +17,9 @@
 package com.nxp.ethernet;
 
 public class EthernetDevInfo {
-    /**
-     * The ethernet interface is configured by dhcp
-     */
-    public static final String ETHERNET_CONN_MODE_DHCP= "dhcp";
-    /**
-     * The ethernet interface is configured manually
-     */
+    /** The ethernet interface is configured by dhcp */
+    public static final String ETHERNET_CONN_MODE_DHCP = "dhcp";
+    /** The ethernet interface is configured manually */
     public static final String ETHERNET_CONN_MODE_MANUAL = "static";
 
     private String dev_name;
@@ -36,7 +32,7 @@ public class EthernetDevInfo {
     private String proxyExclusionList;
     private String gateway;
 
-    public EthernetDevInfo () {
+    public EthernetDevInfo() {
         dev_name = null;
         ipaddr = null;
         dns = null;
@@ -47,15 +43,14 @@ public class EthernetDevInfo {
         gateway = null;
     }
 
-    /**
-     * save interface name into the configuration
-     */
+    /** save interface name into the configuration */
     public void setIfName(String ifname) {
         this.dev_name = ifname;
     }
 
     /**
      * Returns the interface name from the saved configuration
+     *
      * @return interface name
      */
     public String getIfName() {
@@ -82,7 +77,7 @@ public class EthernetDevInfo {
         this.prefixlength = ip;
     }
 
-    public String getPrefixLength( ) {
+    public String getPrefixLength() {
         return this.prefixlength;
     }
 
@@ -119,7 +114,9 @@ public class EthernetDevInfo {
     }
     /**
      * Set ethernet configuration mode
-     * @param mode {@code ETHERNET_CONN_MODE_DHCP} for dhcp {@code ETHERNET_CONN_MODE_MANUAL} for manual configure
+     *
+     * @param mode {@code ETHERNET_CONN_MODE_DHCP} for dhcp {@code ETHERNET_CONN_MODE_MANUAL} for
+     *     manual configure
      */
     public void setConnectMode(String mode) {
         if (mode.equals(ETHERNET_CONN_MODE_DHCP) || mode.equals(ETHERNET_CONN_MODE_MANUAL)) {
@@ -130,5 +127,4 @@ public class EthernetDevInfo {
     public String getConnectMode() {
         return this.mode;
     }
-
 }

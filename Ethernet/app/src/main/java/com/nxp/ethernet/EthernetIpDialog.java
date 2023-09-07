@@ -29,8 +29,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class EthernetIpDialog extends AlertDialog implements
-        DialogInterface.OnClickListener, AdapterView.OnItemSelectedListener, View.OnClickListener {
+public class EthernetIpDialog extends AlertDialog
+        implements DialogInterface.OnClickListener,
+                AdapterView.OnItemSelectedListener,
+                View.OnClickListener {
     private final String TAG = "EthernetIpSetting";
     private static final boolean DBG = true;
     private final EthernetEnabler mEthEnabler;
@@ -47,6 +49,7 @@ public class EthernetIpDialog extends AlertDialog implements
         mEthEnabler = Enabler;
         buildDialogContent(context);
     }
+
     public void buildDialogContent(Context context) {
         this.setTitle(R.string.eth_config_title);
         View mView;
@@ -71,10 +74,18 @@ public class EthernetIpDialog extends AlertDialog implements
                 mConTypeDhcp.setChecked(false);
                 mConTypeManual.setChecked(true);
                 ip_dns_setting.setVisibility(View.VISIBLE);
-                mIpaddr.setText(mEthEnabler.getManager().getSharedPreIpAddress(),TextView.BufferType.EDITABLE);
-                mDns.setText(mEthEnabler.getManager().getSharedPreDnsAddress(),TextView.BufferType.EDITABLE);
-                mPrefixLength.setText(mEthEnabler.getManager().getSharedPrefixLength(),TextView.BufferType.EDITABLE);
-                mGateway.setText(mEthEnabler.getManager().getSharedPreGateway(),TextView.BufferType.EDITABLE);
+                mIpaddr.setText(
+                        mEthEnabler.getManager().getSharedPreIpAddress(),
+                        TextView.BufferType.EDITABLE);
+                mDns.setText(
+                        mEthEnabler.getManager().getSharedPreDnsAddress(),
+                        TextView.BufferType.EDITABLE);
+                mPrefixLength.setText(
+                        mEthEnabler.getManager().getSharedPrefixLength(),
+                        TextView.BufferType.EDITABLE);
+                mGateway.setText(
+                        mEthEnabler.getManager().getSharedPreGateway(),
+                        TextView.BufferType.EDITABLE);
             }
         } else {
             mConTypeDhcp.setChecked(true);
@@ -90,8 +101,7 @@ public class EthernetIpDialog extends AlertDialog implements
         this.setButton(BUTTON_NEGATIVE, context.getText(R.string.menu_cancel), this);
         String[] Devs = mEthEnabler.getManager().getDeviceNameList();
         if (Devs != null) {
-            if (DBG)
-                Log.d(TAG, "found device: " + Devs[0]);
+            if (DBG) Log.d(TAG, "found device: " + Devs[0]);
             updateDevNameList(Devs);
         }
     }
@@ -99,12 +109,13 @@ public class EthernetIpDialog extends AlertDialog implements
     public void saveconf() {
         EthernetDevInfo info = new EthernetDevInfo();
         info.setIfName(mDevList.getSelectedItem().toString());
-        if (DBG)
-            Log.d(TAG, "Config device for " + mDevList.getSelectedItem().toString());
+        if (DBG) Log.d(TAG, "Config device for " + mDevList.getSelectedItem().toString());
         if (mConTypeManual.isChecked()) {
-            if ((mIpaddr.getText().toString().equals("")) || (mPrefixLength.getText().toString().equals("")) ||
-                        mGateway.getText().toString().equals("")) {
-                Toast.makeText(this.getContext(), R.string.show_need_setting,Toast.LENGTH_SHORT).show();
+            if ((mIpaddr.getText().toString().equals(""))
+                    || (mPrefixLength.getText().toString().equals(""))
+                    || mGateway.getText().toString().equals("")) {
+                Toast.makeText(this.getContext(), R.string.show_need_setting, Toast.LENGTH_SHORT)
+                        .show();
                 return;
             } else {
                 info.setConnectMode(EthernetDevInfo.ETHERNET_CONN_MODE_MANUAL);
@@ -119,27 +130,28 @@ public class EthernetIpDialog extends AlertDialog implements
             info.setDnsAddr(null);
         }
 
-//        info.setProxyAddr(mEthEnabler.getManager().getSharedPreProxyAddress());
-//        info.setProxyPort(mEthEnabler.getManager().getSharedPreProxyPort());
-//        info.setProxyExclusionList(mEthEnabler.getManager().getSharedPreProxyExclusionList());
+        //        info.setProxyAddr(mEthEnabler.getManager().getSharedPreProxyAddress());
+        //        info.setProxyPort(mEthEnabler.getManager().getSharedPreProxyPort());
+        //
+        // info.setProxyExclusionList(mEthEnabler.getManager().getSharedPreProxyExclusionList());
 
         mEthEnabler.getManager().updateDevInfo(info);
         mEthEnabler.setEthEnabled();
-        //configHandler.post(new ConfigHandler(info));
+        // configHandler.post(new ConfigHandler(info));
     }
 
-//    class ConfigHandler implements Runnable {
-//        EthernetDevInfo info;
-//
-//        public ConfigHandler(EthernetDevInfo info) {
-//            this.info = info;
-//        }
-//
-//        public void run() {
-//            mEthEnabler.getManager().updateDevInfo(info);
-//            mEthEnabler.setEthEnabled();
-//        }
-//    }
+    //    class ConfigHandler implements Runnable {
+    //        EthernetDevInfo info;
+    //
+    //        public ConfigHandler(EthernetDevInfo info) {
+    //            this.info = info;
+    //        }
+    //
+    //        public void run() {
+    //            mEthEnabler.getManager().updateDevInfo(info);
+    //            mEthEnabler.setEthEnabled();
+    //        }
+    //    }
 
     public void onClick(DialogInterface dialog, int which) {
         switch (which) {
@@ -150,27 +162,22 @@ public class EthernetIpDialog extends AlertDialog implements
                 dialog.cancel();
                 break;
             default:
-                Log.e(TAG,"Unknown button");
+                Log.e(TAG, "Unknown button");
         }
     }
 
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-    }
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {}
 
-    public void onNothingSelected(AdapterView<?> parent) {
-    }
+    public void onNothingSelected(AdapterView<?> parent) {}
 
-    public void onClick(View v) {
-    }
+    public void onClick(View v) {}
 
     public void updateDevNameList(String[] DevList) {
         if (DevList != null) {
-            ArrayAdapter<CharSequence> adapter = new ArrayAdapter<>(
-                    getContext(), android.R.layout.simple_spinner_item, DevList);
-            adapter.setDropDownViewResource(
-                    android.R.layout.simple_spinner_dropdown_item);
+            ArrayAdapter<CharSequence> adapter =
+                    new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, DevList);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             mDevList.setAdapter(adapter);
         }
     }
 }
-

@@ -3,17 +3,18 @@
  */
 package com.nxp.directaudioplayer;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.media.AudioAttributes;
 import android.media.AudioFormat;
 import android.media.AudioManager;
-import android.media.AudioTrack;
 import android.media.AudioTimestamp;
+import android.media.AudioTrack;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
@@ -22,9 +23,10 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
-import android.widget.SeekBar;
 import android.widget.ListView;
+import android.widget.SeekBar;
 import android.widget.TextView;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,13 +41,9 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
-import android.support.v4.app.ActivityCompat;
-
 public class MainActivity extends Activity {
     int mLPA = 0;
-    int positionTime=0;
+    int positionTime = 0;
     ListView mFileList;
     TextView mSelectedFfileNameText;
     String mSelectedFileName;
@@ -62,8 +60,8 @@ public class MainActivity extends Activity {
 
     private boolean isSeekBarChanging;
     private static String TAG = "PLAYMUSIC";
-    public final static int PERMISSION_REQUESTCODE = 1;
-    public final static String LPA_ENABLE_PROPERTY = "vendor.audio.lpa.enable";
+    public static final int PERMISSION_REQUESTCODE = 1;
+    public static final String LPA_ENABLE_PROPERTY = "vendor.audio.lpa.enable";
     private static final int AUTO_UPDATE_TIMER = 1000;
     // For 48KHz audio, this buffer can hold 30s data
     private static final int BUFFER_SIZE = 5760000;
@@ -84,8 +82,8 @@ public class MainActivity extends Activity {
         try {
             initView();
             checkLPAMode();
-        }catch (Exception e){
-            Log.e(TAG,e.toString());
+        } catch (Exception e) {
+            Log.e(TAG, e.toString());
         }
     }
 
@@ -107,16 +105,21 @@ public class MainActivity extends Activity {
     }
 
     private void permission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
             permissionLists.add(Manifest.permission.READ_EXTERNAL_STORAGE);
         }
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
             permissionLists.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
         if (!permissionLists.isEmpty()) {
-            ActivityCompat.requestPermissions(this, permissionLists.toArray(new String[permissionLists.size()]), PERMISSION_REQUESTCODE);
-        }else{
-            Log.i(TAG,"permission not allowed");
+            ActivityCompat.requestPermissions(
+                    this,
+                    permissionLists.toArray(new String[permissionLists.size()]),
+                    PERMISSION_REQUESTCODE);
+        } else {
+            Log.i(TAG, "permission not allowed");
         }
     }
 
@@ -130,34 +133,35 @@ public class MainActivity extends Activity {
         initSeekbar();
 
         imageButton = (ImageButton) findViewById(R.id.bt_media);
-        imageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                isPlayOrPause();
-            }
-        });
+        imageButton.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        isPlayOrPause();
+                    }
+                });
 
-        final CheckBox mCheckBox = (CheckBox)findViewById(R.id.checkBox);
-        mCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView,
-                    boolean isChecked) {
-                if (isChecked){
-                    isLoopPlay = true;
-                } else {
-                    isLoopPlay = false;
-                }
-                Log.i(TAG, "Loop Playback: " + isLoopPlay);
-            }
-        });
+        final CheckBox mCheckBox = (CheckBox) findViewById(R.id.checkBox);
+        mCheckBox.setOnCheckedChangeListener(
+                new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if (isChecked) {
+                            isLoopPlay = true;
+                        } else {
+                            isLoopPlay = false;
+                        }
+                        Log.i(TAG, "Loop Playback: " + isLoopPlay);
+                    }
+                });
     }
 
     public void isPlayOrPause() {
-        int playstate =0;
-        if(threadPlay.mTrack!=null){
+        int playstate = 0;
+        if (threadPlay.mTrack != null) {
             playstate = threadPlay.mTrack.getPlayState();
         }
-        if(playstate == 0){
+        if (playstate == 0) {
             Log.i(TAG, "play click");
             initSeekbar();
             threadPlay.start();
@@ -171,53 +175,57 @@ public class MainActivity extends Activity {
             seekbar.setMax(threadPlay.getDuration());
             getProgress();
         }
-        if(playstate== 2){
+        if (playstate == 2) {
             Log.i(TAG, "play click");
             threadPlay.mTrack.play();
             imageButton.setImageResource(android.R.drawable.ic_media_pause);
         }
-        if(playstate== 3){
+        if (playstate == 3) {
             Log.i(TAG, "pause click");
             threadPlay.mTrack.pause();
             imageButton.setImageResource(android.R.drawable.ic_media_play);
         }
     }
 
-    private  void initSeekbar(){
+    private void initSeekbar() {
         tv_start = (TextView) findViewById(R.id.tv_start);
         tv_end = (TextView) findViewById(R.id.tv_end);
         seekbar = (SeekBar) findViewById(R.id.seekbar);
 
-        seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                tv_start.setText(calculateTime(getCurrentPosition()));
-                tv_end.setText(calculateTime(threadPlay.getDuration()));
-            }
+        seekbar.setOnSeekBarChangeListener(
+                new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        tv_start.setText(calculateTime(getCurrentPosition()));
+                        tv_end.setText(calculateTime(threadPlay.getDuration()));
+                    }
 
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-                isSeekBarChanging = true;
-            }
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+                        isSeekBarChanging = true;
+                    }
 
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                isSeekBarChanging = false;
-                tv_start.setText(calculateTime(getCurrentPosition()));
-            }
-        });
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+                        isSeekBarChanging = false;
+                        tv_start.setText(calculateTime(getCurrentPosition()));
+                    }
+                });
     }
 
     private void getProgress() {
         timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                if(!isSeekBarChanging) {
-                    seekbar.setProgress(getCurrentPosition());
-                }
-            }
-        },0,50);
+        timer.schedule(
+                new TimerTask() {
+                    @Override
+                    public void run() {
+                        if (!isSeekBarChanging) {
+                            seekbar.setProgress(getCurrentPosition());
+                        }
+                    }
+                },
+                0,
+                50);
     }
 
     class Filter implements FilenameFilter {
@@ -229,7 +237,8 @@ public class MainActivity extends Activity {
     private void listFiles() {
         Filter myfilter = new Filter();
         String[] children = mRootdDirectory.list(myfilter);
-        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(this, R.layout.file_row, children);
+        ArrayAdapter<String> spinnerArrayAdapter =
+                new ArrayAdapter<String>(this, R.layout.file_row, children);
         mFileList.setAdapter(spinnerArrayAdapter);
         mFileList.setFocusable(true);
         mFileList.setFocusableInTouchMode(true);
@@ -237,33 +246,35 @@ public class MainActivity extends Activity {
         mFileList.setOnItemClickListener(listClick);
     }
 
-    AdapterView.OnItemClickListener listClick = new AdapterView.OnItemClickListener() {
+    AdapterView.OnItemClickListener listClick =
+            new AdapterView.OnItemClickListener() {
 
-        public void onItemClick(AdapterView adapterView, View view,
-                                int arg2, long arg3) {
-            long selectedPosition = arg3;
-            mSelectedFileName = (String) mFileList.getItemAtPosition((int) selectedPosition);
-            mSelectedFfileNameText.setText("File selected:  "+mSelectedFileName);
+                public void onItemClick(AdapterView adapterView, View view, int arg2, long arg3) {
+                    long selectedPosition = arg3;
+                    mSelectedFileName =
+                            (String) mFileList.getItemAtPosition((int) selectedPosition);
+                    mSelectedFfileNameText.setText("File selected:  " + mSelectedFileName);
 
-            while (avoid_RedundantClickCrash){
-                if(cnt>0){
-                    threadPlay.isPlaying = false;
-                    synchronized (threadPlay.mTrack){
-                        if(threadPlay.mTrack.getPlayState() == AudioTrack.PLAYSTATE_STOPPED){
-                            initView();
-                        }else{
-                            threadPlay.mTrack.pause();
-                            threadPlay.mTrack.flush();
+                    while (avoid_RedundantClickCrash) {
+                        if (cnt > 0) {
+                            threadPlay.isPlaying = false;
+                            synchronized (threadPlay.mTrack) {
+                                if (threadPlay.mTrack.getPlayState()
+                                        == AudioTrack.PLAYSTATE_STOPPED) {
+                                    initView();
+                                } else {
+                                    threadPlay.mTrack.pause();
+                                    threadPlay.mTrack.flush();
+                                }
+                            }
+                            threadPlay = new ThreadPlay();
                         }
+                        cnt++;
+                        avoid_RedundantClickCrash = false;
                     }
-                    threadPlay = new ThreadPlay();
+                    threadPlay.setFile(mSelectedFileName);
                 }
-                cnt++;
-                avoid_RedundantClickCrash = false;
-            }
-            threadPlay.setFile(mSelectedFileName);
-        }
-    };
+            };
 
     class ThreadPlay extends Thread {
         private static final String TAG = "PLAYMUSIC";
@@ -284,80 +295,74 @@ public class MainActivity extends Activity {
         public void setFile(String filename) {
             this.mFileName = filename;
         }
+
         public void run() {
             android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_AUDIO);
             try {
-                mTempFile = new File(Environment.getExternalStorageDirectory().getAbsoluteFile() + "/" + mFileName);
+                mTempFile =
+                        new File(
+                                Environment.getExternalStorageDirectory().getAbsoluteFile()
+                                        + "/"
+                                        + mFileName);
             } catch (Exception ex) {
-                Log.e(TAG,"Fail to find the file");
+                Log.e(TAG, "Fail to find the file");
             }
             try {
                 minputStream = new FileInputStream(mTempFile);
             } catch (Exception ex) {
-                Log.e(TAG,"Fail to transform to inputstream");
+                Log.e(TAG, "Fail to transform to inputstream");
             }
             paserWAVheader();
             int AudioFmtChn;
             int AudioFmtBits;
 
-            if (chans == 1)
-                AudioFmtChn = AudioFormat.CHANNEL_OUT_MONO;
-            else if (chans == 2)
-                AudioFmtChn = AudioFormat.CHANNEL_OUT_STEREO;
-            else if (chans == 4)
-                AudioFmtChn = AudioFormat.CHANNEL_OUT_QUAD;
-            else if (chans == 6)
-                AudioFmtChn = AudioFormat.CHANNEL_OUT_5POINT1;
-            else if (chans == 8)
-                AudioFmtChn = AudioFormat.CHANNEL_OUT_7POINT1_SURROUND;
+            if (chans == 1) AudioFmtChn = AudioFormat.CHANNEL_OUT_MONO;
+            else if (chans == 2) AudioFmtChn = AudioFormat.CHANNEL_OUT_STEREO;
+            else if (chans == 4) AudioFmtChn = AudioFormat.CHANNEL_OUT_QUAD;
+            else if (chans == 6) AudioFmtChn = AudioFormat.CHANNEL_OUT_5POINT1;
+            else if (chans == 8) AudioFmtChn = AudioFormat.CHANNEL_OUT_7POINT1_SURROUND;
             else {
                 Log.e(TAG, "unsupported channel num " + chans + ", treat as stereo");
                 return;
             }
-            if (bits == 8)
-                AudioFmtBits = AudioFormat.ENCODING_PCM_8BIT;
-            else if (bits == 16)
-                AudioFmtBits = AudioFormat.ENCODING_PCM_16BIT;
-            else if (bits == 24)
-                AudioFmtBits = AudioFormat.ENCODING_PCM_FLOAT;
-            else if (bits == 32)
-                AudioFmtBits = AudioFormat.ENCODING_PCM_FLOAT;
+            if (bits == 8) AudioFmtBits = AudioFormat.ENCODING_PCM_8BIT;
+            else if (bits == 16) AudioFmtBits = AudioFormat.ENCODING_PCM_16BIT;
+            else if (bits == 24) AudioFmtBits = AudioFormat.ENCODING_PCM_FLOAT;
+            else if (bits == 32) AudioFmtBits = AudioFormat.ENCODING_PCM_FLOAT;
             else {
                 Log.e(TAG, "unsupported bits " + bits + ", treat as 16 bits");
                 return;
             }
-            AudioManager mAudioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
-            if (bits == 16)
-                mAudioManager.setParameters("pcm_bit=16");
-            else if (bits == 24)
-                mAudioManager.setParameters("pcm_bit=24");
-            else if (bits == 32)
-                mAudioManager.setParameters("pcm_bit=32");
+            AudioManager mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+            if (bits == 16) mAudioManager.setParameters("pcm_bit=16");
+            else if (bits == 24) mAudioManager.setParameters("pcm_bit=24");
+            else if (bits == 32) mAudioManager.setParameters("pcm_bit=32");
 
-            if (mLPA == 1)
-                minBufSize = BUFFER_SIZE;
-            else
-                minBufSize = AudioTrack.getMinBufferSize(rate, AudioFmtChn, AudioFmtBits);
-            Log.e(TAG, "Buffer size: " + minBufSize );
+            if (mLPA == 1) minBufSize = BUFFER_SIZE;
+            else minBufSize = AudioTrack.getMinBufferSize(rate, AudioFmtChn, AudioFmtBits);
+            Log.e(TAG, "Buffer size: " + minBufSize);
 
             mediaBuffer = new byte[minBufSize];
-            // For stream rate <= 192000, channels <=2, it can obviously be attached to a mixed output,
+            // For stream rate <= 192000, channels <=2, it can obviously be attached to a mixed
+            // output,
             // AudioPolicyManager will use mixer thread(primary thread) to play them.
             // In App layer, we can use FLAG_HW_AV_SYNC to explicitly request AudioPolicyManager
             // to use DirectOutput thread.
-            mTrack = new AudioTrack(
-                    new AudioAttributes.Builder()
-                            .setFlags(AudioAttributes.FLAG_HW_AV_SYNC)
-                            .setUsage(AudioAttributes.USAGE_MEDIA)
-                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build(),
-                    new AudioFormat.Builder()
-                            .setSampleRate(rate)
-                            .setEncoding(AudioFmtBits)
-                            .setChannelMask(AudioFmtChn).build(),
-                    minBufSize,
-                    AudioTrack.MODE_STREAM,
-                    AudioManager.AUDIO_SESSION_ID_GENERATE
-            );
+            mTrack =
+                    new AudioTrack(
+                            new AudioAttributes.Builder()
+                                    .setFlags(AudioAttributes.FLAG_HW_AV_SYNC)
+                                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                                    .build(),
+                            new AudioFormat.Builder()
+                                    .setSampleRate(rate)
+                                    .setEncoding(AudioFmtBits)
+                                    .setChannelMask(AudioFmtChn)
+                                    .build(),
+                            minBufSize,
+                            AudioTrack.MODE_STREAM,
+                            AudioManager.AUDIO_SESSION_ID_GENERATE);
 
             mTrack.play();
             long totalFeedSize = 0;
@@ -365,12 +370,12 @@ public class MainActivity extends Activity {
             while (isPlaying) {
                 int state = mTrack.getPlayState();
 
-                if(state ==  AudioTrack.PLAYSTATE_STOPPED) {
+                if (state == AudioTrack.PLAYSTATE_STOPPED) {
                     Log.i(TAG, "PLAYSTATE_STOPPED");
                     break;
                 }
 
-                if(state == AudioTrack.PLAYSTATE_PAUSED) {
+                if (state == AudioTrack.PLAYSTATE_PAUSED) {
                     Log.v(TAG, "PLAYSTATE_PAUSED");
                     try {
                         Thread.sleep(10);
@@ -395,10 +400,15 @@ public class MainActivity extends Activity {
 
                         try {
                             minputStream.close();
-                            mTempFile = new File(Environment.getExternalStorageDirectory().getAbsoluteFile() + "/" + mFileName);
+                            mTempFile =
+                                    new File(
+                                            Environment.getExternalStorageDirectory()
+                                                            .getAbsoluteFile()
+                                                    + "/"
+                                                    + mFileName);
                             minputStream = new FileInputStream(mTempFile);
                         } catch (Exception ex) {
-                            Log.e(TAG,"Fail to find the file");
+                            Log.e(TAG, "Fail to find the file");
                         }
 
                         paserWAVheader();
@@ -414,22 +424,27 @@ public class MainActivity extends Activity {
                 int toWrite = read;
 
                 // In pause stae, mTrack.write may exit with written < read.
-                while(written < read) {
+                while (written < read) {
                     if (bits == 24 || bits == 32) {
                         mediaBufferFloat = byteArrayToFloatArray(mediaBuffer);
-                        ret = mTrack.write(mediaBufferFloat, written/4, toWrite/4, AudioTrack.WRITE_BLOCKING);
-                        ret = ret*4; // convert float to byte length
+                        ret =
+                                mTrack.write(
+                                        mediaBufferFloat,
+                                        written / 4,
+                                        toWrite / 4,
+                                        AudioTrack.WRITE_BLOCKING);
+                        ret = ret * 4; // convert float to byte length
                     } else {
                         ret = mTrack.write(mediaBuffer, written, toWrite);
                     }
 
-                    if(ret < 0) {
+                    if (ret < 0) {
                         Log.i(TAG, "write " + toWrite + " bytes failed, ret " + ret + ", break");
                         break;
                     }
 
                     written += ret;
-                    if(written < read) {
+                    if (written < read) {
                         toWrite = read - written;
 
                         try {
@@ -443,18 +458,28 @@ public class MainActivity extends Activity {
                 totalFeedSize += written;
             } // while (isPlaying)
 
-            if(mLPA == 1) {
+            if (mLPA == 1) {
                 AudioTimestamp timestamp = new AudioTimestamp();
                 mTrack.getTimestamp(timestamp);
 
                 long playedFrame = timestamp.framePosition;
-                long frameSize = chans*bits/8;
-                long totalFrame = totalFeedSize/frameSize;
+                long frameSize = chans * bits / 8;
+                long totalFrame = totalFeedSize / frameSize;
                 long restFrame = totalFrame - playedFrame;
-                long restTimeMs = restFrame*1000/rate;
+                long restTimeMs = restFrame * 1000 / rate;
 
-                Log.i(TAG, "Done feeding data, total frames " + totalFrame + ", played frames " + playedFrame +
-                        ", rest frames " + restFrame + ", rest ms " + restTimeMs + ", frame size " + frameSize);
+                Log.i(
+                        TAG,
+                        "Done feeding data, total frames "
+                                + totalFrame
+                                + ", played frames "
+                                + playedFrame
+                                + ", rest frames "
+                                + restFrame
+                                + ", rest ms "
+                                + restTimeMs
+                                + ", frame size "
+                                + frameSize);
 
                 try {
                     Thread.sleep(restTimeMs);
@@ -474,7 +499,7 @@ public class MainActivity extends Activity {
             mTrack.stop();
             Log.i(TAG, "mtrack stop in play thread");
             mTrack.release();
-            Log.i(TAG,"mtrack release in play thread");
+            Log.i(TAG, "mtrack release in play thread");
         }
 
         public float[] byteArrayToFloatArray(byte[] bytes) {
@@ -491,7 +516,7 @@ public class MainActivity extends Activity {
             byte[] head = new byte[44];
             try {
                 read = minputStream.read(head);
-                Log.i(TAG,"read is "+read);
+                Log.i(TAG, "read is " + read);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -505,27 +530,30 @@ public class MainActivity extends Activity {
                 Log.i(TAG, "error WAVE");
                 return;
             }
-            rate = (int) (head[24] & 0x0FF) +
-                    ((int) (head[24 + 1] & 0x0FF) << 8) +
-                    ((int) (head[24 + 2] & 0x0FF) << 16) +
-                    ((int) (head[24 + 3] & 0x0FF) << 24);
+            rate =
+                    (int) (head[24] & 0x0FF)
+                            + ((int) (head[24 + 1] & 0x0FF) << 8)
+                            + ((int) (head[24 + 2] & 0x0FF) << 16)
+                            + ((int) (head[24 + 3] & 0x0FF) << 24);
             bits = head[34];
             chans = head[22];
-            int byteRate = (int) (head[28] & 0x0FF) +
-                    ((int) (head[28 + 1] & 0x0FF) << 8) +
-                    ((int) (head[28 + 2] & 0x0FF) << 16) +
-                    ((int) (head[28 + 3] & 0x0FF) << 24);
-            int waveSize = (int) (head[40] & 0x0FF) +
-                    ((int) (head[40 + 1] & 0x0FF) << 8) +
-                    ((int) (head[40 + 2] & 0x0FF) << 16) +
-                    ((int) (head[40 + 3] & 0x0FF) << 24);
+            int byteRate =
+                    (int) (head[28] & 0x0FF)
+                            + ((int) (head[28 + 1] & 0x0FF) << 8)
+                            + ((int) (head[28 + 2] & 0x0FF) << 16)
+                            + ((int) (head[28 + 3] & 0x0FF) << 24);
+            int waveSize =
+                    (int) (head[40] & 0x0FF)
+                            + ((int) (head[40 + 1] & 0x0FF) << 8)
+                            + ((int) (head[40 + 2] & 0x0FF) << 16)
+                            + ((int) (head[40 + 3] & 0x0FF) << 24);
             maxSize = waveSize / byteRate;
             Log.i(TAG, "The time of the music: " + maxSize + "(s)");
             Log.i(TAG, "rate " + rate + ", bits " + bits + ", chans " + chans);
         }
 
-        public int getDuration(){
-            return  maxSize;
+        public int getDuration() {
+            return maxSize;
         }
     }
 
@@ -537,37 +565,28 @@ public class MainActivity extends Activity {
             minute = time / 60;
             second = time % 60;
 
-            if(minute>=0&&minute<10)
-            {
-                if(second>=0&&second<10)
-                {
-                    return "0"+minute+":"+"0"+second;
-                }else
-                {
-                    return "0"+minute+":"+second;
+            if (minute >= 0 && minute < 10) {
+                if (second >= 0 && second < 10) {
+                    return "0" + minute + ":" + "0" + second;
+                } else {
+                    return "0" + minute + ":" + second;
                 }
 
-            }else
-            {
-                if(second>=0&&second<10)
-                {
-                    return minute+":"+"0"+second;
-                }else
-                {
-                    return minute+":"+second;
+            } else {
+                if (second >= 0 && second < 10) {
+                    return minute + ":" + "0" + second;
+                } else {
+                    return minute + ":" + second;
                 }
             }
 
         } else if (time < 60) {
             second = time;
-            if(second>=0&&second<10)
-            {
-                return "00:"+"0"+second;
-            }else
-            {
+            if (second >= 0 && second < 10) {
+                return "00:" + "0" + second;
+            } else {
                 return "00:" + second;
             }
-
         }
         return null;
     }
@@ -577,11 +596,13 @@ public class MainActivity extends Activity {
         if (threadPlay != null) {
             if (threadPlay.mTrack != null) {
                 synchronized (threadPlay.mTrack) {
-                    if (threadPlay.mTrack.getPlayState() == 0|| threadPlay.mTrack.getPlayState() == 2||
-                            threadPlay.mTrack.getPlayState() == 3 ) {
-                        CurrentPosition = threadPlay.mTrack.getPlaybackHeadPosition() / threadPlay.rate;
+                    if (threadPlay.mTrack.getPlayState() == 0
+                            || threadPlay.mTrack.getPlayState() == 2
+                            || threadPlay.mTrack.getPlayState() == 3) {
+                        CurrentPosition =
+                                threadPlay.mTrack.getPlaybackHeadPosition() / threadPlay.rate;
                         CurrentPosition %= threadPlay.getDuration();
-                    }else{
+                    } else {
                         CurrentPosition = 0;
                     }
                 }

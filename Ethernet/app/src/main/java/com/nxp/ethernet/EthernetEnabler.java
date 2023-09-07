@@ -23,12 +23,11 @@ public class EthernetEnabler {
     private final LocalEthernetManager mLocalEthManager;
     private EthernetIpDialog mEthConfigDialog;
 
-    public void setIpDialog (EthernetIpDialog Dialog) {
+    public void setIpDialog(EthernetIpDialog Dialog) {
         mEthConfigDialog = Dialog;
     }
 
-    public void setProxyDialog(EthernetProxyDialog Dialog) {
-    }
+    public void setProxyDialog(EthernetProxyDialog Dialog) {}
 
     public EthernetEnabler(Context context) {
         mLocalEthManager = new LocalEthernetManager(context);
@@ -39,17 +38,16 @@ public class EthernetEnabler {
         return mLocalEthManager;
     }
 
-//    public void resume() {
-//    }
-//
-//    public void pause() {
-//    }
+    //    public void resume() {
+    //    }
+    //
+    //    public void pause() {
+    //    }
 
     public void setEthEnabled() {
         if (!mLocalEthManager.isConfigured()) {
             mEthConfigDialog.show();
-        } else
-            {
+        } else {
             mLocalEthManager.resetInterface();
         }
     }

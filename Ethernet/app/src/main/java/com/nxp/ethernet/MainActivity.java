@@ -40,7 +40,7 @@ import android.widget.TextView;
 public class MainActivity extends Activity {
     private final String TAG = "EthernetMainActivity";
 
-    private EthernetDevInfo  mSaveConfig;
+    private EthernetDevInfo mSaveConfig;
     private EthernetProxyDialog mEthernetProxyDialog;
     private EthernetEnabler mEthEnabler;
     private EthernetIpDialog mEthIpConfigDialog;
@@ -49,13 +49,14 @@ public class MainActivity extends Activity {
     private int mNetworkType;
     private ConnectivityManager mConnectivityManager;
 
-    private final BroadcastReceiver mEthernetReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver mEthernetReceiver =
+            new BroadcastReceiver() {
 
-        public void onReceive(Context context, Intent intent) {
-            updateConnectivityStatus();
-            updateConnectivity();
-        }
-    };
+                public void onReceive(Context context, Intent intent) {
+                    updateConnectivityStatus();
+                    updateConnectivity();
+                }
+            };
 
     private void updateConnectivityStatus() {
         NetworkInfo networkInfo = mConnectivityManager.getActiveNetworkInfo();
@@ -70,9 +71,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    /**
-     * Return whether Ethernet port is available.
-     */
+    /** Return whether Ethernet port is available. */
     public boolean isEthernetAvailable() {
         return getPackageManager().hasSystemFeature(PackageManager.FEATURE_ETHERNET)
                 && mEthernetManager.getAvailableInterfaces().length > 0;
@@ -107,10 +106,7 @@ public class MainActivity extends Activity {
         return null;
     }
 
-    /**
-     * Returns the formatted IP addresses of the Ethernet connection or null
-     * if none available.
-     */
+    /** Returns the formatted IP addresses of the Ethernet connection or null if none available. */
     public String getEthernetIpAddress() {
         final Network network = getFirstEthernet();
         if (network == null) {
@@ -144,8 +140,10 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        this.getWindow()
+                .setFlags(
+                        WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                        WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.ethernet_configure);
 
         mEthernetManager = (EthernetManager) getSystemService(EthernetManager.class);
@@ -163,21 +161,23 @@ public class MainActivity extends Activity {
 
         mBtnCheck.setOnClickListener(v -> updateConnectivity());
 
-        mBtnIPConfig.setOnClickListener(v -> {
-            mEthIpConfigDialog = new EthernetIpDialog(MainActivity.this, mEthEnabler);
-            mEthEnabler.setIpDialog(mEthIpConfigDialog);
-            mEthIpConfigDialog.show();
-        });
+        mBtnIPConfig.setOnClickListener(
+                v -> {
+                    mEthIpConfigDialog = new EthernetIpDialog(MainActivity.this, mEthEnabler);
+                    mEthEnabler.setIpDialog(mEthIpConfigDialog);
+                    mEthIpConfigDialog.show();
+                });
 
-        mBtnProxyConfig.setOnClickListener(v -> {
-            mSaveConfig = mEthEnabler.getManager().getSavedConfig();
-            if (mSaveConfig != null) {
-                mEthernetProxyDialog = new EthernetProxyDialog(MainActivity.this,mEthEnabler);
-                mEthEnabler.setProxyDialog(mEthernetProxyDialog);
-                mEthernetProxyDialog.show();
-            }
-        });
-
+        mBtnProxyConfig.setOnClickListener(
+                v -> {
+                    mSaveConfig = mEthEnabler.getManager().getSavedConfig();
+                    if (mSaveConfig != null) {
+                        mEthernetProxyDialog =
+                                new EthernetProxyDialog(MainActivity.this, mEthEnabler);
+                        mEthEnabler.setProxyDialog(mEthernetProxyDialog);
+                        mEthernetProxyDialog.show();
+                    }
+                });
     }
 
     @Override

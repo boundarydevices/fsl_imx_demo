@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 package com.freescale.sleepawake;
+
 import android.app.admin.DeviceAdminReceiver;
 
-public class MyAdmin extends DeviceAdminReceiver {
-
-}
+public class MyAdmin extends DeviceAdminReceiver {}

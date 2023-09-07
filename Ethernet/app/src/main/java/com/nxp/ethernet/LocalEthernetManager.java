@@ -33,15 +33,14 @@ import android.net.StaticIpConfiguration;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
+
 import com.android.net.module.util.ProxyUtils;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 
 public class LocalEthernetManager {
     public static final String TAG = "LocalEthernetManager";
@@ -77,11 +76,11 @@ public class LocalEthernetManager {
 
         mConnMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         mEthernetManager = (EthernetManager) context.getSystemService(EthernetManager.class);
-
     }
 
     /**
      * check if the ethernet service has been configured.
+     *
      * @return {@code true} if configured {@code false} otherwise
      */
     public boolean isConfigured() {
@@ -90,11 +89,11 @@ public class LocalEthernetManager {
 
     /**
      * Return the saved ethernet configuration
+     *
      * @return ethernet interface configuration on success, {@code null} on failure
      */
     public synchronized EthernetDevInfo getSavedConfig() {
-        if (!isConfigured())
-            return null;
+        if (!isConfigured()) return null;
         EthernetDevInfo info = new EthernetDevInfo();
         info.setConnectMode(getSharedPreMode());
         info.setIfName(DevName[0]);
@@ -136,7 +135,7 @@ public class LocalEthernetManager {
 
                 String ipAddr = info.getIpAddress();
                 if (TextUtils.isEmpty(ipAddr)) {
-                    Log.d(TAG,"Static IP configuration failed with empty IP address");
+                    Log.d(TAG, "Static IP configuration failed with empty IP address");
                 }
 
                 Log.d(TAG, "---------Static IP address =" + ipAddr);
@@ -147,24 +146,25 @@ public class LocalEthernetManager {
                     inetAddr = (Inet4Address) InetAddresses.parseNumericAddress(ipAddr);
                     // inetAddress = InetAddresses.parseNumericAddress(ipAddr);
                 } catch (IllegalArgumentException | ClassCastException e) {
-                    Log.d(TAG,"Static IP configuration failed with address parse error");
+                    Log.d(TAG, "Static IP configuration failed with address parse error");
                 }
 
                 if (inetAddr == null || inetAddr.equals(Inet4Address.ANY)) {
-                    Log.d(TAG,"Static IP configuration failed with inetAddr error");
+                    Log.d(TAG, "Static IP configuration failed with inetAddr error");
                 }
 
                 try {
                     int networkPrefixLength = Integer.parseInt(info.getPrefixLength());
-                    Log.d(TAG,"--------networkPrefixLength =" + networkPrefixLength);
+                    Log.d(TAG, "--------networkPrefixLength =" + networkPrefixLength);
 
                     if (networkPrefixLength < 0 || networkPrefixLength > 32) {
-                        Log.d(TAG,"Static IP configuration failed with PrefixLength parse error");
+                        Log.d(TAG, "Static IP configuration failed with PrefixLength parse error");
                     }
                     staticIpBuilder.setIpAddress(new LinkAddress(inetAddr, networkPrefixLength));
-                    // staticIpBuilder.setIpAddress(new LinkAddress(inetAddress, networkPrefixLength));
+                    // staticIpBuilder.setIpAddress(new LinkAddress(inetAddress,
+                    // networkPrefixLength));
                 } catch (NumberFormatException e) {
-                    Log.d(TAG,"Static IP configuration failed with ipaddress set error");
+                    Log.d(TAG, "Static IP configuration failed with ipaddress set error");
                 }
 
                 String gateway = info.getGateway();
@@ -172,7 +172,7 @@ public class LocalEthernetManager {
                     try {
                         staticIpBuilder.setGateway(InetAddresses.parseNumericAddress(gateway));
                     } catch (IllegalArgumentException | ClassCastException e) {
-                        Log.d(TAG,"Static IP configuration failed with gateway set error");
+                        Log.d(TAG, "Static IP configuration failed with gateway set error");
                     }
                 }
 
@@ -182,22 +182,30 @@ public class LocalEthernetManager {
                     try {
                         dnsServers.add(InetAddresses.parseNumericAddress(dns1));
                     } catch (IllegalArgumentException | ClassCastException e) {
-                        Log.d(TAG,"Static IP configuration failed with dns error");
+                        Log.d(TAG, "Static IP configuration failed with dns error");
                     }
                 }
                 staticIpBuilder.setDnsServers(dnsServers);
 
                 mIpConfiguration.setStaticIpConfiguration(staticIpBuilder.build());
                 mEthernetManager.setConfiguration(DevName[0], mIpConfiguration);
-                Log.d(TAG,"Static IP configuration succeeded");
+                Log.d(TAG, "Static IP configuration succeeded");
             } catch (IllegalStateException e) {
-                Log.e(TAG,"Static IP configuration failed with IllegalStateException: " + e);
+                Log.e(TAG, "Static IP configuration failed with IllegalStateException: " + e);
             } catch (IllegalArgumentException e) {
-                Log.e(TAG,"Wrong Static IP: " + e);
-                Toast.makeText(mContext, "Illegal address inputted. You can not access the Internet.",Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "Wrong Static IP: " + e);
+                Toast.makeText(
+                                mContext,
+                                "Illegal address inputted. You can not access the Internet.",
+                                Toast.LENGTH_SHORT)
+                        .show();
             } catch (Exception err) {
                 Log.e(TAG, "Exception in setting Static IP");
-                Toast.makeText(mContext, "We got exception when set the static IP.",Toast.LENGTH_SHORT).show();
+                Toast.makeText(
+                                mContext,
+                                "We got exception when set the static IP.",
+                                Toast.LENGTH_SHORT)
+                        .show();
             }
             Log.d(TAG, "set ip manually " + info.toString());
             updateDevInfo(info);
@@ -206,7 +214,7 @@ public class LocalEthernetManager {
 
     public EthernetDevInfo getDhcpInfo() {
         EthernetDevInfo ethinfo = new EthernetDevInfo();
-        String [] DevName = getDeviceNameList();
+        String[] DevName = getDeviceNameList();
         ethinfo.setIfName(DevName[0]);
         ethinfo.setConnectMode(EthernetDevInfo.ETHERNET_CONN_MODE_DHCP);
         String ip;
@@ -217,23 +225,22 @@ public class LocalEthernetManager {
             ip = "[]";
             Log.w(TAG, "get Dhcp Info error:" + err.toString());
         }
-        if (!ip.equals("[]"))
-            ethinfo.setIpAddress(ip.substring(2, ip.length()-1));
+        if (!ip.equals("[]")) ethinfo.setIpAddress(ip.substring(2, ip.length() - 1));
         String dns = " ";
         try {
             Network network = mConnMgr.getActiveNetwork();
-            for( InetAddress d : mConnMgr.getLinkProperties(network).getDnsServers()) {
+            for (InetAddress d : mConnMgr.getLinkProperties(network).getDnsServers()) {
                 String temp = d.toString();
-                dns = temp.substring(1, temp.length()-1);
+                dns = temp.substring(1, temp.length() - 1);
                 break;
             }
         } catch (Exception err) {
             Log.w(TAG, "get Dhcp Info error:" + err.toString());
         }
-        ethinfo.setDnsAddr(dns);// now only use dns1, need optimization later here.
+        ethinfo.setDnsAddr(dns); // now only use dns1, need optimization later here.
         String proxyAddress = getSharedPreProxyAddress();
         String proxyPort = getSharedPreProxyPort();
-        String proxyExclusionList=getSharedPreProxyExclusionList();
+        String proxyExclusionList = getSharedPreProxyExclusionList();
         ethinfo.setProxyAddr(proxyAddress);
         ethinfo.setProxyPort(proxyPort);
         ethinfo.setProxyExclusionList(proxyExclusionList);
@@ -248,76 +255,75 @@ public class LocalEthernetManager {
         if (info != null && isConfigured()) {
             configureInterface(info);
         } else {
-            //First boot using AOSP dhcp
+            // First boot using AOSP dhcp
             updateDevInfo(getDhcpInfo());
         }
     }
 
     /**
      * update a ethernet interface information
-     * @param info  the interface infomation
+     *
+     * @param info the interface infomation
      */
     public synchronized void updateDevInfo(EthernetDevInfo info) {
         sharedPreferencesStore(info);
     }
 
-    public SharedPreferences sharedPreferences(){
-        return this.mContext.getSharedPreferences("ethernet",
-                Context.MODE_PRIVATE);
+    public SharedPreferences sharedPreferences() {
+        return this.mContext.getSharedPreferences("ethernet", Context.MODE_PRIVATE);
     }
 
-    public void sharedPreferencesStore(EthernetDevInfo info){
+    public void sharedPreferencesStore(EthernetDevInfo info) {
         Editor editor = sharedPreferences().edit();
         try {
-            editor.putString("conn_mode",info.getConnectMode());
-            editor.putString("mIpaddr",info.getIpAddress());
-            editor.putString("mDns",info.getDnsAddr());
+            editor.putString("conn_mode", info.getConnectMode());
+            editor.putString("mIpaddr", info.getIpAddress());
+            editor.putString("mDns", info.getDnsAddr());
             editor.putString("mGateway", info.getGateway());
             editor.putString("mPrefixLength", info.getPrefixLength());
-            editor.putString("mProxyIp",info.getProxyAddr());
+            editor.putString("mProxyIp", info.getProxyAddr());
             editor.putString("mProxyPort", info.getProxyPort());
             editor.putString("mProxyExclusionList", info.getProxyExclusionList());
         } catch (NumberFormatException e) {
             e.printStackTrace();
         }
         editor.apply();
-
     }
 
-    public String getSharedPreMode(){
+    public String getSharedPreMode() {
         String temp = null;
         try {
-            temp = sharedPreferences().getString("conn_mode",null);
+            temp = sharedPreferences().getString("conn_mode", null);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return temp;
     }
 
-    public String getSharedPreIpAddress(){
+    public String getSharedPreIpAddress() {
         String temp = null;
         try {
-            temp = sharedPreferences().getString("mIpaddr",null);
+            temp = sharedPreferences().getString("mIpaddr", null);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return temp;
     }
 
-    public String getSharedPreDnsAddress(){
+    public String getSharedPreDnsAddress() {
         String temp = null;
         try {
-            temp = sharedPreferences().getString("mDns",null);
+            temp = sharedPreferences().getString("mDns", null);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return temp;
     }
 
-    public String getSharedPreGateway(){
+    public String getSharedPreGateway() {
         String temp = null;
         try {
-            temp = sharedPreferences().getString("mGateway",null);
+            temp = sharedPreferences().getString("mGateway", null);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -327,37 +333,37 @@ public class LocalEthernetManager {
     public String getSharedPrefixLength() {
         String temp = null;
         try {
-            temp = sharedPreferences().getString("mPrefixLength",null);
+            temp = sharedPreferences().getString("mPrefixLength", null);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return temp;
     }
 
-    public String getSharedPreProxyAddress(){
+    public String getSharedPreProxyAddress() {
         String temp = null;
         try {
-            temp = sharedPreferences().getString("mProxyIp",null);
+            temp = sharedPreferences().getString("mProxyIp", null);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return temp;
     }
 
-    public String getSharedPreProxyPort(){
+    public String getSharedPreProxyPort() {
         String temp = null;
         try {
-            temp = sharedPreferences().getString("mProxyPort",null);
+            temp = sharedPreferences().getString("mProxyPort", null);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return temp;
     }
 
-    public String getSharedPreProxyExclusionList(){
+    public String getSharedPreProxyExclusionList() {
         String temp = null;
         try {
-            temp = sharedPreferences().getString("mProxyExclusionList",null);
+            temp = sharedPreferences().getString("mProxyExclusionList", null);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -401,7 +407,7 @@ public class LocalEthernetManager {
         return 0;
     }
 
-    public void setProxy(){
+    public void setProxy() {
         IpConfiguration mIpConfiguration = new IpConfiguration();
         boolean hasProxySettings = true;
 
@@ -409,14 +415,15 @@ public class LocalEthernetManager {
             hasProxySettings = false;
         }
 
-        mIpConfiguration.setProxySettings(hasProxySettings
-                ? IpConfiguration.ProxySettings.STATIC : IpConfiguration.ProxySettings.NONE);
+        mIpConfiguration.setProxySettings(
+                hasProxySettings
+                        ? IpConfiguration.ProxySettings.STATIC
+                        : IpConfiguration.ProxySettings.NONE);
 
         if (hasProxySettings) {
             Network network = mConnMgr.getActiveNetwork();
             LinkProperties lp = mConnMgr.getLinkProperties(network);
-            if (lp == null)
-                return;
+            if (lp == null) return;
 
             int port = 0;
             String exclusionList = null;
@@ -431,15 +438,16 @@ public class LocalEthernetManager {
                 result = -1;
             }
             if (result == 0) {
-                mIpConfiguration.setHttpProxy(ProxyInfo.buildDirectProxy(host, port,
-                        ProxyUtils.exclusionStringAsList(exclusionList)));
+                mIpConfiguration.setHttpProxy(
+                        ProxyInfo.buildDirectProxy(
+                                host, port, ProxyUtils.exclusionStringAsList(exclusionList)));
             }
         } else {
             mIpConfiguration.setHttpProxy(null);
         }
     }
 
-    public boolean isEthernetConnect(){
+    public boolean isEthernetConnect() {
         NetworkInfo networkInfo = mConnMgr.getActiveNetworkInfo();
         if (networkInfo == null) {
             return false;
