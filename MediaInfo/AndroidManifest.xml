@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.mediainfo"
+    android:versionCode="1"
+    android:versionName="1.0"
+    coreApp="true" >
+
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
+    <uses-sdk
+        android:minSdkVersion="12"
+        android:targetSdkVersion="23" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@android:style/Theme.Holo"
+        >
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <data android:pathPattern=".*\\.avi" />
+                <data android:pathPattern=".*\\.AVI" />
+                <data android:pathPattern=".*\\.mkv" />
+                <data android:pathPattern=".*\\.MKV" />
+                <data android:pathPattern=".*\\.flv" />
+                <data android:pathPattern=".*\\.FLV" />
+                <data android:pathPattern=".*\\.mp4" />
+                <data android:pathPattern=".*\\.MP4" />
+                <data android:pathPattern=".*\\.mpg" />
+                <data android:pathPattern=".*\\.MPG" />
+                <data android:pathPattern=".*\\.mpeg" />
+                <data android:pathPattern=".*\\.MPEG" />
+                <data android:pathPattern=".*\\.ts" />
+                <data android:pathPattern=".*\\.TS" />
+                <data android:pathPattern=".*\\.asf" />
+                <data android:pathPattern=".*\\.ASF" />
+                <data android:pathPattern=".*\\.wmv" />
+                <data android:pathPattern=".*\\.WMV" />
+                <data android:pathPattern=".*\\.mov" />
+                <data android:pathPattern=".*\\.MOV" />
+                <data android:pathPattern=".*\\.3gp" />
+                <data android:pathPattern=".*\\.3GP" />
+            </intent-filter>
+        </activity>
+    </application>
+
+    </manifest>

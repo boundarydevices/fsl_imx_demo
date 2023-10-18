@@ -1,0 +1,8 @@
+android_app {
+    name: "MediaInfo",
+
+    srcs: ["src/**/*.java"],
+
+    certificate: "platform",
+    platform_apis: true,
+}
