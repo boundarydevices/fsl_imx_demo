@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
  * Copyright (C) 2014 Freescale Semiconductor, Inc.
+ * Copyright 2023 NXP
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +19,6 @@
 package com.example.mediainfo;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -29,7 +29,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.mediainfo.ItemData;
 
 public class ImageTextView extends LinearLayout {
     private static final String CLASS = "ImageTextView: ";
@@ -49,24 +48,24 @@ public class ImageTextView extends LinearLayout {
 
     // task for displaying photo thumbnails
     private DisplayPicture mThumbNailTask = null;
+
     public ImageTextView(Context context) {
         super(context);
         mContext = context;
         mThumbNailTask = null;
         LayoutInflater inflater =
-            (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.griditemextab, this, true);
 
         // findViewById's performance is low
-        mThumbnailImage = (ImageView)findViewById(R.id.grid_item_big_image);
+        mThumbnailImage = (ImageView) findViewById(R.id.grid_item_big_image);
         mDurationView = (TextView) findViewById(R.id.grid_item_duration);
         mNameView = (TextView) findViewById(R.id.grid_item_name);
         clear();
     }
 
     public void onFileClicked() {
-        if(!mDir)
-            SendToLocalRenderer(mUrl);
+        if (!mDir) SendToLocalRenderer(mUrl);
     }
 
     public boolean isDir() {
@@ -74,19 +73,17 @@ public class ImageTextView extends LinearLayout {
     }
 
     public int dirId() {
-        if(!isDir())
-            return -1;
+        if (!isDir()) return -1;
         return mDirId;
     }
 
     private void SendToLocalRenderer(String url) {
-        if(url == null)
-            return;
+        if (url == null) return;
     }
 
     public void clear() {
         // cancel previous tasks
-        if(mThumbNailTask != null){
+        if (mThumbNailTask != null) {
             mThumbNailTask.cancel(true);
             mThumbNailTask.setCancelled();
         }
@@ -103,7 +100,7 @@ public class ImageTextView extends LinearLayout {
 
     public void update(String dirName, int childCount, int id) {
         // cancel previous tasks
-        if(mThumbNailTask != null){
+        if (mThumbNailTask != null) {
             mThumbNailTask.cancel(true);
             mThumbNailTask.setCancelled();
         }
@@ -116,24 +113,23 @@ public class ImageTextView extends LinearLayout {
         mNameView.setText(mName);
         mDurationView.setText(null);
         mThumbnailImage.setImageResource(R.drawable.folder);
-        if(mAlbumArt != null){
+        if (mAlbumArt != null) {
             Log.d(CLASS, "Set art " + mAlbumArt);
             setImage(mAlbumArt);
         }
     }
 
-    public Uri get_myUri(){
+    public Uri get_myUri() {
         return Uri.parse(mUrl);
     }
 
     public void update(ItemData data) {
         // cancel previous tasks
-        if(mThumbNailTask != null){
+        if (mThumbNailTask != null) {
             mThumbNailTask.cancel(true);
             mThumbNailTask.setCancelled();
         }
-        if(data == null)
-            return;
+        if (data == null) return;
         mName = data.mName;
         mUrl = data.mPath;
         mDuration = data.mDuration;
@@ -147,15 +143,13 @@ public class ImageTextView extends LinearLayout {
         minutes = minutes % 60;
         seconds = seconds % 60;
         String fmtDuration = hours + ":";
-        if(minutes < 10)
-            fmtDuration += "0";
+        if (minutes < 10) fmtDuration += "0";
         fmtDuration += minutes + ":";
-        if(seconds < 10)
-            fmtDuration += "0";
+        if (seconds < 10) fmtDuration += "0";
         fmtDuration += seconds;
         mDurationView.setText(fmtDuration);
         mThumbnailImage.setImageResource(R.drawable.file);
-        if(mAlbumArt != null){
+        if (mAlbumArt != null) {
             Log.d(CLASS, "Set art " + mAlbumArt);
             setImage(mAlbumArt);
         }
@@ -163,7 +157,7 @@ public class ImageTextView extends LinearLayout {
 
     private void setImage(String file) {
         // cancel previous tasks
-        if(mThumbNailTask != null){
+        if (mThumbNailTask != null) {
             mThumbNailTask.cancel(true);
             mThumbNailTask.setCancelled();
         }
@@ -171,15 +165,15 @@ public class ImageTextView extends LinearLayout {
         mThumbNailTask = new DisplayPicture();
         try {
             mThumbNailTask.execute(file);
-        }
-        catch(IllegalStateException e) {
+        } catch (IllegalStateException e) {
             Log.d(CLASS, "image decoded failed or cancelled");
         }
     }
 
     // non-static inner class: will access enclosing class instance's non-static member
-    private  class DisplayPicture extends AsyncTask<String, Integer, Bitmap> {
+    private class DisplayPicture extends AsyncTask<String, Integer, Bitmap> {
         private boolean mCancelled = false;
+
         protected Bitmap doInBackground(String... sUrl) {
             mCancelled = false;
             Bitmap bitmap = BitmapFactory.decodeFile(sUrl[0]);
@@ -192,18 +186,16 @@ public class ImageTextView extends LinearLayout {
 
         @Override
         protected void onCancelled() {
-            //Log.d(TAG, "image decoded cancelled");
+            // Log.d(TAG, "image decoded cancelled");
         }
 
         @Override
         protected void onPostExecute(Bitmap result) {
-            if(mCancelled == false && result != null) {
+            if (mCancelled == false && result != null) {
                 mThumbnailImage.setImageBitmap(result);
-            }
-            else {
-                //Log.d(TAG, "image decoded failed or cancelled");
+            } else {
+                // Log.d(TAG, "image decoded failed or cancelled");
             }
         }
     }
-
 }

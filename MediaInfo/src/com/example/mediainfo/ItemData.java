@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
  * Copyright (C) 2014 Freescale Semiconductor, Inc.
+ * Copyright 2023 NXP
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,17 +23,17 @@ public class ItemData {
     public String mName;
     public String mPath;
     public String mMime;
-    public long   mDuration;
+    public long mDuration;
     public String mArt;
     public String mBucket;
 
     public ItemData() {
         mTitle = null;
-        mName  = null;
-        mPath  = null;
-        mMime  = null;
+        mName = null;
+        mPath = null;
+        mMime = null;
         mDuration = 0;
-        mArt   = null;
+        mArt = null;
         mBucket = null;
     }
 }
