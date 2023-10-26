@@ -30,6 +30,7 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.util.Log
 import android.view.*
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
 import androidx.core.graphics.drawable.toDrawable
 import androidx.exifinterface.media.ExifInterface
@@ -424,6 +425,15 @@ class CameraFragment : Fragment() {
                 it.post { it.isEnabled = true }
             }
         }
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    // Handle back button press
+                    navController.navigateUp()
+                }
+            })
 
         if (raw_cap) {
             /* WB process */

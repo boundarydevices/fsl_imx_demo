@@ -28,11 +28,14 @@ import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.Navigation
+import androidx.activity.OnBackPressedCallback
 import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.example.android.camera.utils.GenericListAdapter
 import com.example.android.camera.utils.decodeExifOrientation
+import com.example.android.camera2.basic.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.BufferedInputStream
@@ -119,6 +122,14 @@ class ImageViewerFragment : Fragment() {
                 }
             }
         }
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    // Handle back button press
+                    Navigation.findNavController(requireActivity(), R.id.fragment_container).navigateUp()
+                }
+            })
     }
 
     /** Utility function used to read input file into a byte array */
