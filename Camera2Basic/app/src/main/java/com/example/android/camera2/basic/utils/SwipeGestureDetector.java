@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
 
 public class SwipeGestureDetector extends GestureDetector.SimpleOnGestureListener {
     private static final int MIN_SWIPE_DISTANCE_X = 100;
-    private static final String TAG = "SwipeGestureDetector";
+    private static final String TAG = SwipeGestureDetector.class.getSimpleName();
     private View view;
 
     @Override
@@ -23,15 +23,9 @@ public class SwipeGestureDetector extends GestureDetector.SimpleOnGestureListene
         }
         float deltaX = e1.getX() - e2.getX();
         float deltaXAbs = Math.abs(deltaX);
-        if (deltaXAbs >= MIN_SWIPE_DISTANCE_X) {
-            if (deltaX > 0) {
-
-                if (view.getTag().equals("left"))
-                    Navigation.findNavController(view).navigate(R.id.action_video_to_camera);
-            } else {
-                if (view.getTag().equals("right"))
-                    Navigation.findNavController(view).navigate(R.id.action_camera_to_video);
-            }
+        if (deltaXAbs >= MIN_SWIPE_DISTANCE_X && deltaX < 0) {
+            if (view.getTag().equals("right"))
+                Navigation.findNavController(view).navigate(R.id.action_camera_to_video);
         }
 
         return true;

@@ -38,6 +38,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import androidx.activity.OnBackPressedCallback
 import androidx.navigation.fragment.navArgs
 import com.example.android.camera.utils.AutoFitSurfaceView
 import com.example.android.camera.utils.OrientationLiveData
@@ -463,6 +464,15 @@ class VideoFragment : Fragment() {
             }
             isRecording = !isRecording
         }
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    // Handle back button press
+                    Navigation.findNavController(requireActivity(), R.id.fragment_container).navigateUp()
+                }
+            })
 
         // the request for ISP settings in record mode should be recordRequest
         val captureRequest : CaptureRequest.Builder = recordRequest

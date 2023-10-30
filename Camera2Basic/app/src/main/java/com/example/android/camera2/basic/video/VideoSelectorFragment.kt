@@ -26,18 +26,17 @@ import android.media.MediaRecorder
 import android.os.Bundle
 import android.util.Log
 import android.util.Size
-import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
+import androidx.activity.OnBackPressedCallback
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.camera.utils.GenericListAdapter
 import com.example.android.camera2.basic.R
-import com.example.android.camera2.basic.SwipeGestureDetector
 import java.util.*
 
 
@@ -46,7 +45,6 @@ import java.util.*
  * speed video recording
  */
 class VideoSelectorFragment : Fragment() {
-
     lateinit var mView : RecyclerView
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -58,17 +56,16 @@ class VideoSelectorFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         view as RecyclerView
-
-        // This swipe gesture adds a fun gesture to switch between video and photo
-        view.setTag("left")
-        val swipeGestures = SwipeGestureDetector(view)
-        val gestureDetectorCompat = GestureDetector(requireContext(), swipeGestures)
-        view.setOnTouchListener { _, motionEvent ->
-            if (gestureDetectorCompat.onTouchEvent(motionEvent)) return@setOnTouchListener false
-            return@setOnTouchListener true
-        }
-
         mView = view
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    // Handle back button press
+                    Navigation.findNavController(requireActivity(), R.id.fragment_container).navigateUp()
+                }
+            })
     }
 
     override fun onStart() {
@@ -94,7 +91,7 @@ class VideoSelectorFragment : Fragment() {
     }
 
     companion object {
-
+        private val TAG = VideoSelectorFragment::class.java.simpleName
         private data class CameraInfo(
                 val name: String,
                 val cameraId: String,
@@ -125,7 +122,7 @@ class VideoSelectorFragment : Fragment() {
                         characteristics.get(CameraCharacteristics.LENS_FACING)!!)
 
                 if (orientation == "ack" || orientation == "ront")
-                    Log.e("VideoFragment", "We do not care back or front camera")
+                    Log.e(TAG, "We do not care back or front camera")
                 else {
                     // Query the available capabilities and output formats
                     val capabilities = characteristics.get(
@@ -153,7 +150,7 @@ class VideoSelectorFragment : Fragment() {
                             val mEncoder: MediaCodec = MediaCodec.createEncoderByType("video/avc")
                             val encCaps: VideoCapabilities = mEncoder.getCodecInfo().getCapabilitiesForType("video/avc").getVideoCapabilities()
                             if (!encCaps.isSizeSupported(size.width, size.height)) {
-                                Log.i("VideoSelector", "The encoder does not support size: " + size)
+                                Log.i(TAG, "The encoder does not support size: " + size)
                             }
                             else
                                 availableCameras.add(CameraInfo(
