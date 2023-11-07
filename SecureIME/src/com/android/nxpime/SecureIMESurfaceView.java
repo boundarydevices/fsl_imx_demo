@@ -62,7 +62,7 @@ public class SecureIMESurfaceView extends SurfaceView implements Callback {
                 /* only allow valid key */
                 Log.i(TAG, "coordinate: X " + x + " Y " + y);
                 if ((key >= 0) && (key <= 9)) {
-                    mIC.commitText(String.valueOf(key), 0);
+                    mIC.commitText(String.valueOf(key), 1);
                 } else if (key == 10) {
                     mIC.deleteSurroundingText(1, 0);
                 } else if (key == 11) {
